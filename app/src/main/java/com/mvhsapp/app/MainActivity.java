@@ -24,8 +24,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void openAries() {
-        String url = "https://parentportal.mvla.net/LoginParent" +
-                ".aspx?page=default.aspx";
+        String url =
+                "https://parentportal.mvla.net/LoginParent.aspx?page=default.aspx";
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         startActivity(i);
