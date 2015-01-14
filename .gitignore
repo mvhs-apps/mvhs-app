@@ -142,3 +142,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+map_api_key.xml

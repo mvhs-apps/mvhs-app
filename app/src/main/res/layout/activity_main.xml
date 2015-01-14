@@ -14,4 +14,12 @@
         android:contentDescription="@string/logo"
         android:src="@drawable/logo" />
 
+    <Button
+        android:id="@id/map_button"
+        style="?android:buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Map" />
+
+
 </RelativeLayout>
