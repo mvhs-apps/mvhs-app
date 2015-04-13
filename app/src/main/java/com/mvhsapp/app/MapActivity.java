@@ -11,19 +11,19 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  *
  */
 public class MapActivity extends ActionBarActivity {
 
-    private static final double[] MAP_LATITUDES = {37.360268};
-    private static final double[] MAP_LONGITUDES = {-122.068058};
-    private static final int[] MAP_TITLES = {R.string.entrance};
-    private static final int[] MAP_ICONS = {R.drawable.map_icon};
+    private static final double[] MAP_LATITUDES = {37.361031, 37.361031, 37.361031, 37.361031, 37.361031};
+    private static final double[] MAP_LONGITUDES = {-122.067937, -122.067818, -122.067695, -122.067590};
+    private static final String[] MAP_TITLES = {"601", "602", "603", "604"};
 
     public static int convertDpToPx(Context context, float dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density
@@ -52,44 +52,42 @@ public class MapActivity extends ActionBarActivity {
                         LatLng ne = new LatLng(37.361262, -122.065098);
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(
                                 new LatLngBounds(sw, ne), convertDpToPx(MapActivity.this, 8)));
-                        googleMap.setPadding(0, getStatusBarHeight(), 0, getNavBarHeight());
                         googleMap.setMyLocationEnabled(true);
                         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         googleMap.getUiSettings().setMapToolbarEnabled(true);
                         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
                         googleMap.getUiSettings().setCompassEnabled(true);
 
-                        int numberOfPlaces = MAP_ICONS.length;
-                        for (int i = 0; i < numberOfPlaces; i++) {
-                            LatLng latLng = new LatLng(MAP_LATITUDES[i], MAP_LONGITUDES[i]);
-                            googleMap.addMarker(new MarkerOptions()
-                                            .position(latLng)
-                                            .title(getString(MAP_TITLES[i]))
-                                            .icon(BitmapDescriptorFactory.fromResource(MAP_ICONS[i]))
-                            );
-                        }
+                        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                            @Override
+                            public void onCameraChange(CameraPosition cameraPosition) {
+                                googleMap.clear();
+//                                if(cameraPosition.zoom>23){
+                                LatLngBounds mapBounds = new LatLngBounds(new LatLng(37.359014, -122.068730),
+                                        new LatLng(37.361323, -122.065080));
+                                GroundOverlayOptions schoolMap = new GroundOverlayOptions()
+                                        .image(BitmapDescriptorFactory.fromResource(
+                                                BuildConfig.DEBUG ? R.drawable.map2 : R.drawable.map))
+                                        .transparency(0.1f)
+                                        .positionFromBounds(mapBounds);
+                                googleMap.addGroundOverlay(schoolMap);
+//                                }else{
+                                    /*int numberOfPlaces = MAP_LONGITUDES.length;
+                                    for (int i = 0; i < numberOfPlaces; i++) {
+                                        LatLng latLng = new LatLng(MAP_LATITUDES[i], MAP_LONGITUDES[i]);
+                                        googleMap.addMarker(new MarkerOptions()
+                                                        .position(latLng)
+                                                        .title(MAP_TITLES[i])
+                                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_icon))
+                                        );
+                                    }*/
+//                                }
+                            }
+                        });
                     }
                 });
                 findViewById(android.R.id.content).getViewTreeObserver().removeGlobalOnLayoutListener(this);
             }
         });
-    }
-
-    public int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
-
-    public int getNavBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
 }

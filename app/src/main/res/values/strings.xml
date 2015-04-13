@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">MVHS</string>
-    <string name="logo">logo</string>
-    <string name="entrance">Entrance</string>
+    <string name="logo">Logo</string>
 </resources>

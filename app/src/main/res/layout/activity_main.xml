@@ -16,10 +16,11 @@
 
     <Button
         android:id="@id/map_button"
-        style="?android:buttonBarButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="Map" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="School Map" />
 
 
 </RelativeLayout>
