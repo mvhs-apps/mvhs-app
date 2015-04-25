@@ -54,11 +54,11 @@ public class Node implements Comparable {
         return Math.sqrt(Math.pow(a.getLong() - b.getLong(), 2) + Math.pow(a.getLat() - b.getLat(), 2));
     }
 
-    public void removeConnected(Node node) {
+    void removeConnected(Node node) {
         mConnected.remove(node);
     }
 
-    public void addConnected(Node node) {
+    void addConnected(Node node) {
         mConnected.add(node);
     }
 
@@ -90,7 +90,7 @@ public class Node implements Comparable {
         return (int) (mLong * mLat * 1000);
     }
 
-    public void updateGH(Node target) {
+    void updateGH(Node target) {
         if (mParent != null) {
             double distance = distance(this, mParent);
             mG = mParent.mG + distance;

@@ -3,10 +3,13 @@ package com.mvhsapp.app;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,12 +24,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.mvhsapp.app.pathfinding.LocationNode;
+import com.mvhsapp.app.pathfinding.MapData;
 import com.mvhsapp.app.pathfinding.Node;
 import com.mvhsapp.app.pathfinding.Path;
-import com.mvhsapp.app.pathfinding.SortedNodeList;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,59 +43,18 @@ public class MapActivity extends AppCompatActivity {
                 + 0.5f);
     }
 
-    private static List<Node> findPath(Node start, Node end) {
-        SortedNodeList openList = new SortedNodeList();
-        List<Node> closedList = new ArrayList<>();
-
-        openList.setTarget(end);
-        openList.add(start);
-        while (true) {
-            Node lowestF = openList.first();
-            openList.remove(lowestF);
-            closedList.add(lowestF);
-            if (lowestF.equals(end)) {
-                break;
-            }
-            for (Node n : lowestF.getConnected()) {
-                if (!closedList.contains(n)) {
-                    if (!openList.contains(n)) {
-                        n.setParent(lowestF);
-                        openList.add(n);
-                    } else {
-                        double gFromLowestFToN = lowestF.getG()
-                                + Node.distance(lowestF, n);
-                        if (gFromLowestFToN < n.getG()) {
-                            n.setParent(lowestF);
-                        }
-                        openList.sort();
-                    }
-                }
-            }
-        }
-
-        List<Node> path = new ArrayList<>();
-        Node child = end;
-        path.add(end);
-        while (!child.equals(start)) {
-            Node parent = child.getParent();
-            path.add(parent);
-            child = parent;
-        }
-        Collections.reverse(path);
-        return path;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_map);
         FragmentManager manager = getFragmentManager();
-        MapFragment map = (MapFragment) manager.findFragmentById(android.R.id.content);
+        MapFragment map = (MapFragment) manager.findFragmentById(R.id.activity_map_fragment_container);
         if (map == null) {
             map = new MapFragment();
-            manager.beginTransaction().add(android.R.id.content, map).commit();
+            manager.beginTransaction().add(R.id.activity_map_fragment_container, map).commit();
         }
 
-        ViewTreeObserver vto = findViewById(android.R.id.content).getViewTreeObserver();
+        ViewTreeObserver vto = findViewById(R.id.activity_map_fragment_container).getViewTreeObserver();
         final MapFragment finalMap = map;
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -103,35 +64,77 @@ public class MapActivity extends AppCompatActivity {
 
                     @Override
                     public void onMapReady(final GoogleMap googleMap) {
-                        LatLng sw = new LatLng(37.356799, -122.068738);
-                        LatLng ne = new LatLng(37.361262, -122.065098);
+                        LatLngBounds mapBounds = new LatLngBounds(
+                                new LatLng(37.359014, -122.068730), new LatLng(37.361323, -122.065080));
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(
-                                new LatLngBounds(sw, ne), convertDpToPx(MapActivity.this, 8)));
+                                mapBounds, convertDpToPx(MapActivity.this, 8)));
                         googleMap.setMyLocationEnabled(true);
                         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         googleMap.getUiSettings().setMapToolbarEnabled(true);
                         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
                         googleMap.getUiSettings().setCompassEnabled(true);
+                        googleMap.getUiSettings().setMapToolbarEnabled(false);
 
                         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                             @Override
                             public void onInfoWindowClick(Marker marker) {
-                                Node node = new Node(37.359545, -122.067985);
-                                Node node2 = new Node(37.360720, -122.066975);
-                                List<Node> path = findPath(MapData.pathNodeMap.get(node), MapData.pathNodeMap.get(node2));
+                                double myLat = googleMap.getMyLocation().getLatitude();
+                                double myLong = googleMap.getMyLocation().getLongitude();
+                                Node myLocation = new Node(myLat, myLong);
+
+                                if (MapData.onCampus(myLocation)) {
+                                    Toast.makeText(MapActivity.this,
+                                            "You are not in the Mountain View High School campus.",
+                                            Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                Node closestMapNode = null;
+                                double closestDistance = -1;
+                                List<Node> nodes = new ArrayList<>(MapData.pathNodeMap.values());
+                                nodes.addAll(MapData.locationNodeMap.values());
+                                for (Node node : nodes) {
+                                    double distance = Node.distance(node, myLocation);
+                                    if (closestDistance == -1 || distance < closestDistance) {
+                                        closestDistance = distance;
+                                        closestMapNode = node;
+                                    }
+                                }
+                                if (closestMapNode == null) {
+                                    Toast.makeText(MapActivity.this, "Error: closest map node null", Toast.LENGTH_SHORT);
+                                    return;
+                                }
+
+                                Node end = new Node(marker.getPosition().latitude, marker.getPosition().longitude);
+                                List<Node> path = MapData.findPath(closestMapNode, end);
+                                if (path == null) {
+                                    Toast.makeText(MapActivity.this, "Error: path not found or not location node", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 for (int i = 1; i < path.size(); i++) {
                                     Node n = path.get(i - 1);
                                     Node n2 = path.get(i);
-                                    Log.e("Tag", n + " " + n2);
                                     googleMap.addPolyline(
                                             new PolylineOptions()
                                                     .add(new LatLng(n.getLat(), n.getLong()),
                                                             new LatLng(n2.getLat(), n2.getLong()))
                                                     .color(Color.BLUE)
                                                     .width(10)
+                                                    .zIndex(1000)
                                     );
                                 }
-                                Log.e("Tag", "done");
+                                if (!myLocation.equals(closestMapNode)) {
+                                    googleMap.addPolyline(
+                                            new PolylineOptions()
+                                                    .add(new LatLng(closestMapNode.getLat(), closestMapNode.getLong()),
+                                                            new LatLng(myLocation.getLat(), myLocation.getLong()))
+                                                    .color(Color.CYAN)
+                                                    .width(10)
+                                                    .zIndex(1000)
+                                    );
+                                }
+
+                                //TODO: for debug:
+                                updateMapOverlays(googleMap);
                             }
                         });
 
@@ -139,61 +142,69 @@ public class MapActivity extends AppCompatActivity {
                             @Override
                             public void onCameraChange(CameraPosition cameraPosition) {
                                 if (!done) {
-                                    googleMap.clear();
-//                                if(cameraPosition.zoom>23){
-                                    LatLngBounds mapBounds = new LatLngBounds(new LatLng(37.359014, -122.068730),
-                                            new LatLng(37.361323, -122.065080));
-                                    GroundOverlayOptions schoolMap = new GroundOverlayOptions()
-                                            .image(BitmapDescriptorFactory.fromResource(
-                                                    BuildConfig.DEBUG ? R.drawable.map2 : R.drawable.map))
-                                            .transparency(0.1f)
-                                            .positionFromBounds(mapBounds);
-                                    googleMap.addGroundOverlay(schoolMap);
-//                                }else{
-                                    /*int numberOfPlaces = MAP_LONGITUDES.length;
-                                    for (int i = 0; i < numberOfPlaces; i++) {
-                                        LatLng latLng = new LatLng(MAP_LATITUDES[i], MAP_LONGITUDES[i]);
-                                        googleMap.addMarker(new MarkerOptions()
-                                                        .position(latLng)
-                                                        .title(MAP_TITLES[i])
-                                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_icon))
-                                        );
-                                    }*/
-//                                }
-                                    for (LocationNode node : MapData.locationNodeSet) {
-                                        MarkerOptions options = new MarkerOptions();
-                                        options.position(new LatLng(node.getLat(), node.getLong())).title(node.getName());
-                                        googleMap.addMarker(options);
-                                    }
-
-                                    Set<Path> addedNodeMap = new HashSet<>();
-
-                                    for (Node n : MapData.pathNodeMap.values()) {
-                                        for (Node connected : n.getConnected()) {
-                                            Path path = new Path(n, connected);
-                                            if (!addedNodeMap.contains(path)) {
-                                                addedNodeMap.add(path);
-                                                googleMap.addPolyline(new PolylineOptions().add(new LatLng(n.getLat(), n.getLong()),
-                                                        new LatLng(connected.getLat(), connected.getLong())).color(Color.GREEN).width(10));
-                                            }
-                                        }
-
-                                        MarkerOptions options = new MarkerOptions();
-                                        String snippet = "Connected:";
-                                        for (Node n2 : n.getConnected()) {
-                                            snippet += "\n" + n2;
-                                        }
-                                        options.position(new LatLng(n.getLat(), n.getLong())).title(n.toString()).snippet(snippet);
-                                        googleMap.addMarker(options);
-                                    }
+                                    updateMapOverlays(googleMap);
                                     done = true;
                                 }
                             }
                         });
                     }
                 });
-                findViewById(android.R.id.content).getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    findViewById(R.id.activity_map_fragment_container).getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    findViewById(R.id.activity_map_fragment_container).getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
             }
         });
+
+        Button clearNav = (Button) findViewById(R.id.activity_map_button_clear_nav);
+        clearNav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MapData.cleanTempNodes();
+                MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container);
+                updateMapOverlays(mapFragment.getMap());
+            }
+        });
+    }
+
+    private void updateMapOverlays(GoogleMap googleMap) {
+        googleMap.clear();
+//                                if(cameraPosition.zoom>23){
+        LatLngBounds mapBounds = new LatLngBounds(new LatLng(37.359014, -122.068730),
+                new LatLng(37.361323, -122.065080));
+        GroundOverlayOptions schoolMap = new GroundOverlayOptions()
+                .image(BitmapDescriptorFactory.fromResource(
+                        BuildConfig.DEBUG ? R.drawable.map2 : R.drawable.map))
+                .transparency(0.1f)
+                .positionFromBounds(mapBounds);
+        googleMap.addGroundOverlay(schoolMap);
+
+        for (LocationNode node : MapData.locationNodeMap.values()) {
+            MarkerOptions options = new MarkerOptions();
+            options.position(new LatLng(node.getLat(), node.getLong())).title(node.getName());
+            googleMap.addMarker(options);
+        }
+
+        Set<Path> addedNodeMap = new HashSet<>();
+
+        for (Node n : MapData.pathNodeMap.values()) {
+            for (Node connected : n.getConnected()) {
+                Path path = new Path(n, connected);
+                if (!addedNodeMap.contains(path)) {
+                    addedNodeMap.add(path);
+                    googleMap.addPolyline(new PolylineOptions().add(new LatLng(n.getLat(), n.getLong()),
+                            new LatLng(connected.getLat(), connected.getLong())).color(Color.GREEN).width(10));
+                }
+            }
+
+            MarkerOptions options = new MarkerOptions();
+            String snippet = "Connected:";
+            for (Node n2 : n.getConnected()) {
+                snippet += "\n" + n2;
+            }
+            options.position(new LatLng(n.getLat(), n.getLong())).title(n.toString()).snippet(snippet);
+            googleMap.addMarker(options);
+        }
     }
 }

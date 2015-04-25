@@ -2,4 +2,6 @@
 <resources>
     <item name="main_button" type="id" />
     <item name="map_button" type="id" />
+    <item name="activity_map_fragment_container" type="id" />
+    <item name="activity_map_button_clear_nav" type="id" />
 </resources>

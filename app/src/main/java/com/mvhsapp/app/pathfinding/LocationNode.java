@@ -5,21 +5,22 @@ package com.mvhsapp.app.pathfinding;
  */
 public class LocationNode extends Node {
 
-    private String mName;
-    private String mPath;
+    private final String name;
+    private final Node pathNode;
 
-    public LocationNode(double longitude, double latitude, String pathName, String locationName) {
-        super(longitude, latitude);
-        mPath = pathName;
-        mName = locationName;
-    }
-
-    public String getPath() {
-        return mPath;
+    public LocationNode(double lat, double lon, double latOnPath, double longOnPath, String locationName) {
+        super(lat, lon);
+        pathNode = new Node(latOnPath, longOnPath);
+        name = locationName;
+        addConnected(pathNode);
+        pathNode.addConnected(this);
     }
 
     public String getName() {
-        return mName;
+        return name;
     }
 
+    public Node getPathNode() {
+        return pathNode;
+    }
 }
