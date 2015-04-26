@@ -1,7 +1,6 @@
 package com.mvhsapp.app.pathfinding;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -111,7 +110,6 @@ public class Node implements Comparable {
 
     public Node nodeLiesOnConnectedPath(Node check) {
         for (Node connected : mConnected) {
-            Log.e("Text", check + "/" + connected + "/" + this);
             if (distance(this, check) + distance(check, connected) == distance(this, connected)) {
                 return connected;
             }

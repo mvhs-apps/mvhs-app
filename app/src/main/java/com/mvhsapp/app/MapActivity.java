@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.mvhsapp.app.pathfinding.LocationNode;
 import com.mvhsapp.app.pathfinding.MapData;
@@ -37,6 +40,10 @@ import java.util.Set;
  *
  */
 public class MapActivity extends AppCompatActivity {
+
+    private List<Polyline> mNavPathPolylines;
+    private int mStep;
+    private boolean mDebug;
 
     public static int convertDpToPx(Context context, float dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density
@@ -75,20 +82,43 @@ public class MapActivity extends AppCompatActivity {
                         googleMap.getUiSettings().setCompassEnabled(true);
                         googleMap.getUiSettings().setMapToolbarEnabled(false);
 
+                        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(Marker marker) {
+                                Node n = new Node(marker.getPosition().latitude, marker.getPosition().longitude);
+                                Node node = MapData.pathNodeMap.get(n);
+                                if (node == null) {
+                                    return false;
+                                }
+                                String snippet = node.toString() + "\nConnected:";
+                                for (Node n2 : node.getConnected()) {
+                                    snippet += "\n" + n2;
+                                }
+                                snippet += "\n" + node.getG();
+                                Toast.makeText(MapActivity.this,
+                                        snippet,
+                                        Toast.LENGTH_SHORT).show();
+
+                                return false;
+                            }
+                        });
+
                         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                             @Override
                             public void onInfoWindowClick(Marker marker) {
+                                clearNav();
                                 double myLat = googleMap.getMyLocation().getLatitude();
                                 double myLong = googleMap.getMyLocation().getLongitude();
                                 Node myLocation = new Node(myLat, myLong);
 
-                                if (MapData.onCampus(myLocation)) {
+                                if (!MapData.onCampus(myLocation)) {
                                     Toast.makeText(MapActivity.this,
-                                            "You are not in the Mountain View High School campus.",
+                                            "You are not on the Mountain View High School campus.",
                                             Toast.LENGTH_LONG).show();
                                     return;
                                 }
-                                Node closestMapNode = null;
+
+                                Node closestPathNode = null;
                                 double closestDistance = -1;
                                 List<Node> nodes = new ArrayList<>(MapData.pathNodeMap.values());
                                 nodes.addAll(MapData.locationNodeMap.values());
@@ -96,45 +126,44 @@ public class MapActivity extends AppCompatActivity {
                                     double distance = Node.distance(node, myLocation);
                                     if (closestDistance == -1 || distance < closestDistance) {
                                         closestDistance = distance;
-                                        closestMapNode = node;
+                                        closestPathNode = node;
                                     }
                                 }
-                                if (closestMapNode == null) {
-                                    Toast.makeText(MapActivity.this, "Error: closest map node null", Toast.LENGTH_SHORT);
+                                if (closestPathNode == null) {
+                                    Toast.makeText(MapActivity.this, "Error: closest path node null", Toast.LENGTH_SHORT);
                                     return;
                                 }
 
                                 Node end = new Node(marker.getPosition().latitude, marker.getPosition().longitude);
-                                List<Node> path = MapData.findPath(closestMapNode, end);
-                                if (path == null) {
-                                    Toast.makeText(MapActivity.this, "Error: path not found or not location node", Toast.LENGTH_SHORT).show();
+                                List<Node> navPath = MapData.findPath(closestPathNode, end);
+                                if (navPath == null) {
+                                    Toast.makeText(MapActivity.this, "Error: path not found", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
-                                for (int i = 1; i < path.size(); i++) {
-                                    Node n = path.get(i - 1);
-                                    Node n2 = path.get(i);
-                                    googleMap.addPolyline(
+                                navPath.add(0, myLocation);
+
+                                //TODO: for debug:
+                                if (mDebug) {
+                                    updateMapOverlays(googleMap);
+                                }
+
+                                mNavPathPolylines = new ArrayList<>();
+                                for (int i = 1; i < navPath.size(); i++) {
+                                    Node n = navPath.get(i - 1);
+                                    Node n2 = navPath.get(i);
+                                    Polyline polyline = googleMap.addPolyline(
                                             new PolylineOptions()
                                                     .add(new LatLng(n.getLat(), n.getLong()),
                                                             new LatLng(n2.getLat(), n2.getLong()))
-                                                    .color(Color.BLUE)
+                                                    .color(Color.argb(255, 0, 203, 112))
                                                     .width(10)
                                                     .zIndex(1000)
                                     );
+                                    mNavPathPolylines.add(polyline);
                                 }
-                                if (!myLocation.equals(closestMapNode)) {
-                                    googleMap.addPolyline(
-                                            new PolylineOptions()
-                                                    .add(new LatLng(closestMapNode.getLat(), closestMapNode.getLong()),
-                                                            new LatLng(myLocation.getLat(), myLocation.getLong()))
-                                                    .color(Color.CYAN)
-                                                    .width(10)
-                                                    .zIndex(1000)
-                                    );
-                                }
+                                mStep = mNavPathPolylines.size();
 
-                                //TODO: for debug:
-                                updateMapOverlays(googleMap);
+                                Toast.makeText(MapActivity.this, "Path found to " + ((LocationNode) navPath.get(navPath.size() - 1)).getName(), Toast.LENGTH_SHORT).show();
                             }
                         });
 
@@ -161,21 +190,54 @@ public class MapActivity extends AppCompatActivity {
         clearNav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MapData.cleanTempNodes();
+                clearNav();
+            }
+        });
+        Button next = (Button) findViewById(R.id.activity_map_button_show_nav);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mNavPathPolylines != null && mStep < mNavPathPolylines.size()) {
+                    mNavPathPolylines.get(mStep).setColor(Color.argb(255, 0, 203, 112));
+                    mStep++;
+                } else if (mNavPathPolylines != null) {
+                    mStep = 0;
+                    for (Polyline p : mNavPathPolylines) {
+                        p.setColor(Color.argb(0, 0, 0, 0));
+                    }
+                }
+            }
+        });
+
+        CheckBox debug = (CheckBox) findViewById(R.id.activity_map_checkbox_debug);
+        debug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mDebug = isChecked;
                 MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container);
                 updateMapOverlays(mapFragment.getMap());
             }
         });
+        debug.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+    }
+
+    private void clearNav() {
+        MapData.cleanTempNodes();
+        if (mNavPathPolylines != null) {
+            for (Polyline line : mNavPathPolylines) {
+                line.remove();
+            }
+            mNavPathPolylines = null;
+        }
     }
 
     private void updateMapOverlays(GoogleMap googleMap) {
         googleMap.clear();
-//                                if(cameraPosition.zoom>23){
         LatLngBounds mapBounds = new LatLngBounds(new LatLng(37.359014, -122.068730),
                 new LatLng(37.361323, -122.065080));
         GroundOverlayOptions schoolMap = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(
-                        BuildConfig.DEBUG ? R.drawable.map2 : R.drawable.map))
+                        mDebug ? R.drawable.map2 : R.drawable.map))
                 .transparency(0.1f)
                 .positionFromBounds(mapBounds);
         googleMap.addGroundOverlay(schoolMap);
@@ -188,23 +250,24 @@ public class MapActivity extends AppCompatActivity {
 
         Set<Path> addedNodeMap = new HashSet<>();
 
-        for (Node n : MapData.pathNodeMap.values()) {
-            for (Node connected : n.getConnected()) {
-                Path path = new Path(n, connected);
-                if (!addedNodeMap.contains(path)) {
-                    addedNodeMap.add(path);
-                    googleMap.addPolyline(new PolylineOptions().add(new LatLng(n.getLat(), n.getLong()),
-                            new LatLng(connected.getLat(), connected.getLong())).color(Color.GREEN).width(10));
+        //TODO: for debug:
+        if (mDebug) {
+            for (Node n : MapData.pathNodeMap.values()) {
+                for (Node connected : n.getConnected()) {
+                    Path path = new Path(n, connected);
+                    if (!addedNodeMap.contains(path)) {
+                        addedNodeMap.add(path);
+                        googleMap.addPolyline(new PolylineOptions()
+                                .add(new LatLng(n.getLat(), n.getLong()), new LatLng(connected.getLat(), connected.getLong()))
+                                .color(Color.WHITE)
+                                .width(20));
+                    }
                 }
-            }
 
-            MarkerOptions options = new MarkerOptions();
-            String snippet = "Connected:";
-            for (Node n2 : n.getConnected()) {
-                snippet += "\n" + n2;
+                MarkerOptions options = new MarkerOptions();
+                options.position(new LatLng(n.getLat(), n.getLong()));
+                googleMap.addMarker(options);
             }
-            options.position(new LatLng(n.getLat(), n.getLong())).title(n.toString()).snippet(snippet);
-            googleMap.addMarker(options);
         }
     }
 }

@@ -18,4 +18,24 @@
         android:layout_alignParentRight="true"
         android:text="Clear Navigation" />
 
+    <Button
+        android:id="@id/activity_map_button_show_nav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/activity_map_button_clear_nav"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:text="Step through navigation" />
+
+    <CheckBox
+        android:id="@id/activity_map_checkbox_debug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/activity_map_button_show_nav"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:paddingRight="8dp"
+        android:text="Debug Mode"
+        android:textColor="@android:color/white" />
+
 </RelativeLayout>

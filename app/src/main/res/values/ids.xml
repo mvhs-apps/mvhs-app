@@ -4,4 +4,6 @@
     <item name="map_button" type="id" />
     <item name="activity_map_fragment_container" type="id" />
     <item name="activity_map_button_clear_nav" type="id" />
+    <item name="activity_map_button_show_nav" type="id" />
+    <item name="activity_map_checkbox_debug" type="id" />
 </resources>
