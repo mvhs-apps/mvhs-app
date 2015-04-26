@@ -26,10 +26,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.mvhsapp.app.pathfinding.LocationNode;
-import com.mvhsapp.app.pathfinding.MapData;
-import com.mvhsapp.app.pathfinding.Node;
-import com.mvhsapp.app.pathfinding.Path;
+import com.mvhsapp.app.map.LocationNode;
+import com.mvhsapp.app.map.MapData;
+import com.mvhsapp.app.map.Node;
+import com.mvhsapp.app.map.Path;
 
 import java.util.ArrayList;
 import java.util.HashSet;

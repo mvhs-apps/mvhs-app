@@ -1,4 +1,4 @@
-package com.mvhsapp.app.pathfinding;
+package com.mvhsapp.app.map;
 
 import java.util.ArrayList;
 import java.util.Collections;
