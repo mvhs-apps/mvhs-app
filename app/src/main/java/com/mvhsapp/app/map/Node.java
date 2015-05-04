@@ -2,6 +2,8 @@ package com.mvhsapp.app.map;
 
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,11 +15,7 @@ public class Node implements Comparable {
     /**
      * The x coordinate of the node
      */
-    private double mLong;
-    /**
-     * The y coordinate of the node
-     */
-    private double mLat;
+    public LatLng latLng;
     /**
      * The path cost for this node
      */
@@ -30,10 +28,8 @@ public class Node implements Comparable {
      * The double cost of this node
      */
     private double mH;
-    /**
-     * The search mDepth of this node
-     */
-    private int mDepth;
+
+    private Node mTarget;
 
     private Set<Node> mConnected;
 
@@ -44,13 +40,12 @@ public class Node implements Comparable {
      * @param latitude  The y coordinate of the node
      */
     public Node(double latitude, double longitude) {
-        this.mLat = latitude;
-        this.mLong = longitude;
+        latLng = new LatLng(latitude, longitude);
         mConnected = new HashSet<>();
     }
 
     public static double distance(Node a, Node b) {
-        return Math.sqrt(Math.pow(a.getLong() - b.getLong(), 2) + Math.pow(a.getLat() - b.getLat(), 2));
+        return Math.sqrt(Math.pow(a.latLng.longitude - b.latLng.longitude, 2) + Math.pow(a.latLng.latitude - b.latLng.latitude, 2));
     }
 
     void removeConnected(Node node) {
@@ -69,24 +64,13 @@ public class Node implements Comparable {
         return mParent;
     }
 
-    public int setParent(Node parent) {
-        mDepth = parent.mDepth + 1;
+    public void setParent(Node parent) {
         this.mParent = parent;
-
-        return mDepth;
-    }
-
-    public double getLong() {
-        return mLong;
-    }
-
-    public double getLat() {
-        return mLat;
     }
 
     @Override
     public int hashCode() {
-        return (int) (mLong * mLat * 1000);
+        return latLng.hashCode();
     }
 
     void updateGH(Node target) {
@@ -94,15 +78,19 @@ public class Node implements Comparable {
             double distance = distance(this, mParent);
             mG = mParent.mG + distance;
         }
-        mH = distance(this, target);
+        if (mTarget == null || !mTarget.equals(target)) {
+            mH = distance(this, target);
+            mTarget = target;
+        }
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Node) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof Node) {
             Node other = (Node) o;
-
-            return other.getLat() == mLat && other.getLong() == mLong;
+            return other.latLng.equals(latLng);
         } else {
             return false;
         }
@@ -141,6 +129,6 @@ public class Node implements Comparable {
 
     @Override
     public String toString() {
-        return mLat + " " + mLong;
+        return latLng.toString();
     }
 }

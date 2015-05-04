@@ -1,10 +1,14 @@
 package com.mvhsapp.app.map;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Map Data
@@ -12,8 +16,8 @@ import java.util.Map;
 public class MapData {
 
 
-    public static final Map<Node, LocationNode> locationNodeMap;
-    public static final Map<Node, Node> pathNodeMap;
+    public static final Map<LatLng, LocationNode> locationNodeMap;
+    public static final Map<LatLng, Node> pathNodeMap;
     private static final double[][][][] LOCATIONS = {
             //600
             {
@@ -53,7 +57,7 @@ public class MapData {
             {{37.360991, -122.067525}, {37.360720, -122.067525}, {37.360408, -122.067525}},
 
             //Fourth vertical
-            {{37.360720, -122.067411}, {37.360408, -122.067411}, {37.360150, -122.067411}, {37.359889, -122.067411}, {37.359485, -122.067411}, {37.359218, -122.067411}},
+            {{37.360720, -122.067411}, {37.360408, -122.067411}, {37.360150, -122.067411}, {37.359889, -122.067411}, {37.359781, -122.067411}, {37.359485, -122.067411}, {37.359218, -122.067411}},
 
             //Fifth vertical
             {{37.360991, -122.066982}, {37.360720, -122.066982}, {37.360408, -122.066982}, {37.360150, -122.066982}},
@@ -74,12 +78,13 @@ public class MapData {
             {{37.360150, -122.068003}, {37.360150, -122.067745}, {37.360150, -122.067411}, {37.360150, -122.066982}, {37.360150, -122.066300}},
 
             //400
-            {{37.359889, -122.068003}, {37.359889, -122.067411}, {37.359889, -122.067411}, {37.359781, -122.067411},
+            {{37.359889, -122.068003}, {37.359889, -122.067411}, {37.359781, -122.067411},
                     {37.359781, -122.066713}, {37.359781, -122.066267}, {37.359674, -122.066267}},
 
             //500
-            {{37.359485, -122.068003}, {37.359485, -122.067411}, {37.359485, -122.066713}, {37.359532, -122.066713},
-                    {37.359532, -122.066387}, {37.359532, -122.066267}, {37.359470, -122.066267}},
+            {{37.359485, -122.068003}, {37.359485, -122.067411}, {37.359485, -122.066713},
+                    {37.359532, -122.066713}, {37.359532, -122.066387}, {37.359532, -122.066267},
+                    {37.359470, -122.066267}},
 
             //400/500 end connection
             {{37.359674, -122.066267}, {37.359532, -122.066267}},
@@ -94,7 +99,7 @@ public class MapData {
             {{37.359532, -122.066387}, {37.359218, -122.066387}}
     };
 
-    private static Node tempAddedLocationNode;
+    private final static Set<LocationNode> tempAddedNodes = new HashSet<>();
 
     static {
         locationNodeMap = new HashMap<>();
@@ -106,7 +111,7 @@ public class MapData {
                         ROOM[1][0], ROOM[1][1],
                         LOCATION_NAMES[count]);
                 count++;
-                locationNodeMap.put(node, node);
+                locationNodeMap.put(node.latLng, node);
             }
         }
 
@@ -124,20 +129,20 @@ public class MapData {
             for (int i = 0; i < added.size(); i++) {
                 Node nodeAdd = added.get(i);
                 if (pathNodeMap.containsValue(nodeAdd)) {
-                    added.set(i, pathNodeMap.get(nodeAdd));
+                    added.set(i, pathNodeMap.get(nodeAdd.latLng));
                 }
             }
 
             //TODO: remove duplicate nodes (after using the ones from the path already added)
 
-            //Connect all added nodes up, add it to node map
+            //Connect all added nodes in the path up, add it to node map
             for (int i = 0; i < added.size(); i++) {
                 if (i != added.size() - 1) {
                     int j = i + 1;
                     added.get(i).addConnected(added.get(j));
                     added.get(j).addConnected(added.get(i));
                 }
-                pathNodeMap.put(added.get(i), added.get(i));
+                pathNodeMap.put(added.get(i).latLng, added.get(i));
             }
         }
 
@@ -147,21 +152,21 @@ public class MapData {
      * Finds path.
      *
      * @param start Node from path node map
-     * @param end   Node with coords of end (a location node)
+     * @param end   Node with co-ords of end (a location node)
      * @return path
      */
-    public static List<Node> findPath(Node start, Node end) {
+    public static List<Node> findPath(LatLng start, LatLng end) {
         cleanTempNodes();
-        end = MapData.addLocationNodeToPaths(end);
-        if (end == null) {
-            return null;
+        LocationNode endNode = MapData.addTempLocationNodeToPaths(end);
+        Node startNode = pathNodeMap.get(start);
+        if (locationNodeMap.containsKey(start)) {
+            startNode = MapData.addTempLocationNodeToPaths(start);
         }
-        tempAddedLocationNode = end;
         SortedNodeList openList = new SortedNodeList();
         List<Node> closedList = new ArrayList<>();
 
-        openList.setTarget(end);
-        openList.add(start);
+        openList.setTarget(endNode);
+        openList.add(startNode);
         while (true) {
             if (openList.size() == 0) {
                 return null;
@@ -169,7 +174,7 @@ public class MapData {
             Node lowestF = openList.first();
             openList.remove(lowestF);
             closedList.add(lowestF);
-            if (lowestF.equals(end)) {
+            if (lowestF.equals(endNode)) {
                 break;
             }
             for (Node n : lowestF.getConnected()) {
@@ -190,9 +195,9 @@ public class MapData {
         }
 
         List<Node> path = new ArrayList<>();
-        Node child = end;
-        path.add(end);
-        while (!child.equals(start)) {
+        Node child = endNode;
+        path.add(endNode);
+        while (!child.equals(startNode)) {
             Node parent = child.getParent();
             path.add(parent);
             child = parent;
@@ -201,18 +206,23 @@ public class MapData {
         return path;
     }
 
-    public static LocationNode addLocationNodeToPaths(Node node) {
-        Map<Node, Node> added = new HashMap<>();
-        LocationNode locationNode = locationNodeMap.get(node);
+    public static LocationNode addTempLocationNodeToPaths(LatLng latLng) {
+        Map<LatLng, Node> added = new HashMap<>();
+        LocationNode locationNode = locationNodeMap.get(latLng);
+
         if (locationNode == null) {
             return null;
+        } else if (pathNodeMap.containsKey(locationNode.latLng)) {
+            return locationNode;
         }
-        added.put(locationNode, locationNode);
-        added.put(locationNode.getPathNode(), locationNode.getPathNode());
+
+        added.put(locationNode.latLng, locationNode);
+        added.put(locationNode.getPathNode().latLng, locationNode.getPathNode());
 
         //If the added node is on the line of two other nodes on node map, connect it up
-        for (Node nodeAdded : added.values()) {
-            for (Node pathNode : pathNodeMap.values()) {
+
+        for (Node pathNode : pathNodeMap.values()) {
+            for (Node nodeAdded : added.values()) {
                 Node pathNodeConnected = pathNode.nodeLiesOnConnectedPath(nodeAdded);
                 if (pathNodeConnected != null && !pathNodeConnected.equals(nodeAdded)) {
                     nodeAdded.addConnected(pathNode);
@@ -221,37 +231,41 @@ public class MapData {
                     pathNodeConnected.removeConnected(pathNode);
                     pathNode.addConnected(nodeAdded);
                     pathNode.removeConnected(pathNodeConnected);
+                    break;
                 }
-
             }
         }
 
         pathNodeMap.putAll(added);
+        tempAddedNodes.add(locationNode);
         return locationNode;
     }
 
     public static void cleanTempNodes() {
-        if (tempAddedLocationNode != null) {
-            removeLocationNode((LocationNode) tempAddedLocationNode);
-            tempAddedLocationNode = null;
+        for (Node node : tempAddedNodes) {
+            removeLocationNode((LocationNode) node);
         }
+        tempAddedNodes.clear();
     }
 
     private static void removeLocationNode(LocationNode node) {
-        Node pathNode = node.getPathNode();
-        List<Node> connected = new ArrayList<>(pathNode.getConnected());
-        connected.remove(node);
-        if (connected.size() >= 2) {
-            connected.get(0).addConnected(connected.get(1));
-            connected.get(1).addConnected(connected.get(0));
-            pathNode.removeConnected(connected.get(0));
-            pathNode.removeConnected(connected.get(1));
+        Node locationPathNode = node.getPathNode();
+        List<Node> locationPathNodeConnected = new ArrayList<>(locationPathNode.getConnected());
+        locationPathNodeConnected.remove(node);
+        if (locationPathNodeConnected.size() == 2) {
+            locationPathNodeConnected.get(0).addConnected(locationPathNodeConnected.get(1));
+            locationPathNodeConnected.get(1).addConnected(locationPathNodeConnected.get(0));
+            locationPathNodeConnected.get(0).removeConnected(locationPathNode);
+            locationPathNodeConnected.get(1).removeConnected(locationPathNode);
+            locationPathNode.removeConnected(locationPathNodeConnected.get(0));
+            locationPathNode.removeConnected(locationPathNodeConnected.get(1));
         }
-        pathNodeMap.remove(pathNode);
-        pathNodeMap.remove(node);
+        pathNodeMap.remove(locationPathNode.latLng);
+        pathNodeMap.remove(node.latLng);
     }
 
     public static boolean onCampus(Node node) {
-        return node.getLat() > 37.356813 && node.getLat() < 37.361323 && node.getLong() > -122.068730 && node.getLong() < -122.065080;
+        return node.latLng.latitude > 37.356813 && node.latLng.latitude < 37.361323
+                && node.latLng.longitude > -122.068730 && node.latLng.longitude < -122.065080;
     }
 }

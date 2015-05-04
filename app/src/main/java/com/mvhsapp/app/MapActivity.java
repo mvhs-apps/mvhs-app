@@ -29,7 +29,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.mvhsapp.app.map.LocationNode;
 import com.mvhsapp.app.map.MapData;
 import com.mvhsapp.app.map.Node;
-import com.mvhsapp.app.map.Path;
+import com.mvhsapp.app.map.TwoNodes;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -85,8 +85,7 @@ public class MapActivity extends AppCompatActivity {
                         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                             @Override
                             public boolean onMarkerClick(Marker marker) {
-                                Node n = new Node(marker.getPosition().latitude, marker.getPosition().longitude);
-                                Node node = MapData.pathNodeMap.get(n);
+                                Node node = MapData.pathNodeMap.get(marker.getPosition());
                                 if (node == null) {
                                     return false;
                                 }
@@ -134,8 +133,7 @@ public class MapActivity extends AppCompatActivity {
                                     return;
                                 }
 
-                                Node end = new Node(marker.getPosition().latitude, marker.getPosition().longitude);
-                                List<Node> navPath = MapData.findPath(closestPathNode, end);
+                                List<Node> navPath = MapData.findPath(closestPathNode.latLng, marker.getPosition());
                                 if (navPath == null) {
                                     Toast.makeText(MapActivity.this, "Error: path not found", Toast.LENGTH_SHORT).show();
                                     return;
@@ -153,8 +151,8 @@ public class MapActivity extends AppCompatActivity {
                                     Node n2 = navPath.get(i);
                                     Polyline polyline = googleMap.addPolyline(
                                             new PolylineOptions()
-                                                    .add(new LatLng(n.getLat(), n.getLong()),
-                                                            new LatLng(n2.getLat(), n2.getLong()))
+                                                    .add(new LatLng(n.latLng.latitude, n.latLng.longitude),
+                                                            new LatLng(n2.latLng.latitude, n2.latLng.longitude))
                                                     .color(Color.argb(255, 0, 203, 112))
                                                     .width(10)
                                                     .zIndex(1000)
@@ -181,6 +179,7 @@ public class MapActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     findViewById(R.id.activity_map_fragment_container).getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 } else {
+                    //noinspection deprecation
                     findViewById(R.id.activity_map_fragment_container).getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
             }
@@ -229,6 +228,10 @@ public class MapActivity extends AppCompatActivity {
             }
             mNavPathPolylines = null;
         }
+        if (mDebug) {
+            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container);
+            updateMapOverlays(mapFragment.getMap());
+        }
     }
 
     private void updateMapOverlays(GoogleMap googleMap) {
@@ -244,28 +247,41 @@ public class MapActivity extends AppCompatActivity {
 
         for (LocationNode node : MapData.locationNodeMap.values()) {
             MarkerOptions options = new MarkerOptions();
-            options.position(new LatLng(node.getLat(), node.getLong())).title(node.getName());
+            options.position(new LatLng(node.latLng.latitude, node.latLng.longitude)).title(node.getName());
             googleMap.addMarker(options);
         }
 
-        Set<Path> addedNodeMap = new HashSet<>();
+        if (mNavPathPolylines != null) {
+            List<Polyline> newPolylines = new ArrayList<>();
+            for (Polyline p : mNavPathPolylines) {
+                Polyline polyline = googleMap.addPolyline(new PolylineOptions()
+                        .addAll(p.getPoints())
+                        .color(Color.argb(255, 0, 203, 112))
+                        .zIndex(1000)
+                        .width(10));
+                newPolylines.add(polyline);
+            }
+            mNavPathPolylines = newPolylines;
+            mStep = mNavPathPolylines.size();
+        }
 
         //TODO: for debug:
         if (mDebug) {
+            Set<TwoNodes> addedNodeMap = new HashSet<>();
             for (Node n : MapData.pathNodeMap.values()) {
                 for (Node connected : n.getConnected()) {
-                    Path path = new Path(n, connected);
+                    TwoNodes path = new TwoNodes(n, connected);
                     if (!addedNodeMap.contains(path)) {
                         addedNodeMap.add(path);
                         googleMap.addPolyline(new PolylineOptions()
-                                .add(new LatLng(n.getLat(), n.getLong()), new LatLng(connected.getLat(), connected.getLong()))
+                                .add(new LatLng(n.latLng.latitude, n.latLng.longitude), new LatLng(connected.latLng.latitude, connected.latLng.longitude))
                                 .color(Color.WHITE)
                                 .width(20));
                     }
                 }
 
                 MarkerOptions options = new MarkerOptions();
-                options.position(new LatLng(n.getLat(), n.getLong()));
+                options.position(new LatLng(n.latLng.latitude, n.latLng.longitude));
                 googleMap.addMarker(options);
             }
         }
