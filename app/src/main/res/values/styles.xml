@@ -7,4 +7,13 @@
         <item name="colorAccent">@color/accent</item>
     </style>
 
+    <style name="Theme.SearchboxMenu" parent="Theme.MVHSApp.Light">
+        <item name="drawerArrowStyle">@style/SearchboxDrawerArrowStyle</item>
+    </style>
+
+    <style name="SearchboxDrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="drawableSize">24dp</item>
+        <item name="barSize">18dp</item>
+    </style>
+
 </resources>

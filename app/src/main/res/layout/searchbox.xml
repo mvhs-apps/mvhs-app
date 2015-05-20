@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="@drawable/searchbox_bg"
+    android:descendantFocusability="beforeDescendants"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <!--<TextView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/material_menu_button"
+        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/mic"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="54dp"
+        android:singleLine="true"
+        android:gravity="center_vertical"
+        android:text="Logo"
+        android:textColor="#212121"
+        android:textAppearance="?android:attr/textAppearanceMedium" />-->
+
+    <EditText
+        android:id="@id/searchbox_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="64dp"
+        android:layout_marginStart="64dp"
+        android:background="@null"
+        android:hint="Search MVHS Campus"
+        android:imeOptions="actionSearch"
+        android:singleLine="true"
+        android:textColor="#212121"
+        android:textSize="16sp" />
+
+    <ImageView
+        android:id="@id/searchbox_menu_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:background="?selectableItemBackground"
+        android:paddingTop="1dp" />
+
+</RelativeLayout>

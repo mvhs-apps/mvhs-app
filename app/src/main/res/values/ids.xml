@@ -6,4 +6,13 @@
     <item name="activity_map_button_clear_nav" type="id" />
     <item name="activity_map_button_show_nav" type="id" />
     <item name="activity_map_checkbox_debug" type="id" />
+    <item name="activity_map_searchbox" type="id" />
+    <item name="activity_map_list_fragment_container" type="id" />
+    <item name="fragment_list_recycler" type="id" />
+    <item name="list_item_location_title_textview" type="id" />
+    <item name="list_item_location_desc_textview" type="id" />
+    <item name="activity_map_showlist_framelayout" type="id" />
+    <item name="activity_map_showlist_linearlayout" type="id" />
+    <item name="searchbox_menu_button" type="id" />
+    <item name="searchbox_edittext" type="id" />
 </resources>

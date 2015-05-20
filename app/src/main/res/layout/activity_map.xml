@@ -7,15 +7,17 @@
     <FrameLayout
         android:id="@id/activity_map_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@id/activity_map_showlist_framelayout" />
 
     <Button
         android:id="@id/activity_map_button_clear_nav"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/activity_map_showlist_framelayout"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:elevation="0dp"
         android:text="Clear Navigation" />
 
     <Button
@@ -25,6 +27,7 @@
         android:layout_above="@id/activity_map_button_clear_nav"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:elevation="0dp"
         android:text="Step through navigation" />
 
     <CheckBox
@@ -34,8 +37,60 @@
         android:layout_above="@id/activity_map_button_show_nav"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:elevation="0dp"
         android:paddingRight="8dp"
         android:text="Debug Mode"
         android:textColor="@android:color/white" />
+
+    <FrameLayout
+        android:id="@id/activity_map_showlist_framelayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@id/activity_map_showlist_linearlayout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?selectableItemBackground"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="List"
+                android:padding="14dp"
+                android:src="@drawable/ic_list_white"
+                android:tint="@android:color/black" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="start|center_vertical"
+                android:text="List of classrooms and locations"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_above="@id/activity_map_showlist_framelayout"
+        android:background="@drawable/toolbar_shadow"
+        android:scaleY="-1" />
+
+    <include
+        android:id="@id/activity_map_searchbox"
+        layout="@layout/searchbox" />
+
+    <FrameLayout
+        android:id="@id/activity_map_list_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/activity_map_searchbox"
+        android:elevation="16dp" />
 
 </RelativeLayout>

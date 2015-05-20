@@ -98,7 +98,7 @@ public class Node implements Comparable {
 
     public Node nodeLiesOnConnectedPath(Node check) {
         for (Node connected : mConnected) {
-            if (distance(this, check) + distance(check, connected) == distance(this, connected)) {
+            if ((distance(this, check) + distance(check, connected) - distance(this, connected)) < 0.000001) {
                 return connected;
             }
         }

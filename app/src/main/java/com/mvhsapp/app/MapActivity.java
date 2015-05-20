@@ -1,16 +1,24 @@
 package com.mvhsapp.app;
 
+import android.animation.ObjectAnimator;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ContextThemeWrapper;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -32,8 +40,10 @@ import com.mvhsapp.app.map.Node;
 import com.mvhsapp.app.map.TwoNodes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,19 +51,49 @@ import java.util.Set;
  */
 public class MapActivity extends AppCompatActivity {
 
+    public static final String FRAGMENT_LIST = "List";
     private List<Polyline> mNavPathPolylines;
     private int mStep;
     private boolean mDebug;
+    private boolean mMapMode;
+    private Map<LocationNode, Marker> mMarkers;
 
     public static int convertDpToPx(Context context, float dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density
                 + 0.5f);
     }
 
+    private void showList() {
+        final FrameLayout listFrame = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
+        ObjectAnimator animator = new ObjectAnimator();
+        animator.setProperty(View.TRANSLATION_Y);
+        animator.setFloatValues(0f);
+        animator.setTarget(listFrame);
+        animator.setDuration(250);
+        animator.start();
+        mMapMode = false;
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void hideList() {
+        final FrameLayout layout = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
+        ObjectAnimator animator = new ObjectAnimator();
+        animator.setProperty(View.TRANSLATION_Y);
+        animator.setTarget(layout);
+        animator.setFloatValues(layout.getHeight());
+        animator.setDuration(250);
+        animator.start();
+        mMapMode = true;
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        mMapMode = true;
+
         FragmentManager manager = getFragmentManager();
         MapFragment map = (MapFragment) manager.findFragmentById(R.id.activity_map_fragment_container);
         if (map == null) {
@@ -62,6 +102,97 @@ public class MapActivity extends AppCompatActivity {
         }
 
         ViewTreeObserver vto = findViewById(R.id.activity_map_fragment_container).getViewTreeObserver();
+        initMap(map, vto);
+
+        Button clearNav = (Button) findViewById(R.id.activity_map_button_clear_nav);
+        clearNav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearNav();
+            }
+        });
+        Button next = (Button) findViewById(R.id.activity_map_button_show_nav);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mNavPathPolylines != null && mStep < mNavPathPolylines.size()) {
+                    mNavPathPolylines.get(mStep).setColor(Color.argb(255, 0, 203, 112));
+                    mStep++;
+                } else if (mNavPathPolylines != null) {
+                    mStep = 0;
+                    for (Polyline p : mNavPathPolylines) {
+                        p.setColor(Color.argb(0, 0, 0, 0));
+                    }
+                }
+            }
+        });
+
+        CheckBox debug = (CheckBox) findViewById(R.id.activity_map_checkbox_debug);
+        debug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mDebug = isChecked;
+                MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container);
+                updateMapOverlays(mapFragment.getMap());
+            }
+        });
+        debug.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+
+        LinearLayout openListBar = (LinearLayout) findViewById(R.id.activity_map_showlist_linearlayout);
+        openListBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showList();
+            }
+        });
+
+        ContextThemeWrapper wrapper = new ContextThemeWrapper(this, R.style.Theme_SearchboxMenu);
+        SearchboxArrowDrawable drawable = new SearchboxArrowDrawable(wrapper);
+        ((ImageView) findViewById(R.id.searchbox_menu_button)).setImageDrawable(drawable);
+
+        MapListFragment listFragment = (MapListFragment) manager.findFragmentByTag(FRAGMENT_LIST);
+        if (listFragment == null) {
+            listFragment = new MapListFragment();
+            manager.beginTransaction()
+                    .add(R.id.activity_map_list_fragment_container, listFragment, FRAGMENT_LIST)
+                    .commit();
+        }
+
+        if (!mMapMode) {
+            showList();
+        } else {
+            addOnGlobalLayoutListener(findViewById(R.id.activity_map_list_fragment_container), new Runnable() {
+                @Override
+                public void run() {
+                    final FrameLayout listFragmentFrame = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
+                    listFragmentFrame.setTranslationY(listFragmentFrame.getMeasuredHeight());
+                }
+            });
+        }
+
+        mMarkers = new HashMap<>();
+    }
+
+    private void addOnGlobalLayoutListener(View view, final Runnable r) {
+        ViewTreeObserver vto = view.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                new Handler(Looper.getMainLooper()).post(r);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    findViewById(android.R.id.content)
+                            .getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    //noinspection deprecation
+                    findViewById(android.R.id.content)
+                            .getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+            }
+        });
+    }
+
+
+    private void initMap(MapFragment map, ViewTreeObserver vto) {
         final MapFragment finalMap = map;
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -112,7 +243,7 @@ public class MapActivity extends AppCompatActivity {
 
                                 if (!MapData.onCampus(myLocation)) {
                                     Toast.makeText(MapActivity.this,
-                                            "You are not on the Mountain View High School campus.",
+                                            "You are not on campus.",
                                             Toast.LENGTH_LONG).show();
                                     return;
                                 }
@@ -184,40 +315,31 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-        Button clearNav = (Button) findViewById(R.id.activity_map_button_clear_nav);
-        clearNav.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearNav();
-            }
-        });
-        Button next = (Button) findViewById(R.id.activity_map_button_show_nav);
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mNavPathPolylines != null && mStep < mNavPathPolylines.size()) {
-                    mNavPathPolylines.get(mStep).setColor(Color.argb(255, 0, 203, 112));
-                    mStep++;
-                } else if (mNavPathPolylines != null) {
-                    mStep = 0;
-                    for (Polyline p : mNavPathPolylines) {
-                        p.setColor(Color.argb(0, 0, 0, 0));
-                    }
-                }
-            }
-        });
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                hideList();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-        CheckBox debug = (CheckBox) findViewById(R.id.activity_map_checkbox_debug);
-        debug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mDebug = isChecked;
-                MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container);
-                updateMapOverlays(mapFragment.getMap());
-            }
-        });
-        debug.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+    @Override
+    public void onBackPressed() {
+        if (mMapMode) {
+            super.onBackPressed();
+        } else {
+            hideList();
+        }
+    }
+
+    public void showMarkerInfoWindow(LocationNode index) {
+        if (!mMapMode) {
+            hideList();
+        }
+        mMarkers.get(index).showInfoWindow();
     }
 
     private void clearNav() {
@@ -247,8 +369,10 @@ public class MapActivity extends AppCompatActivity {
 
         for (LocationNode node : MapData.locationNodeMap.values()) {
             MarkerOptions options = new MarkerOptions();
-            options.position(new LatLng(node.latLng.latitude, node.latLng.longitude)).title(node.getName());
-            googleMap.addMarker(options);
+            options.position(new LatLng(node.latLng.latitude, node.latLng.longitude)).title(node.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.map_icon))
+                    .snippet("Press for navigation");
+            mMarkers.put(node, googleMap.addMarker(options));
         }
 
         if (mNavPathPolylines != null) {
