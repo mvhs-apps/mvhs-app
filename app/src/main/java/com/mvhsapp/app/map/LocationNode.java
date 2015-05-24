@@ -25,6 +25,6 @@ public class LocationNode extends Node {
     }
 
     public boolean matchFilter(String filter) {
-        return name.contains(filter);
+        return name.toLowerCase().contains(filter.toLowerCase());
     }
 }

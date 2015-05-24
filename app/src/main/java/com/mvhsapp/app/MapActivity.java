@@ -52,6 +52,7 @@ import java.util.Set;
  */
 public class MapActivity extends AppCompatActivity {
 
+    public static final String STATE_MAP_MODE = "mapMode";
     public static final String FRAGMENT_LIST = "List";
     private List<Polyline> mNavPathPolylines;
     private int mStep;
@@ -63,6 +64,12 @@ public class MapActivity extends AppCompatActivity {
     public static int convertDpToPx(Context context, float dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density
                 + 0.5f);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_MAP_MODE, mMapMode);
     }
 
     private void showList() {
@@ -97,7 +104,11 @@ public class MapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        mMapMode = true;
+        if (savedInstanceState == null) {
+            mMapMode = true;
+        } else {
+            mMapMode = savedInstanceState.getBoolean(STATE_MAP_MODE);
+        }
 
         FragmentManager manager = getFragmentManager();
         MapFragment mapFragment = (MapFragment) manager.findFragmentById(R.id.activity_map_fragment_container);
@@ -190,6 +201,7 @@ public class MapActivity extends AppCompatActivity {
 
         if (!mMapMode) {
             showList();
+            mSearchView.setDrawerIconVisibility(true, false);
         } else {
             addOnGlobalLayoutListener(findViewById(R.id.activity_map_list_fragment_container), new Runnable() {
                 @Override
@@ -199,6 +211,7 @@ public class MapActivity extends AppCompatActivity {
                     listFragmentFrame.setVisibility(View.INVISIBLE);
                 }
             });
+            mSearchView.setDrawerIconVisibility(false, false);
         }
 
         mMarkers = new HashMap<>();
