@@ -132,6 +132,7 @@ public class SearchView extends RelativeLayout {
                 if (mSearchViewCallback != null) {
                     mSearchViewCallback.onFocusChange(hasFocus);
                 }
+                setImeVisibility(hasFocus);
             }
         });
     }

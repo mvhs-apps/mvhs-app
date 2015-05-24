@@ -235,7 +235,7 @@ public class MapActivity extends AppCompatActivity {
                     listFragmentFrame.setTranslationY(listFragmentFrame.getMeasuredHeight());
                 }
             });
-            hideList();
+            mSearchView.setDrawerIconVisibility(false, true);
         }
 
         mMarkers = new HashMap<>();
@@ -424,7 +424,7 @@ public class MapActivity extends AppCompatActivity {
             MarkerOptions options = new MarkerOptions().position(new LatLng(node.latLng.latitude, node.latLng.longitude))
                     .title(node.getName())
                     .snippet("Press for navigation");
-            if (mDebugMode) {
+            if (!mDebugMode) {
                 options.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_icon));
             }
             mMarkers.put(node, googleMap.addMarker(options));
