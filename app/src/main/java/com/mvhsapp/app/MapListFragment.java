@@ -31,8 +31,8 @@ public class MapListFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    public void setSearch(String search) {
-        mAdapter.updateSearch(search);
+    public void updateDataAndSearch(String search) {
+        mAdapter.updateDataAndSearch(search);
     }
 
     @Nullable
@@ -52,7 +52,7 @@ public class MapListFragment extends Fragment {
         private List<LocationNode> mLocations;
 
         public LocationAdapter() {
-            updateSearch("");
+            updateDataAndSearch("");
 
             mSearchQuery = "";
         }
@@ -73,7 +73,7 @@ public class MapListFragment extends Fragment {
             //holder.desc.setText(text);
         }
 
-        public void updateSearch(String string) {
+        public void updateDataAndSearch(String string) {
             mSearchQuery = string;
 
             if (!mSearchQuery.isEmpty()) {

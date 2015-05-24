@@ -83,7 +83,7 @@
     <View
         android:id="@id/activity_map_searchbox_background"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="56dp"
         android:alpha="0"
         android:background="?android:windowBackground" />
 
@@ -96,7 +96,7 @@
         android:id="@id/activity_map_list_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/activity_map_searchbox"
+        android:layout_below="@id/activity_map_searchbox_background"
         android:elevation="16dp"
         tools:visibility="gone" />
 
