@@ -82,6 +82,15 @@ public class MapActivity extends AppCompatActivity {
         animator.setDuration(250);
         animator.setInterpolator(new LinearOutSlowInInterpolator());
         animator.start();
+
+        ObjectAnimator animator2 = new ObjectAnimator();
+        animator2.setProperty(View.ALPHA);
+        animator2.setFloatValues(1f);
+        animator2.setTarget(findViewById(R.id.activity_map_searchbox_background));
+        animator2.setDuration(250);
+        animator2.setInterpolator(new LinearOutSlowInInterpolator());
+        animator2.start();
+
         mMapMode = false;
         mSearchView.setDrawerIconVisibility(true, true);
     }
@@ -95,6 +104,15 @@ public class MapActivity extends AppCompatActivity {
         animator.setDuration(250);
         animator.setInterpolator(new FastOutLinearInInterpolator());
         animator.start();
+
+        ObjectAnimator animator2 = new ObjectAnimator();
+        animator2.setProperty(View.ALPHA);
+        animator2.setFloatValues(0f);
+        animator2.setTarget(findViewById(R.id.activity_map_searchbox_background));
+        animator2.setDuration(250);
+        animator2.setInterpolator(new LinearOutSlowInInterpolator());
+        animator2.start();
+
         mMapMode = true;
         mSearchView.setDrawerIconVisibility(false, true);
     }
@@ -201,7 +219,7 @@ public class MapActivity extends AppCompatActivity {
 
         if (!mMapMode) {
             showList();
-            mSearchView.setDrawerIconVisibility(true, false);
+            //mSearchView.setDrawerIconVisibility(true, false);
         } else {
             addOnGlobalLayoutListener(findViewById(R.id.activity_map_list_fragment_container), new Runnable() {
                 @Override
@@ -211,7 +229,8 @@ public class MapActivity extends AppCompatActivity {
                     listFragmentFrame.setVisibility(View.INVISIBLE);
                 }
             });
-            mSearchView.setDrawerIconVisibility(false, false);
+            hideList();
+            //mSearchView.setDrawerIconVisibility(false, false);
         }
 
         mMarkers = new HashMap<>();

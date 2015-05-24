@@ -80,6 +80,13 @@
         android:background="@drawable/toolbar_shadow"
         android:scaleY="-1" />
 
+    <View
+        android:id="@id/activity_map_searchbox_background"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:alpha="0"
+        android:background="?android:windowBackground" />
+
     <com.mvhsapp.app.widget.SearchView
         android:id="@id/activity_map_searchbox"
         android:layout_width="match_parent"
