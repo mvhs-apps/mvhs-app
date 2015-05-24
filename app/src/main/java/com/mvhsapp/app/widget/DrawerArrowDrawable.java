@@ -1,4 +1,4 @@
-package com.mvhsapp.app;
+package com.mvhsapp.app.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,10 +10,12 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
+import com.mvhsapp.app.R;
+
 /**
  * From DrawableArrowDrawable in appcompat-v7
  */
-public class SearchboxArrowDrawable extends Drawable {
+public class DrawerArrowDrawable extends Drawable {
 
     // The angle in degress that the arrow head is inclined at.
     private static final float ARROW_HEAD_ANGLE = (float) Math.toRadians(45);
@@ -46,7 +48,7 @@ public class SearchboxArrowDrawable extends Drawable {
     /**
      * @param context used to get the configuration for the drawable from
      */
-    public SearchboxArrowDrawable(Context context) {
+    public DrawerArrowDrawable(Context context) {
         final TypedArray typedArray = context.getTheme()
                 .obtainStyledAttributes(null, R.styleable.DrawerArrowToggle,
                         R.attr.drawerArrowStyle,

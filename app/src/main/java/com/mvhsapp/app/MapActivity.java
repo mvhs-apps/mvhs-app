@@ -8,8 +8,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.view.animation.FastOutLinearInInterpolator;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.app.AppCompatActivity;
-import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -17,7 +18,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -38,6 +38,7 @@ import com.mvhsapp.app.map.LocationNode;
 import com.mvhsapp.app.map.MapData;
 import com.mvhsapp.app.map.Node;
 import com.mvhsapp.app.map.TwoNodes;
+import com.mvhsapp.app.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +58,7 @@ public class MapActivity extends AppCompatActivity {
     private boolean mDebug;
     private boolean mMapMode;
     private Map<LocationNode, Marker> mMarkers;
+    private SearchView mSearchView;
 
     public static int convertDpToPx(Context context, float dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density
@@ -65,14 +67,16 @@ public class MapActivity extends AppCompatActivity {
 
     private void showList() {
         final FrameLayout listFrame = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
+        listFrame.setVisibility(View.VISIBLE);
         ObjectAnimator animator = new ObjectAnimator();
         animator.setProperty(View.TRANSLATION_Y);
         animator.setFloatValues(0f);
         animator.setTarget(listFrame);
         animator.setDuration(250);
+        animator.setInterpolator(new LinearOutSlowInInterpolator());
         animator.start();
         mMapMode = false;
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mSearchView.setDrawerIconVisibility(true, true);
     }
 
     private void hideList() {
@@ -80,11 +84,12 @@ public class MapActivity extends AppCompatActivity {
         ObjectAnimator animator = new ObjectAnimator();
         animator.setProperty(View.TRANSLATION_Y);
         animator.setTarget(layout);
-        animator.setFloatValues(layout.getHeight());
+        animator.setFloatValues(layout.getMeasuredHeight());
         animator.setDuration(250);
+        animator.setInterpolator(new FastOutLinearInInterpolator());
         animator.start();
         mMapMode = true;
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        mSearchView.setDrawerIconVisibility(false, true);
     }
 
     @Override
@@ -95,14 +100,14 @@ public class MapActivity extends AppCompatActivity {
         mMapMode = true;
 
         FragmentManager manager = getFragmentManager();
-        MapFragment map = (MapFragment) manager.findFragmentById(R.id.activity_map_fragment_container);
-        if (map == null) {
-            map = new MapFragment();
-            manager.beginTransaction().add(R.id.activity_map_fragment_container, map).commit();
+        MapFragment mapFragment = (MapFragment) manager.findFragmentById(R.id.activity_map_fragment_container);
+        boolean initCamera = false;
+        if (mapFragment == null) {
+            mapFragment = MapFragment.newInstance();
+            manager.beginTransaction().add(R.id.activity_map_fragment_container, mapFragment).commit();
+            initCamera = true;
         }
-
-        ViewTreeObserver vto = findViewById(R.id.activity_map_fragment_container).getViewTreeObserver();
-        initMap(map, vto);
+        initMap(mapFragment, initCamera);
 
         Button clearNav = (Button) findViewById(R.id.activity_map_button_clear_nav);
         clearNav.setOnClickListener(new View.OnClickListener() {
@@ -146,9 +151,34 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
-        ContextThemeWrapper wrapper = new ContextThemeWrapper(this, R.style.Theme_SearchboxMenu);
-        SearchboxArrowDrawable drawable = new SearchboxArrowDrawable(wrapper);
-        ((ImageView) findViewById(R.id.searchbox_menu_button)).setImageDrawable(drawable);
+        mSearchView = (SearchView) findViewById(R.id.activity_map_searchbox);
+        mSearchView.setCallback(new SearchView.SearchViewCallback() {
+
+            @Override
+            public void onQueryTextChange(String newText) {
+                ((MapListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_LIST))
+                        .setSearch(newText);
+            }
+
+            @Override
+            public void onFocusChange(boolean focused) {
+                if (focused) {
+                    showList();
+                }
+            }
+
+            @Override
+            public void onDrawerIconClicked() {
+                if (mMapMode) {
+                    showList();
+                } else {
+                    hideList();
+                    mSearchView.clearFocus();
+                    mSearchView.clearText();
+                }
+            }
+        });
+        mSearchView.setDrawerIconState(false, false);
 
         MapListFragment listFragment = (MapListFragment) manager.findFragmentByTag(FRAGMENT_LIST);
         if (listFragment == null) {
@@ -166,6 +196,7 @@ public class MapActivity extends AppCompatActivity {
                 public void run() {
                     final FrameLayout listFragmentFrame = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
                     listFragmentFrame.setTranslationY(listFragmentFrame.getMeasuredHeight());
+                    listFragmentFrame.setVisibility(View.INVISIBLE);
                 }
             });
         }
@@ -192,26 +223,30 @@ public class MapActivity extends AppCompatActivity {
     }
 
 
-    private void initMap(MapFragment map, ViewTreeObserver vto) {
+    private void initMap(MapFragment map, final boolean initCamera) {
         final MapFragment finalMap = map;
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        addOnGlobalLayoutListener(findViewById(R.id.activity_map_fragment_container), new Runnable() {
             @Override
-            public void onGlobalLayout() {
+            public void run() {
                 finalMap.getMapAsync(new OnMapReadyCallback() {
                     private boolean done;
 
                     @Override
                     public void onMapReady(final GoogleMap googleMap) {
-                        LatLngBounds mapBounds = new LatLngBounds(
-                                new LatLng(37.359014, -122.068730), new LatLng(37.361323, -122.065080));
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(
-                                mapBounds, convertDpToPx(MapActivity.this, 8)));
                         googleMap.setMyLocationEnabled(true);
                         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         googleMap.getUiSettings().setMapToolbarEnabled(true);
                         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
                         googleMap.getUiSettings().setCompassEnabled(true);
                         googleMap.getUiSettings().setMapToolbarEnabled(false);
+                        googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.searchbox_height), 0, 0);
+
+                        if (initCamera) {
+                            LatLngBounds mapBounds = new LatLngBounds(
+                                    new LatLng(37.359014, -122.068730), new LatLng(37.361323, -122.065080));
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(
+                                    mapBounds, convertDpToPx(MapActivity.this, 8)));
+                        }
 
                         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                             @Override
@@ -307,12 +342,6 @@ public class MapActivity extends AppCompatActivity {
                         });
                     }
                 });
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    findViewById(R.id.activity_map_fragment_container).getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                } else {
-                    //noinspection deprecation
-                    findViewById(R.id.activity_map_fragment_container).getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                }
             }
         });
     }

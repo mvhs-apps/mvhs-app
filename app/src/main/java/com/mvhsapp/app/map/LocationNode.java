@@ -23,4 +23,8 @@ public class LocationNode extends Node {
     public Node getPathNode() {
         return pathNode;
     }
+
+    public boolean matchFilter(String filter) {
+        return name.contains(filter);
+    }
 }

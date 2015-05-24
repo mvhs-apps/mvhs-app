@@ -31,9 +31,9 @@ public class MapListFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    /*public void updateDataAndSetSearch(String search) {
+    public void setSearch(String search) {
         mAdapter.updateSearch(search);
-    }*/
+    }
 
     @Nullable
     @Override
@@ -52,13 +52,8 @@ public class MapListFragment extends Fragment {
         private List<LocationNode> mLocations;
 
         public LocationAdapter() {
-            mLocations = new ArrayList<>(MapData.locationNodeMap.values());
-            Collections.sort(mLocations, new Comparator<LocationNode>() {
-                @Override
-                public int compare(LocationNode lhs, LocationNode rhs) {
-                    return lhs.getName().compareTo(rhs.getName());
-                }
-            });
+            updateSearch("");
+
             mSearchQuery = "";
         }
 
@@ -79,7 +74,7 @@ public class MapListFragment extends Fragment {
         }
 
         public void updateSearch(String string) {
-            /*mSearchQuery = string;
+            mSearchQuery = string;
 
             if (!mSearchQuery.isEmpty()) {
                 mLocations = new ArrayList<>();
@@ -89,9 +84,19 @@ public class MapListFragment extends Fragment {
                     }
                 }
             } else {
-                mLocations = ArtLocationList.getInstance().getList();
+                mLocations = new ArrayList<>(MapData.locationNodeMap.values());
             }
-            notifyDataSetChanged();*/
+
+            Collections.sort(mLocations, new Comparator<LocationNode>() {
+                @Override
+                public int compare(LocationNode lhs, LocationNode rhs) {
+                    if (lhs.getName().startsWith(mSearchQuery) && !rhs.getName().startsWith(mSearchQuery)) {
+                        return -1;
+                    }
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+            notifyDataSetChanged();
         }
 
         @Override
