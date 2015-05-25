@@ -32,7 +32,9 @@ public class MapListFragment extends Fragment {
     }
 
     public void updateDataAndSearch(String search) {
-        mAdapter.updateDataAndSearch(search);
+        if (mAdapter != null) {
+            mAdapter.updateDataAndSearch(search);
+        }
     }
 
     @Nullable
