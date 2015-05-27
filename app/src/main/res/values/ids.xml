@@ -16,4 +16,5 @@
     <item name="searchbox_menu_button" type="id" />
     <item name="searchbox_edittext" type="id" />
     <item name="activity_map_searchbox_background" type="id" />
+    <item name="activity_map_navigation_text" type="id" />
 </resources>

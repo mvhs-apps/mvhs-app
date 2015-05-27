@@ -199,4 +199,20 @@ public class MapData {
         return node.latLng.latitude > 37.356813 && node.latLng.latitude < 37.361323
                 && node.latLng.longitude > -122.068730 && node.latLng.longitude < -122.065080;
     }
+
+    public static boolean nodesLiesOnOnePath(List<Node> check) {
+        if (check.size() == 2) {
+            return true;
+        }
+        boolean lies = true;
+        Node start = check.get(0);
+        Node end = check.get(check.size() - 1);
+        for (int i = 1; i < check.size() - 1; i++) {
+            Node checking = check.get(i);
+            if (!((Node.distance(start, checking) + Node.distance(checking, end) - Node.distance(start, end)) < 0.000001)) {
+                lies = false;
+            }
+        }
+        return lies;
+    }
 }

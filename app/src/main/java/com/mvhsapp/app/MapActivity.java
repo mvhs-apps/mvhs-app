@@ -19,6 +19,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -67,10 +68,24 @@ public class MapActivity extends AppCompatActivity {
     private boolean mDebugMode;
     private List<Polyline> mNavPathPolylines;
     private int mNavPathStep;
+    private List<String> mNavTexts;
+
+
     private boolean mMapMode;
     private Map<LocationNode, Marker> mMarkers;
     private SearchView mSearchView;
     private DownloadInfoTask mTask;
+    private TextView mNavigationText;
+
+    protected static double bearing(double lat1, double lon1, double lat2, double lon2) {
+        double latitude1 = Math.toRadians(lat1);
+        double latitude2 = Math.toRadians(lat2);
+        double longDiff = Math.toRadians(lon2 - lon1);
+        double y = Math.sin(longDiff) * Math.cos(latitude2);
+        double x = Math.cos(latitude1) * Math.sin(latitude2) - Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(longDiff);
+
+        return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -155,6 +170,8 @@ public class MapActivity extends AppCompatActivity {
 
 
         //SET UP VIEWS
+        mNavigationText = (TextView) findViewById(R.id.activity_map_navigation_text);
+
         Button clearNav = (Button) findViewById(R.id.activity_map_button_clear_nav);
         clearNav.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,14 +183,22 @@ public class MapActivity extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //nav step = how many lines travelled
+
                 if (mNavPathPolylines != null && mNavPathStep < mNavPathPolylines.size()) {
+                    //nav step = how many lines travelled-1
                     mNavPathPolylines.get(mNavPathStep).setColor(Color.argb(255, 0, 203, 112));
+                    mNavigationText.setText(mNavTexts.get(mNavPathStep));
                     mNavPathStep++;
                 } else if (mNavPathPolylines != null) {
                     mNavPathStep = 0;
+                    mNavigationText.setText(mNavTexts.get(0));
                     for (Polyline p : mNavPathPolylines) {
-                        p.setColor(Color.argb(0, 0, 0, 0));
+                        if (p != null) {
+                            p.setColor(Color.argb(0, 0, 0, 0));
+                        }
                     }
+                    mNavPathStep++;
                 }
             }
         });
@@ -241,7 +266,6 @@ public class MapActivity extends AppCompatActivity {
         mMarkers = new HashMap<>();
     }
 
-
     private void initMap(MapFragment map, final boolean initCamera) {
         final MapFragment finalMap = map;
         Utils.addOnGlobalLayoutListener(findViewById(R.id.activity_map_fragment_container), new Runnable() {
@@ -292,6 +316,14 @@ public class MapActivity extends AppCompatActivity {
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
+                if (mNavPathPolylines != null) {
+                    for (Polyline line : mNavPathPolylines) {
+                        if (line != null) {
+                            line.setWidth((cameraPosition.zoom - 14.7f) * 6f);
+                        }
+                    }
+                }
+                Log.e("Test", "" + cameraPosition.zoom);
                 if (!done[0]) {
                     updateMapOverlays(googleMap);
                     done[0] = true;
@@ -342,20 +374,70 @@ public class MapActivity extends AppCompatActivity {
         }
 
         mNavPathPolylines = new ArrayList<>();
-        for (int i = 1; i < navPath.size(); i++) {
+        for (int i = 1; i < navPath.size(); ) {
             Node n = navPath.get(i - 1);
-            Node n2 = navPath.get(i);
+
+            int index = i;
+            while (index < navPath.size() - 1) {
+                int test = index + 1;
+                if (!MapData.nodesLiesOnOnePath(navPath.subList(i - 1, test + 1))) {
+                    break;
+                }
+                Log.e("Test", "Test successed:" + navPath.subList(i - 1, test + 1).toString());
+                index = test;
+            }
+
             Polyline polyline = googleMap.addPolyline(
                     new PolylineOptions()
-                            .add(new LatLng(n.latLng.latitude, n.latLng.longitude),
-                                    new LatLng(n2.latLng.latitude, n2.latLng.longitude))
+                            .add(n.latLng, navPath.get(index).latLng)
                             .color(Color.argb(255, 0, 203, 112))
-                            .width(10)
+                            .width((googleMap.getCameraPosition().zoom - 14.7f) * 6f)
                             .zIndex(1000)
             );
+
             mNavPathPolylines.add(polyline);
+            i += index - i + 1;
         }
+        mNavPathPolylines.add(0, null);
         mNavPathStep = mNavPathPolylines.size();
+
+        mNavTexts = new ArrayList<>();
+        double bearingPrevious = 0;
+        for (int i = 1; i < mNavPathPolylines.size(); i++) {
+            List<LatLng> latLngs = mNavPathPolylines.get(i).getPoints();
+            LatLng n = latLngs.get(0);
+            LatLng n2 = latLngs.get(1);
+
+            double bearing = bearing(n.latitude, n.longitude, n2.latitude, n2.longitude);
+            Log.e("Test", "Baering " + bearing + " for points " + n + ", " + n2);
+            String nav = null;
+            if (i == 1) {
+                if (bearing < 45 || bearing >= 315) {
+                    nav = "Go north";
+                } else if (bearing < 135) {
+                    nav = "Go east";
+                } else if (bearing < 225) {
+                    nav = "Go south";
+                } else if (bearing < 315) {
+                    nav = "Go west";
+                }
+            } else {
+                double difference = bearing - bearingPrevious;
+                difference = (difference + 360) % 360;
+                if (difference < 45 || difference >= 315) {
+                    nav = "Go forward";
+                } else if (difference < 135) {
+                    nav = "Turn right";
+                } else if (difference < 225) {
+                    nav = "Turn around";
+                } else if (difference < 315) {
+                    nav = "Turn left";
+                }
+            }
+            bearingPrevious = bearing;
+            mNavTexts.add(nav);
+        }
+        mNavTexts.add("");
 
         Toast.makeText(MapActivity.this, "Path found to " + ((LocationNode) navPath.get(navPath.size() - 1)).getName(), Toast.LENGTH_SHORT).show();
     }
@@ -389,6 +471,7 @@ public class MapActivity extends AppCompatActivity {
         if (!mMapMode) {
             hideList();
         }
+        mSearchView.clearFocus();
         mMarkers.get(index).showInfoWindow();
     }
 
@@ -396,7 +479,9 @@ public class MapActivity extends AppCompatActivity {
         MapData.cleanTempNodes();
         if (mNavPathPolylines != null) {
             for (Polyline line : mNavPathPolylines) {
-                line.remove();
+                if (line != null) {
+                    line.remove();
+                }
             }
             mNavPathPolylines = null;
         }
@@ -433,12 +518,14 @@ public class MapActivity extends AppCompatActivity {
         if (mNavPathPolylines != null) {
             List<Polyline> newPolylines = new ArrayList<>();
             for (Polyline p : mNavPathPolylines) {
-                Polyline polyline = googleMap.addPolyline(new PolylineOptions()
-                        .addAll(p.getPoints())
-                        .color(Color.argb(255, 0, 203, 112))
-                        .zIndex(1000)
-                        .width(10));
-                newPolylines.add(polyline);
+                if (p != null) {
+                    Polyline polyline = googleMap.addPolyline(new PolylineOptions()
+                            .addAll(p.getPoints())
+                            .color(Color.argb(255, 0, 203, 112))
+                            .zIndex(1000)
+                            .width((googleMap.getCameraPosition().zoom - 14.7f) * 6f));
+                    newPolylines.add(polyline);
+                }
             }
             mNavPathPolylines = newPolylines;
             mNavPathStep = mNavPathPolylines.size();

@@ -11,6 +11,13 @@
         android:layout_height="match_parent"
         android:layout_above="@id/activity_map_showlist_framelayout" />
 
+    <TextView
+        android:id="@id/activity_map_navigation_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_map_searchbox_background"
+        android:textColor="@android:color/white" />
+
     <Button
         android:id="@id/activity_map_button_clear_nav"
         android:layout_width="wrap_content"
