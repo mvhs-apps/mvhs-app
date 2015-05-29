@@ -35,4 +35,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.+'
     compile 'com.google.android.gms:play-services-maps:7.+'
     compile 'com.afollestad:material-dialogs:0.+'
+    compile 'com.android.support:design:22.+'
 }

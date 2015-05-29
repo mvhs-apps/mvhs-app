@@ -4,11 +4,14 @@ import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -76,6 +80,7 @@ public class MapActivity extends AppCompatActivity {
     private SearchView mSearchView;
     private DownloadInfoTask mTask;
     private TextView mNavigationText;
+    private FloatingActionButton mFab;
 
     protected static double bearing(double lat1, double lon1, double lat2, double lon2) {
         double latitude1 = Math.toRadians(lat1);
@@ -248,6 +253,27 @@ public class MapActivity extends AppCompatActivity {
         });
         mSearchView.setDrawerIconState(false, false);
 
+        mFab = (FloatingActionButton) findViewById(R.id.activity_map_nav_fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MapActivity.this, "Test", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        FloatingActionButton myLocFab = (FloatingActionButton) findViewById(R.id.activity_map_my_loc_fab);
+        myLocFab.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        myLocFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GoogleMap map = getMap();
+                Location myLocation = map.getMyLocation();
+                LatLng latLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
+                map.animateCamera(cameraUpdate);
+            }
+        });
+
         //RESTORE MAP MODE AND STUFF
         if (!mMapMode) {
             showList();
@@ -285,10 +311,9 @@ public class MapActivity extends AppCompatActivity {
         final boolean[] done = new boolean[1];
         googleMap.setMyLocationEnabled(true);
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        googleMap.getUiSettings().setMapToolbarEnabled(true);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
-        googleMap.getUiSettings().setCompassEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(true);
         googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.searchbox_height), 0, 0);
 
         if (initCamera) {
@@ -368,7 +393,6 @@ public class MapActivity extends AppCompatActivity {
         }
         navPath.add(0, myLocation);
 
-        //TODO: for debug:
         if (mDebugMode) {
             updateMapOverlays(googleMap);
         }
@@ -439,6 +463,9 @@ public class MapActivity extends AppCompatActivity {
         }
         mNavTexts.add("");
 
+        LatLngBounds bounds = new LatLngBounds.Builder().include(myLocation.latLng).include(marker.getPosition()).build();
+        getMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.convertDpToPx(this, 64)));
+
         Toast.makeText(MapActivity.this, "Path found to " + ((LocationNode) navPath.get(navPath.size() - 1)).getName(), Toast.LENGTH_SHORT).show();
     }
 
@@ -473,6 +500,9 @@ public class MapActivity extends AppCompatActivity {
         }
         mSearchView.clearFocus();
         mMarkers.get(index).showInfoWindow();
+        getMap().animateCamera(CameraUpdateFactory.newLatLng(mMarkers.get(index).getPosition()));
+        //TODO: Clear nav?
+        //clearNav();
     }
 
     private void clearNav() {

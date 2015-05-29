@@ -17,4 +17,6 @@
     <item name="searchbox_edittext" type="id" />
     <item name="activity_map_searchbox_background" type="id" />
     <item name="activity_map_navigation_text" type="id" />
+    <item name="activity_map_nav_fab" type="id" />
+    <item name="activity_map_my_loc_fab" type="id" />
 </resources>
