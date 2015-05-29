@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:id="@id/activity_map_fragment_container"
@@ -11,30 +10,23 @@
         android:layout_height="match_parent"
         android:layout_above="@id/activity_map_showlist_framelayout" />
 
-    <TextView
-        android:id="@id/activity_map_navigation_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/activity_map_searchbox_background"
-        android:textColor="@android:color/white" />
+    <!--    <Button
+            android:id="@id/activity_map_button_clear_nav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/activity_map_showlist_framelayout"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:text="Clear Navigation" />
 
-    <Button
-        android:id="@id/activity_map_button_clear_nav"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/activity_map_showlist_framelayout"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:text="Clear Navigation" />
-
-    <Button
-        android:id="@id/activity_map_button_show_nav"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/activity_map_button_clear_nav"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:text="Step through navigation" />
+        <Button
+            android:id="@id/activity_map_button_show_nav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/activity_map_button_clear_nav"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:text="Step through navigation" />-->
 
     <CheckBox
         android:id="@id/activity_map_checkbox_debug"
@@ -45,7 +37,8 @@
         android:layout_alignParentRight="true"
         android:paddingRight="8dp"
         android:text="Debug Mode"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        tools:visibility="gone" />
 
     <FrameLayout
         android:id="@id/activity_map_showlist_framelayout"
@@ -99,7 +92,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_directions_white_24dp" />
+        android:src="@drawable/ic_directions_black_24dp" />
 
     <View
         android:layout_width="match_parent"
@@ -119,7 +112,6 @@
         android:id="@id/activity_map_list_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="80dp"
         android:elevation="16dp"
         tools:visibility="gone" />
 
@@ -128,5 +120,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp" />
+
+    <include
+        layout="@layout/navigation_selection_appbar"
+        tools:visibility="gone" />
+
+    <include
+        layout="@layout/navigation_appbar"
+        tools:visibility="gone" />
 
 </RelativeLayout>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@id/navigation_selection_appbar"
+    android:layout_width="match_parent"
+    android:layout_height="152dp"
+    android:background="#4E342E"
+    android:elevation="4dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@id/navigation_selection_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/abc_action_bar_default_height_material"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:contentInsetStart="72dp" />
+
+    <Button
+        android:id="@+id/navigation_appbar_startingloc_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/navigation_selection_toolbar"
+        android:layout_marginStart="64dp"
+        android:background="?selectableItemBackground"
+        android:fontFamily="sans-serif"
+        android:gravity="start|center_vertical"
+        android:paddingLeft="8dp"
+        android:text="Your location"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/navigation_appbar_startingloc_button"
+        android:layout_marginStart="64dp"
+        android:background="@null"
+        android:fontFamily="sans-serif"
+        android:gravity="start|center_vertical"
+        android:paddingLeft="8dp"
+        android:text="Choose destination below"
+        android:textAllCaps="false"
+        android:textColor="#87ffffff"
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/navigation_appbar_startingloc_button"
+        android:layout_marginLeft="72dp"
+        android:background="#67ffffff" />
+
+    <TextView
+        android:layout_width="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="80dp"
+        android:text=" |\n\\/"
+        android:textColor="@android:color/white" />
+
+</RelativeLayout>

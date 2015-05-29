@@ -20,7 +20,7 @@ import com.mvhsapp.app.R;
 import java.lang.reflect.Method;
 
 /**
- * SearchView
+ * SearchView - based on SearchView in appcompat-v7 library's action bar widget
  */
 public class SearchView extends RelativeLayout {
 
@@ -188,6 +188,10 @@ public class SearchView extends RelativeLayout {
 
     public void setCallback(SearchViewCallback listener) {
         mSearchViewCallback = listener;
+    }
+
+    public void focus() {
+        mSearchboxEditText.requestFocus();
     }
 
     private void setImeVisibility(final boolean visible) {

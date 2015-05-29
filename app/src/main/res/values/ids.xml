@@ -3,8 +3,6 @@
     <item name="main_button" type="id" />
     <item name="map_button" type="id" />
     <item name="activity_map_fragment_container" type="id" />
-    <item name="activity_map_button_clear_nav" type="id" />
-    <item name="activity_map_button_show_nav" type="id" />
     <item name="activity_map_checkbox_debug" type="id" />
     <item name="activity_map_searchbox" type="id" />
     <item name="activity_map_list_fragment_container" type="id" />
@@ -16,7 +14,10 @@
     <item name="searchbox_menu_button" type="id" />
     <item name="searchbox_edittext" type="id" />
     <item name="activity_map_searchbox_background" type="id" />
-    <item name="activity_map_navigation_text" type="id" />
     <item name="activity_map_nav_fab" type="id" />
     <item name="activity_map_my_loc_fab" type="id" />
+    <item name="navigation_selection_appbar" type="id" />
+    <item name="navigation_selection_toolbar" type="id" />
+    <item name="navigation_appbar" type="id" />
+    <item name="navigation_toolbar" type="id" />
 </resources>

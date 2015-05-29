@@ -115,7 +115,8 @@ public class MapListFragment extends Fragment {
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((MapActivity) getActivity()).showMarkerInfoWindow(mLocations.get(getLayoutPosition()));
+                        MapActivity activity = (MapActivity) getActivity();
+                        activity.onMapListItemClicked(mLocations.get(getLayoutPosition()));
                     }
                 });
             }

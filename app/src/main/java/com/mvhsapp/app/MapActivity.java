@@ -15,14 +15,15 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -70,17 +71,27 @@ public class MapActivity extends AppCompatActivity {
     public static final String FRAGMENT_LIST = "List";
 
     private boolean mDebugMode;
+
+    private boolean mListShowing;
+    private boolean mChoosingStart;
+    private boolean mChoosingDestination;
+    private LatLng mStartingLocation;
+
+    private boolean mNavigating;
+    private Marker mDestinationMarker;
     private List<Polyline> mNavPathPolylines;
     private int mNavPathStep;
     private List<String> mNavTexts;
+    //TODO: Cache zoom, only change if changed
 
-
-    private boolean mMapMode;
     private Map<LocationNode, Marker> mMarkers;
     private SearchView mSearchView;
     private DownloadInfoTask mTask;
-    private TextView mNavigationText;
-    private FloatingActionButton mFab;
+    private FloatingActionButton mNavSelectionFab;
+    private View mNavigationSelectionAppBar;
+    private Button mStartingLocationButton;
+    private ViewGroup mNavigationAppBar;
+    private Toolbar mNavToolbar;
 
     protected static double bearing(double lat1, double lon1, double lat2, double lon2) {
         double latitude1 = Math.toRadians(lat1);
@@ -95,14 +106,14 @@ public class MapActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(STATE_MAP_MODE, mMapMode);
+        outState.putBoolean(STATE_MAP_MODE, !mListShowing);
     }
 
-    private void showList() {
+    private void showList(int listMarginTop) {
         final FrameLayout listFrame = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
         ObjectAnimator animator = new ObjectAnimator();
-        animator.setProperty(View.TRANSLATION_Y);
-        animator.setFloatValues(0f);
+        animator.setProperty(View.Y);
+        animator.setFloatValues(Utils.convertDpToPx(this, listMarginTop));
         animator.setTarget(listFrame);
         animator.setDuration(250);
         animator.setInterpolator(new LinearOutSlowInInterpolator());
@@ -116,14 +127,16 @@ public class MapActivity extends AppCompatActivity {
         animator2.setInterpolator(new LinearOutSlowInInterpolator());
         animator2.start();
 
-        mMapMode = false;
+        listFrame.setPadding(0, 0, 0, Utils.convertDpToPx(this, listMarginTop));
+
+        mListShowing = true;
         mSearchView.setDrawerIconVisibility(true, true);
     }
 
     private void hideList() {
         final FrameLayout layout = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
         ObjectAnimator animator = new ObjectAnimator();
-        animator.setProperty(View.TRANSLATION_Y);
+        animator.setProperty(View.Y);
         animator.setTarget(layout);
         animator.setFloatValues(layout.getMeasuredHeight());
         animator.setDuration(250);
@@ -138,7 +151,7 @@ public class MapActivity extends AppCompatActivity {
         animator2.setInterpolator(new LinearOutSlowInInterpolator());
         animator2.start();
 
-        mMapMode = true;
+        mListShowing = false;
         mSearchView.setDrawerIconVisibility(false, true);
     }
 
@@ -148,10 +161,10 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_map);
 
         if (savedInstanceState == null) {
-            mMapMode = true;
+            mListShowing = false;
             downloadMapData();
         } else {
-            mMapMode = savedInstanceState.getBoolean(STATE_MAP_MODE);
+            mListShowing = !savedInstanceState.getBoolean(STATE_MAP_MODE);
         }
 
         //ADD MAP AND LIST FRAGMENTS
@@ -173,41 +186,6 @@ public class MapActivity extends AppCompatActivity {
                     .commit();
         }
 
-
-        //SET UP VIEWS
-        mNavigationText = (TextView) findViewById(R.id.activity_map_navigation_text);
-
-        Button clearNav = (Button) findViewById(R.id.activity_map_button_clear_nav);
-        clearNav.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearNav();
-            }
-        });
-        Button next = (Button) findViewById(R.id.activity_map_button_show_nav);
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //nav step = how many lines travelled
-
-                if (mNavPathPolylines != null && mNavPathStep < mNavPathPolylines.size()) {
-                    //nav step = how many lines travelled-1
-                    mNavPathPolylines.get(mNavPathStep).setColor(Color.argb(255, 0, 203, 112));
-                    mNavigationText.setText(mNavTexts.get(mNavPathStep));
-                    mNavPathStep++;
-                } else if (mNavPathPolylines != null) {
-                    mNavPathStep = 0;
-                    mNavigationText.setText(mNavTexts.get(0));
-                    for (Polyline p : mNavPathPolylines) {
-                        if (p != null) {
-                            p.setColor(Color.argb(0, 0, 0, 0));
-                        }
-                    }
-                    mNavPathStep++;
-                }
-            }
-        });
-
         CheckBox debug = (CheckBox) findViewById(R.id.activity_map_checkbox_debug);
         debug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -223,7 +201,7 @@ public class MapActivity extends AppCompatActivity {
         openListBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showList();
+                showList(80);
                 ((MapListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_LIST)).updateDataAndSearch("");
             }
         });
@@ -240,24 +218,67 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(boolean focused) {
                 if (focused) {
-                    showList();
+                    showList(80);
                 }
             }
 
             @Override
             public void onDrawerIconClicked() {
-                hideList();
+                onBackPressed();
                 mSearchView.clearFocus();
                 mSearchView.clearText();
             }
         });
         mSearchView.setDrawerIconState(false, false);
 
-        mFab = (FloatingActionButton) findViewById(R.id.activity_map_nav_fab);
-        mFab.setOnClickListener(new View.OnClickListener() {
+        mNavigationSelectionAppBar = findViewById(R.id.navigation_selection_appbar);
+
+        mStartingLocationButton = (Button) findViewById(R.id.navigation_appbar_startingloc_button);
+        mStartingLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MapActivity.this, "Test", Toast.LENGTH_SHORT).show();
+                enterChoosingStart();
+            }
+        });
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mNavigationSelectionAppBar.getLayoutParams();
+        params.topMargin = getStatusBarHeight();
+        mNavigationSelectionAppBar.setLayoutParams(params);
+
+        Toolbar navSelection = (Toolbar) findViewById(R.id.navigation_selection_toolbar);
+        navSelection.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        navSelection.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exitChoosingDestination();
+            }
+        });
+
+        mNavSelectionFab = (FloatingActionButton) findViewById(R.id.activity_map_nav_fab);
+        mNavSelectionFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mNavigating) {
+                    enterChoosingDestination();
+                } else {
+                    //nav step = how many lines travelled
+
+                    if (mNavPathStep < mNavPathPolylines.size()) {
+                        //nav step = how many lines travelled-1
+                        mNavPathPolylines.get(mNavPathStep).setColor(Color.argb(255, 255, 255, 255));
+                        mNavToolbar.setTitle(mNavTexts.get(mNavPathStep));
+                        mNavPathStep++;
+                    } else {
+                        mNavPathStep = 0;
+                        mNavToolbar.setTitle(mNavTexts.get(0));
+                        for (Polyline p : mNavPathPolylines) {
+                            if (p != null) {
+                                p.setColor(Color.argb(127, 255, 255, 255));
+                            }
+                        }
+                        mNavPathStep++;
+                    }
+                }
             }
         });
 
@@ -274,9 +295,20 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
+        mNavigationAppBar = (ViewGroup) findViewById(R.id.navigation_appbar);
+        mNavToolbar = (Toolbar) findViewById(R.id.navigation_toolbar);
+        mNavToolbar.setNavigationIcon(R.drawable.abc_ic_clear_mtrl_alpha);
+        mNavToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+
         //RESTORE MAP MODE AND STUFF
-        if (!mMapMode) {
-            showList();
+        if (mListShowing) {
+            showList(80);
             ((MapListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_LIST)).updateDataAndSearch("");
         } else {
             Utils.addOnGlobalLayoutListener(findViewById(R.id.activity_map_list_fragment_container), new Runnable() {
@@ -290,6 +322,37 @@ public class MapActivity extends AppCompatActivity {
         }
 
         mMarkers = new HashMap<>();
+    }
+
+    private void enterChoosingStart() {
+        mStartingLocation = null;
+        mNavigationSelectionAppBar.setVisibility(View.GONE);
+        mChoosingDestination = false;
+
+        mChoosingStart = true;
+        showList(80);
+    }
+
+    private void exitChoosingDestination() {
+        mNavigationSelectionAppBar.setVisibility(View.GONE);
+        hideList();
+        mChoosingDestination = false;
+    }
+
+    private void enterChoosingDestination() {
+        mSearchView.clearFocus();
+        mNavigationSelectionAppBar.setVisibility(View.VISIBLE);
+        mChoosingDestination = true;
+        showList(176);
+    }
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     private void initMap(MapFragment map, final boolean initCamera) {
@@ -334,14 +397,14 @@ public class MapActivity extends AppCompatActivity {
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                MapActivity.this.onInfoWindowClick(marker, googleMap);
+                MapActivity.this.startNavigation(marker, googleMap);
             }
         });
 
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
-                if (mNavPathPolylines != null) {
+                if (mNavigating) {
                     for (Polyline line : mNavPathPolylines) {
                         if (line != null) {
                             line.setWidth((cameraPosition.zoom - 14.7f) * 6f);
@@ -357,13 +420,40 @@ public class MapActivity extends AppCompatActivity {
         });
     }
 
-    private void onInfoWindowClick(Marker marker, GoogleMap googleMap) {
-        clearNav();
-        double myLat = googleMap.getMyLocation().getLatitude();
-        double myLong = googleMap.getMyLocation().getLongitude();
-        Node myLocation = new Node(myLat, myLong);
+    public void onMapListItemClicked(LocationNode node) {
+        Marker marker = mMarkers.get(node);
+        if (mChoosingDestination) {
+            startNavigation(marker, getMap());
+            onBackPressed();
+        } else if (mChoosingStart) {
+            mStartingLocationButton.setText(node.getName());
+            mStartingLocation = node.latLng;
+            onBackPressed();
+        } else {
+            if (mListShowing) {
+                hideList();
+            }
+            mSearchView.clearFocus();
+            marker.showInfoWindow();
+            getMap().animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+            //TODO: Clear nav?
+            //clearNav();
+        }
+    }
 
-        if (!MapData.onCampus(myLocation)) {
+    private void startNavigation(Marker marker, GoogleMap googleMap) {
+        clearNav();
+
+        Node startPlace;
+        if (mStartingLocation == null) {
+            double myLat = googleMap.getMyLocation().getLatitude();
+            double myLong = googleMap.getMyLocation().getLongitude();
+            startPlace = new Node(myLat, myLong);
+        } else {
+            startPlace = new Node(mStartingLocation.latitude, mStartingLocation.longitude);
+        }
+
+        if (!MapData.onCampus(startPlace)) {
             Toast.makeText(MapActivity.this,
                     "You are not on campus.",
                     Toast.LENGTH_LONG).show();
@@ -375,7 +465,7 @@ public class MapActivity extends AppCompatActivity {
         List<Node> nodes = new ArrayList<>(MapData.pathNodeMap.values());
         nodes.addAll(MapData.locationNodeMap.values());
         for (Node node : nodes) {
-            double distance = Node.distance(node, myLocation);
+            double distance = Node.distance(node, startPlace);
             if (closestDistance == -1 || distance < closestDistance) {
                 closestDistance = distance;
                 closestPathNode = node;
@@ -391,7 +481,7 @@ public class MapActivity extends AppCompatActivity {
             Toast.makeText(MapActivity.this, "Error: path not found", Toast.LENGTH_SHORT).show();
             return;
         }
-        navPath.add(0, myLocation);
+        navPath.add(0, startPlace);
 
         if (mDebugMode) {
             updateMapOverlays(googleMap);
@@ -414,7 +504,7 @@ public class MapActivity extends AppCompatActivity {
             Polyline polyline = googleMap.addPolyline(
                     new PolylineOptions()
                             .add(n.latLng, navPath.get(index).latLng)
-                            .color(Color.argb(255, 0, 203, 112))
+                            .color(Color.argb(255, 255, 255, 255))
                             .width((googleMap.getCameraPosition().zoom - 14.7f) * 6f)
                             .zIndex(1000)
             );
@@ -461,12 +551,20 @@ public class MapActivity extends AppCompatActivity {
             bearingPrevious = bearing;
             mNavTexts.add(nav);
         }
-        mNavTexts.add("");
 
-        LatLngBounds bounds = new LatLngBounds.Builder().include(myLocation.latLng).include(marker.getPosition()).build();
-        getMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.convertDpToPx(this, 64)));
+        LocationNode endLocationNode = (LocationNode) navPath.get(navPath.size() - 1);
+        mNavTexts.add("Arrived at " + endLocationNode.getName());
 
-        Toast.makeText(MapActivity.this, "Path found to " + ((LocationNode) navPath.get(navPath.size() - 1)).getName(), Toast.LENGTH_SHORT).show();
+        LatLngBounds bounds = new LatLngBounds.Builder().include(startPlace.latLng).include(marker.getPosition()).build();
+        getMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.convertDpToPx(this, 128)));
+
+        mNavigating = true;
+        marker.setIcon(BitmapDescriptorFactory.defaultMarker());
+        mDestinationMarker = marker;
+        mNavigationAppBar.setVisibility(View.VISIBLE);
+        mNavSelectionFab.setImageResource(R.drawable.ic_chevron_right_black_24dp);
+
+        mNavToolbar.setTitle("Path to " + endLocationNode.getName());
     }
 
     private boolean onMarkerClick(Marker marker) {
@@ -487,25 +585,29 @@ public class MapActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (mMapMode) {
+        if (mNavigating) {
+            clearNav();
+        } else if (!mListShowing) {
             super.onBackPressed();
+        } else if (mChoosingDestination) {
+            exitChoosingDestination();
+        } else if (mChoosingStart) {
+            enterChoosingDestination();
         } else {
             hideList();
         }
     }
 
-    public void showMarkerInfoWindow(LocationNode index) {
-        if (!mMapMode) {
-            hideList();
-        }
-        mSearchView.clearFocus();
-        mMarkers.get(index).showInfoWindow();
-        getMap().animateCamera(CameraUpdateFactory.newLatLng(mMarkers.get(index).getPosition()));
-        //TODO: Clear nav?
-        //clearNav();
-    }
-
     private void clearNav() {
+        mNavigating = false;
+        mStartingLocationButton.setText("Your location");
+
+        mNavigationAppBar.setVisibility(View.GONE);
+        mNavSelectionFab.setImageResource(R.drawable.ic_directions_black_24dp);
+
+        if (mDestinationMarker != null)
+            mDestinationMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.map_icon));
+
         MapData.cleanTempNodes();
         if (mNavPathPolylines != null) {
             for (Polyline line : mNavPathPolylines) {
@@ -551,7 +653,7 @@ public class MapActivity extends AppCompatActivity {
                 if (p != null) {
                     Polyline polyline = googleMap.addPolyline(new PolylineOptions()
                             .addAll(p.getPoints())
-                            .color(Color.argb(255, 0, 203, 112))
+                            .color(Color.argb(255, 255, 255, 255))
                             .zIndex(1000)
                             .width((googleMap.getCameraPosition().zoom - 14.7f) * 6f));
                     newPolylines.add(polyline);
