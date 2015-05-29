@@ -10,24 +10,6 @@
         android:layout_height="match_parent"
         android:layout_above="@id/activity_map_showlist_framelayout" />
 
-    <!--    <Button
-            android:id="@id/activity_map_button_clear_nav"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/activity_map_showlist_framelayout"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:text="Clear Navigation" />
-
-        <Button
-            android:id="@id/activity_map_button_show_nav"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/activity_map_button_clear_nav"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:text="Step through navigation" />-->
-
     <CheckBox
         android:id="@id/activity_map_checkbox_debug"
         android:layout_width="wrap_content"
@@ -58,7 +40,7 @@
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:contentDescription="List"
+                android:contentDescription="@string/list"
                 android:padding="14dp"
                 android:src="@drawable/ic_list_white"
                 android:tint="@android:color/black" />
@@ -67,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="start|center_vertical"
-                android:text="List of classrooms and locations"
+                android:text="@string/list_of_classrooms"
                 android:textAllCaps="false" />
         </LinearLayout>
 

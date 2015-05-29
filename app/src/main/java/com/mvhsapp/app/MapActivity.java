@@ -3,12 +3,9 @@ package com.mvhsapp.app;
 import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -53,8 +50,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -195,7 +190,7 @@ public class MapActivity extends AppCompatActivity {
                 updateMapOverlays(mapFragment.getMap());
             }
         });
-        debug.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+        debug.setVisibility(/*BuildConfig.DEBUG*/false ? View.VISIBLE : View.GONE);
 
         LinearLayout openListBar = (LinearLayout) findViewById(R.id.activity_map_showlist_linearlayout);
         openListBar.setOnClickListener(new View.OnClickListener() {
@@ -265,7 +260,7 @@ public class MapActivity extends AppCompatActivity {
 
                     if (mNavPathStep < mNavPathPolylines.size()) {
                         //nav step = how many lines travelled-1
-                        mNavPathPolylines.get(mNavPathStep).setColor(Color.argb(255, 255, 255, 255));
+                        mNavPathPolylines.get(mNavPathStep).setColor(Color.argb(255, 255, 255, 0));
                         mNavToolbar.setTitle(mNavTexts.get(mNavPathStep));
                         mNavPathStep++;
                     } else {
@@ -273,7 +268,7 @@ public class MapActivity extends AppCompatActivity {
                         mNavToolbar.setTitle(mNavTexts.get(0));
                         for (Polyline p : mNavPathPolylines) {
                             if (p != null) {
-                                p.setColor(Color.argb(127, 255, 255, 255));
+                                p.setColor(Color.argb(127, 255, 255, 0));
                             }
                         }
                         mNavPathStep++;
@@ -304,6 +299,10 @@ public class MapActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
+        ViewGroup.MarginLayoutParams params2 = (ViewGroup.MarginLayoutParams) mNavToolbar.getLayoutParams();
+        params2.topMargin = getStatusBarHeight();
+        mNavToolbar.setLayoutParams(params2);
 
 
         //RESTORE MAP MODE AND STUFF
@@ -340,6 +339,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void enterChoosingDestination() {
+        mChoosingStart = false;
         mSearchView.clearFocus();
         mNavigationSelectionAppBar.setVisibility(View.VISIBLE);
         mChoosingDestination = true;
@@ -423,12 +423,12 @@ public class MapActivity extends AppCompatActivity {
     public void onMapListItemClicked(LocationNode node) {
         Marker marker = mMarkers.get(node);
         if (mChoosingDestination) {
-            startNavigation(marker, getMap());
             onBackPressed();
+            startNavigation(marker, getMap());
         } else if (mChoosingStart) {
+            onBackPressed();
             mStartingLocationButton.setText(node.getName());
             mStartingLocation = node.latLng;
-            onBackPressed();
         } else {
             if (mListShowing) {
                 hideList();
@@ -450,13 +450,14 @@ public class MapActivity extends AppCompatActivity {
             double myLong = googleMap.getMyLocation().getLongitude();
             startPlace = new Node(myLat, myLong);
         } else {
-            startPlace = new Node(mStartingLocation.latitude, mStartingLocation.longitude);
+            startPlace = MapData.locationNodeMap.get(mStartingLocation);
         }
 
         if (!MapData.onCampus(startPlace)) {
             Toast.makeText(MapActivity.this,
-                    "You are not on campus.",
+                    R.string.not_on_campus,
                     Toast.LENGTH_LONG).show();
+            enterChoosingDestination();
             return;
         }
 
@@ -504,7 +505,7 @@ public class MapActivity extends AppCompatActivity {
             Polyline polyline = googleMap.addPolyline(
                     new PolylineOptions()
                             .add(n.latLng, navPath.get(index).latLng)
-                            .color(Color.argb(255, 255, 255, 255))
+                            .color(Color.argb(255, 255, 255, 0))
                             .width((googleMap.getCameraPosition().zoom - 14.7f) * 6f)
                             .zIndex(1000)
             );
@@ -523,29 +524,29 @@ public class MapActivity extends AppCompatActivity {
             LatLng n2 = latLngs.get(1);
 
             double bearing = bearing(n.latitude, n.longitude, n2.latitude, n2.longitude);
-            Log.e("Test", "Baering " + bearing + " for points " + n + ", " + n2);
+            Log.e("Test", "Bearing " + bearing + " for points " + n + ", " + n2);
             String nav = null;
             if (i == 1) {
                 if (bearing < 45 || bearing >= 315) {
-                    nav = "Go north";
+                    nav = getString(R.string.north);
                 } else if (bearing < 135) {
-                    nav = "Go east";
+                    nav = getString(R.string.east);
                 } else if (bearing < 225) {
-                    nav = "Go south";
+                    nav = getString(R.string.south);
                 } else if (bearing < 315) {
-                    nav = "Go west";
+                    nav = getString(R.string.west);
                 }
             } else {
                 double difference = bearing - bearingPrevious;
                 difference = (difference + 360) % 360;
                 if (difference < 45 || difference >= 315) {
-                    nav = "Go forward";
+                    nav = getString(R.string.forward);
                 } else if (difference < 135) {
-                    nav = "Turn right";
+                    nav = getString(R.string.right);
                 } else if (difference < 225) {
-                    nav = "Turn around";
+                    nav = getString(R.string.around);
                 } else if (difference < 315) {
-                    nav = "Turn left";
+                    nav = getString(R.string.left);
                 }
             }
             bearingPrevious = bearing;
@@ -553,18 +554,23 @@ public class MapActivity extends AppCompatActivity {
         }
 
         LocationNode endLocationNode = (LocationNode) navPath.get(navPath.size() - 1);
-        mNavTexts.add("Arrived at " + endLocationNode.getName());
+        mNavTexts.add(getString(R.string.arrived_at) + endLocationNode.getName());
 
         LatLngBounds bounds = new LatLngBounds.Builder().include(startPlace.latLng).include(marker.getPosition()).build();
         getMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, Utils.convertDpToPx(this, 128)));
 
         mNavigating = true;
-        marker.setIcon(BitmapDescriptorFactory.defaultMarker());
+        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
         mDestinationMarker = marker;
         mNavigationAppBar.setVisibility(View.VISIBLE);
         mNavSelectionFab.setImageResource(R.drawable.ic_chevron_right_black_24dp);
 
-        mNavToolbar.setTitle("Path to " + endLocationNode.getName());
+        if (startPlace instanceof LocationNode) {
+            mNavToolbar.setTitle(String.format(getString(R.string.path_to), ((LocationNode) startPlace).getName(), endLocationNode.getName()));
+        } else {
+            mNavToolbar.setTitle(String.format(getString(R.string.path_to), "your location", endLocationNode.getName()));
+        }
+        Toast.makeText(this, getString(R.string.proceed), Toast.LENGTH_SHORT).show();
     }
 
     private boolean onMarkerClick(Marker marker) {
@@ -587,12 +593,12 @@ public class MapActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (mNavigating) {
             clearNav();
-        } else if (!mListShowing) {
-            super.onBackPressed();
         } else if (mChoosingDestination) {
             exitChoosingDestination();
         } else if (mChoosingStart) {
             enterChoosingDestination();
+        } else if (!mListShowing) {
+            super.onBackPressed();
         } else {
             hideList();
         }
@@ -600,7 +606,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void clearNav() {
         mNavigating = false;
-        mStartingLocationButton.setText("Your location");
+        mStartingLocationButton.setText(R.string.your_location);
 
         mNavigationAppBar.setVisibility(View.GONE);
         mNavSelectionFab.setImageResource(R.drawable.ic_directions_black_24dp);
@@ -653,7 +659,7 @@ public class MapActivity extends AppCompatActivity {
                 if (p != null) {
                     Polyline polyline = googleMap.addPolyline(new PolylineOptions()
                             .addAll(p.getPoints())
-                            .color(Color.argb(255, 255, 255, 255))
+                            .color(Color.argb(255, 255, 255, 0))
                             .zIndex(1000)
                             .width((googleMap.getCameraPosition().zoom - 14.7f) * 6f));
                     newPolylines.add(polyline);
@@ -686,13 +692,13 @@ public class MapActivity extends AppCompatActivity {
 
     private void downloadMapData() {
         if (mTask == null || mTask.getStatus() != AsyncTask.Status.RUNNING) {
-            ConnectivityManager connMgr = (ConnectivityManager)
+            /*ConnectivityManager connMgr = (ConnectivityManager)
                     getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
-                mTask = new DownloadInfoTask();
-                mTask.execute("http://pluscubed.github.io/mvhs-map-data/production-mapdata.json");
-            } else {
+            if (networkInfo != null && networkInfo.isConnected()) {*/
+            mTask = new DownloadInfoTask();
+            mTask.execute("http://pluscubed.github.io/mvhs-map-data/production-mapdata.json");
+            /*} else {
                 new MaterialDialog.Builder(this)
                         .content("Not connected to the Internet.")
                         .positiveText("Dismiss")
@@ -705,7 +711,7 @@ public class MapActivity extends AppCompatActivity {
                             }
                         })
                         .show();
-            }
+            }*/
         }
     }
 
@@ -728,13 +734,14 @@ public class MapActivity extends AppCompatActivity {
             InputStream stream = null;
             try {
                 // Instantiate the parser
-                URL url = new URL(urls[0]);
+                /*URL url = new URL(urls[0]);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoInput(true);
                 // Starts the query
                 conn.connect();
                 Log.e("", "Connection opened");
-                stream = conn.getInputStream();
+                stream = conn.getInputStream();*/
+                stream = getAssets().open("production-mapdata.json");
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
                 BufferedReader streamReader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));

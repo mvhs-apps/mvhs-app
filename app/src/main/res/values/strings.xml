@@ -1,4 +1,21 @@
 <resources>
     <string name="app_name">MVHS Map</string>
     <string name="logo">Logo</string>
+    <string name="proceed">To proceed, press yellow circle with arrow.</string>
+    <string name="path_to">Path from %1$s to %2$s</string>
+    <string name="north">Go north</string>
+    <string name="east">Go east</string>
+    <string name="south">Go south</string>
+    <string name="west">Go west</string>
+    <string name="forward">Go forward</string>
+    <string name="right">Turn right</string>
+    <string name="around">Turn around</string>
+    <string name="left">Turn left</string>
+    <string name="arrived_at">"Arrived at "</string>
+    <string name="not_on_campus">You are not on campus. Please select a starting point other than your location.</string>
+    <string name="your_location">Your location</string>
+    <string name="change_starting_point">Press to change starting point</string>
+    <string name="choose_destination_below">Choose destination below</string>
+    <string name="list">List</string>
+    <string name="list_of_classrooms">List of classrooms and locations</string>
 </resources>

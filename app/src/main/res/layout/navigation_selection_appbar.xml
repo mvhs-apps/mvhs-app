@@ -19,6 +19,20 @@
         app:contentInsetStart="72dp" />
 
     <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="68dp"
+        android:background="@null"
+        android:fontFamily="sans-serif"
+        android:gravity="start|center_vertical"
+        android:paddingLeft="8dp"
+        android:text="@string/change_starting_point"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="12sp" />
+
+    <Button
         android:id="@+id/navigation_appbar_startingloc_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,9 +40,10 @@
         android:layout_marginStart="64dp"
         android:background="?selectableItemBackground"
         android:fontFamily="sans-serif"
-        android:gravity="start|center_vertical"
+        android:gravity="start"
         android:paddingLeft="8dp"
-        android:text="Your location"
+        android:paddingTop="8dp"
+        android:text="@string/your_location"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="16sp" />
@@ -42,7 +57,7 @@
         android:fontFamily="sans-serif"
         android:gravity="start|center_vertical"
         android:paddingLeft="8dp"
-        android:text="Choose destination below"
+        android:text="@string/choose_destination_below"
         android:textAllCaps="false"
         android:textColor="#87ffffff"
         android:textSize="16sp" />
@@ -54,12 +69,25 @@
         android:layout_marginLeft="72dp"
         android:background="#67ffffff" />
 
-    <TextView
-        android:layout_width="16dp"
+    <ImageView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="80dp"
-        android:text=" |\n\\/"
-        android:textColor="@android:color/white" />
+        android:src="@drawable/ic_expand_more_white_24dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="86dp"
+        android:src="@drawable/ic_expand_more_white_24dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="92dp"
+        android:src="@drawable/ic_expand_more_white_24dp" />
 
 </RelativeLayout>
