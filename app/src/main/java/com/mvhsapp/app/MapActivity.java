@@ -104,6 +104,50 @@ public class MapActivity extends AppCompatActivity {
         outState.putBoolean(STATE_MAP_MODE, !mListShowing);
     }
 
+    private void showNav() {
+        final View listFrame = findViewById(R.id.navigation_appbar);
+        ObjectAnimator animator = new ObjectAnimator();
+        animator.setProperty(View.TRANSLATION_Y);
+        animator.setFloatValues(0f);
+        animator.setTarget(listFrame);
+        animator.setDuration(250);
+        animator.setInterpolator(new LinearOutSlowInInterpolator());
+        animator.start();
+    }
+
+    private void hideNav() {
+        final View listFrame = findViewById(R.id.navigation_appbar);
+        ObjectAnimator animator = new ObjectAnimator();
+        animator.setProperty(View.TRANSLATION_Y);
+        animator.setFloatValues(-listFrame.getMeasuredHeight());
+        animator.setTarget(listFrame);
+        animator.setDuration(250);
+        animator.setInterpolator(new FastOutLinearInInterpolator());
+        animator.start();
+    }
+
+    private void showSelection() {
+        final View listFrame = findViewById(R.id.navigation_selection_appbar);
+        ObjectAnimator animator = new ObjectAnimator();
+        animator.setProperty(View.TRANSLATION_Y);
+        animator.setFloatValues(0f);
+        animator.setTarget(listFrame);
+        animator.setDuration(250);
+        animator.setInterpolator(new LinearOutSlowInInterpolator());
+        animator.start();
+    }
+
+    private void hideSelection() {
+        final View listFrame = findViewById(R.id.navigation_selection_appbar);
+        ObjectAnimator animator = new ObjectAnimator();
+        animator.setProperty(View.TRANSLATION_Y);
+        animator.setFloatValues(-listFrame.getMeasuredHeight());
+        animator.setTarget(listFrame);
+        animator.setDuration(250);
+        animator.setInterpolator(new FastOutLinearInInterpolator());
+        animator.start();
+    }
+
     private void showList(int listMarginTop) {
         final FrameLayout listFrame = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
         ObjectAnimator animator = new ObjectAnimator();
@@ -237,7 +281,7 @@ public class MapActivity extends AppCompatActivity {
         });
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mNavigationSelectionAppBar.getLayoutParams();
-        params.topMargin = getStatusBarHeight();
+        params.height += getStatusBarHeight();
         mNavigationSelectionAppBar.setLayoutParams(params);
 
         Toolbar navSelection = (Toolbar) findViewById(R.id.navigation_selection_toolbar);
@@ -320,12 +364,24 @@ public class MapActivity extends AppCompatActivity {
             mSearchView.setDrawerIconVisibility(false, true);
         }
 
+
+        Utils.addOnGlobalLayoutListener(findViewById(R.id.navigation_selection_appbar), new Runnable() {
+            @Override
+            public void run() {
+                final View listFragmentFrame = findViewById(R.id.navigation_selection_appbar);
+                listFragmentFrame.setTranslationY(-listFragmentFrame.getMeasuredHeight());
+                final View listFragment = findViewById(R.id.navigation_appbar);
+                listFragment.setTranslationY(-listFragment.getMeasuredHeight());
+            }
+        });
+
         mMarkers = new HashMap<>();
     }
 
     private void enterChoosingStart() {
         mStartingLocation = null;
-        mNavigationSelectionAppBar.setVisibility(View.GONE);
+        mSearchView.clearText();
+        hideSelection();
         mChoosingDestination = false;
 
         mChoosingStart = true;
@@ -333,7 +389,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void exitChoosingDestination() {
-        mNavigationSelectionAppBar.setVisibility(View.GONE);
+        hideSelection();
         hideList();
         mChoosingDestination = false;
     }
@@ -341,7 +397,8 @@ public class MapActivity extends AppCompatActivity {
     private void enterChoosingDestination() {
         mChoosingStart = false;
         mSearchView.clearFocus();
-        mNavigationSelectionAppBar.setVisibility(View.VISIBLE);
+        mSearchView.clearText();
+        showSelection();
         mChoosingDestination = true;
         showList(176);
     }
@@ -442,7 +499,6 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void startNavigation(Marker marker, GoogleMap googleMap) {
-        clearNav();
 
         Node startPlace;
         if (mStartingLocation == null) {
@@ -452,6 +508,8 @@ public class MapActivity extends AppCompatActivity {
         } else {
             startPlace = MapData.locationNodeMap.get(mStartingLocation);
         }
+
+        clearNav();
 
         if (!MapData.onCampus(startPlace)) {
             Toast.makeText(MapActivity.this,
@@ -562,7 +620,7 @@ public class MapActivity extends AppCompatActivity {
         mNavigating = true;
         marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
         mDestinationMarker = marker;
-        mNavigationAppBar.setVisibility(View.VISIBLE);
+        showNav();
         mNavSelectionFab.setImageResource(R.drawable.ic_chevron_right_black_24dp);
 
         if (startPlace instanceof LocationNode) {
@@ -606,9 +664,10 @@ public class MapActivity extends AppCompatActivity {
 
     private void clearNav() {
         mNavigating = false;
+        mStartingLocation = null;
         mStartingLocationButton.setText(R.string.your_location);
 
-        mNavigationAppBar.setVisibility(View.GONE);
+        hideNav();
         mNavSelectionFab.setImageResource(R.drawable.ic_directions_black_24dp);
 
         if (mDestinationMarker != null)
@@ -710,7 +769,7 @@ public class MapActivity extends AppCompatActivity {
                                 downloadMapData();
                             }
                         })
-                        .show();
+                        .showSelection();
             }*/
         }
     }
