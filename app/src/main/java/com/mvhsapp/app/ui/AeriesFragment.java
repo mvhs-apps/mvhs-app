@@ -36,9 +36,14 @@ import com.mvhsapp.app.Utils;
 
 public class AeriesFragment extends Fragment {
 
+    public static final String SAVE_STATE_CREDENTIAL = "save_state_credential";
+
     public static final int RC_SAVE = 0;
     public static final int RC_READ = 1;
     public static final int RC_HINT = 2;
+
+    private Credential mCurrentCredential;
+
     private EditText mUsernameEditText;
     private EditText mPasswordEditText;
     private WebView mWebView;
@@ -51,7 +56,7 @@ public class AeriesFragment extends Fragment {
     private Snackbar mErrorSnackbar;
     private Snackbar mSavingSnackbar;
 
-    private boolean mFromSavedInstanceState;
+    private boolean mAttemptRequestCredentials = true;
 
     @Override
     public void onStart() {
@@ -65,7 +70,13 @@ public class AeriesFragment extends Fragment {
         mCredentialsApiClient.disconnect();
     }
 
-    
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(SAVE_STATE_CREDENTIAL, mCurrentCredential);
+        mWebView.saveState(outState);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +114,6 @@ public class AeriesFragment extends Fragment {
                         event.getAction() == KeyEvent.ACTION_DOWN &&
                                 event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     mLoginButton.callOnClick();
-                    Utils.hideSoftKeyBoard(getActivity());
                     return true;
                 }
                 return false;
@@ -114,6 +124,7 @@ public class AeriesFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 login(mUsernameEditText.getText().toString(), mPasswordEditText.getText().toString());
+                Utils.hideSoftKeyBoard(getActivity());
             }
         });
 
@@ -121,9 +132,10 @@ public class AeriesFragment extends Fragment {
 
         if (savedInstanceState == null) {
             mWebView.loadUrl("https://mvla.asp.aeries.net/student/LoginParent.aspx");
-            mFromSavedInstanceState = false;
+            mAttemptRequestCredentials = true;
         } else {
-            mFromSavedInstanceState = true;
+            mCurrentCredential = savedInstanceState.getParcelable(SAVE_STATE_CREDENTIAL);
+            mWebView.restoreState(savedInstanceState);
         }
 
         return view;
@@ -275,10 +287,12 @@ public class AeriesFragment extends Fragment {
                     .setPassword(mPasswordEditText.getText().toString())
                     .build();
 
-            mSavingSnackbar = Snackbar.make(mWebView, R.string.saving_credentials, Snackbar.LENGTH_INDEFINITE);
-            mSavingSnackbar.show();
+            if (mCurrentCredential == null || mCurrentCredential.describeContents() != credential.describeContents()) {
+                mSavingSnackbar = Snackbar.make(mWebView, R.string.saving_credentials, Snackbar.LENGTH_INDEFINITE);
+                mSavingSnackbar.show();
+            }
 
-            //showIndeterminateProgressBar();
+            mCurrentCredential = credential;
 
             Auth.CredentialsApi.save(mCredentialsApiClient, credential).setResultCallback(
                     new ResultCallback<Status>() {
@@ -350,10 +364,9 @@ public class AeriesFragment extends Fragment {
             //Login page
             if (url.equalsIgnoreCase("https://mvla.asp.aeries.net/student/LoginParent.aspx")) {
 
-                if (!mFromSavedInstanceState) {
+                if (mAttemptRequestCredentials) {
                     showIndeterminateProgressBar();
                     attemptRequestCredentials();
-                    mFromSavedInstanceState = true;
                 } else {
                     finishAllLoading();
                 }
@@ -362,7 +375,7 @@ public class AeriesFragment extends Fragment {
                     @Override
                     public void onReceiveValue(String value) {
                         if (!value.equalsIgnoreCase("null")) {
-                            showSnackbarMessage(value.substring(1, value.length() - 1));
+                            Snackbar.make(mWebView, getString(R.string.incorrect_login), Snackbar.LENGTH_LONG);
                         }
                     }
                 });
@@ -371,13 +384,13 @@ public class AeriesFragment extends Fragment {
                     @Override
                     public void onReceiveValue(String value) {
                         if (!value.equalsIgnoreCase("null")) {
-                            showSnackbarMessage(value.substring(1, value.length() - 1));
+                            Snackbar.make(mWebView, getString(R.string.incorrect_login), Snackbar.LENGTH_LONG);
                         }
                     }
                 });
-            }/*else if(url.startsWith("https://mvla.asp.aeries.net/student/m/loginparent.html")){
-
-            }*/
+            } else if (url.startsWith("https://mvla.asp.aeries.net/student/m/loginparent.html")) {
+                mAttemptRequestCredentials = false;
+            }
         }
 
         @Override
@@ -393,7 +406,7 @@ public class AeriesFragment extends Fragment {
                 mLoginButton.setEnabled(false);
                 mLoginLayout.setVisibility(View.VISIBLE);
 
-            } else if (url.startsWith("https://mvla.asp.aeries.net/student/m/loginparent.html")) {
+            } else if (url.equalsIgnoreCase("https://mvla.asp.aeries.net/student/m/loginparent.html")) {
                 //Logged in
                 mLoggedIn = true;
                 mLoginLayout.setVisibility(View.GONE);

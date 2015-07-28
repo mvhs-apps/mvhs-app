@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MVHS Map</string>
+    <string name="app_name">MVHS App</string>
     <string name="logo">Logo</string>
 
     <string name="aeries">Aeries SIS</string>
@@ -64,4 +64,5 @@
     <string name="retrieving_credentials">Retrieving Smart Lock Credentials…</string>
     <string name="saving_credentials">Saving Smart Lock Credentials…</string>
     <string name="error">Error</string>
+    <string name="incorrect_login">The username or password entered is incorrect.</string>
 </resources>

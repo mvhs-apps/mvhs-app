@@ -119,6 +119,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
             }
         });
 
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
+
         ScrollView mDrawerScrollView = (ScrollView) findViewById(R.id
                 .activity_drawer_drawer_scrollview);
         int actionBarSize = resources.getDimensionPixelSize(R.dimen.navigation_drawer_margin);

@@ -23,7 +23,6 @@
     <item name="fragment_aeries_webview" type="id" />
 
 
-    <item name="activity_aeries_appbar" type="id" />
     <item name="fragment_aeries_login_username" type="id" />
     <item name="fragment_aeries_login_password" type="id" />
     <item name="fragment_aeries_login_button" type="id" />

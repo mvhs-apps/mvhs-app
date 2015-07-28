@@ -4,5 +4,5 @@
     <item name="primary" type="color">#FDD835</item>
     <item name="accent" type="color">#448AFF</item>
 
-    <item name="disabled_button" type="color">#1fffffff</item>
+    <item name="disabled_button" type="color">#10000000</item>
 </resources>

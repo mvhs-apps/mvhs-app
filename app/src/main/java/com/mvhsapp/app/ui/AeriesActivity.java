@@ -3,7 +3,6 @@ package com.mvhsapp.app.ui;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -29,8 +28,6 @@ public class AeriesActivity extends DrawerActivity {
         }
 
         mProgressBar = (ProgressBar) findViewById(R.id.activity_aeries_progress_bar);
-        mProgressBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.material_deep_teal_500), PorterDuff.Mode.SRC_IN);
-        mProgressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.material_deep_teal_500), PorterDuff.Mode.SRC_IN);
 
         overridePendingTransition(0, 0);
     }

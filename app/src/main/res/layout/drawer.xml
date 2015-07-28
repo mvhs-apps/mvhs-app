@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="start"
-    android:background="?colorPrimaryDark"
+    android:background="@color/primary_dark_material_light"
     android:fillViewport="true"
     android:fitsSystemWindows="true">
 
