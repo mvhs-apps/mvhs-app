@@ -151,7 +151,7 @@ public class SearchView extends RelativeLayout {
     }
 
     public void setDrawerIconVisibility(boolean show, boolean animate) {
-        float editTextTarget = show ? 0f : getResources().getDimensionPixelSize(R.dimen.offset);
+        float editTextTarget = show ? 0f : getResources().getDimensionPixelSize(R.dimen.searchbox_no_menu_offset);
 
         if (animate) {
             ObjectAnimator animator = new ObjectAnimator();

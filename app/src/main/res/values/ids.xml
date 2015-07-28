@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="main_button" type="id" />
-    <item name="map_button" type="id" />
     <item name="activity_map_fragment_container" type="id" />
     <item name="activity_map_checkbox_debug" type="id" />
     <item name="activity_map_searchbox" type="id" />
     <item name="activity_map_list_fragment_container" type="id" />
+
     <item name="fragment_list_recycler" type="id" />
+
     <item name="list_item_location_title_textview" type="id" />
     <item name="list_item_location_desc_textview" type="id" />
     <item name="activity_map_showlist_framelayout" type="id" />
@@ -20,4 +20,19 @@
     <item name="navigation_selection_toolbar" type="id" />
     <item name="navigation_appbar" type="id" />
     <item name="navigation_toolbar" type="id" />
+    <item name="fragment_aeries_webview" type="id" />
+
+
+    <item name="activity_aeries_appbar" type="id" />
+    <item name="fragment_aeries_login_username" type="id" />
+    <item name="fragment_aeries_login_password" type="id" />
+    <item name="fragment_aeries_login_button" type="id" />
+    <item name="activity_drawer_drawerlayout" type="id" />
+    <item name="activity_drawer_drawer_scrollview" type="id" />
+    <item name="activity_drawer_drawer_linearlayout" type="id" />
+    <item name="activity_drawer_content" type="id" />
+    <item name="toolbar_actionbar" type="id" />
+    <item name="activity_aeries_fragment" type="id" />
+    <item name="activity_aeries_progress_bar" type="id" />
+    <item name="fragment_aeries_login_linear" type="id" />
 </resources>

@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#D8F000"
+    android:orientation="vertical"
+    android:paddingBottom="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/mvhs_logo" />
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="10"
+            android:width="@dimen/abc_action_bar_stacked_tab_max_width"
+            android:background="@drawable/round"
+            android:onClick="addHomework"
+            android:text="Add Homework"
+            android:textColor="#D8F000" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="10"
+            android:width="@dimen/abc_action_bar_stacked_tab_max_width"
+            android:background="@drawable/round"
+            android:onClick="todayHW"
+            android:text="Look at today's Homework"
+            android:textColor="#D8F000" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="10"
+            android:width="@dimen/abc_action_bar_stacked_tab_max_width"
+            android:background="@drawable/round"
+            android:onClick="openCalendar"
+            android:text="Look at what's coming up"
+            android:textColor="#D8F000" />
+    </LinearLayout>
+
+</LinearLayout>

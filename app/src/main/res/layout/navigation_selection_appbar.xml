@@ -19,84 +19,84 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark"
         tools:visibility="visible">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@id/navigation_selection_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_action_bar_default_height_material"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:contentInsetStart="72dp" />
+        <android.support.v7.widget.Toolbar
+            android:id="@id/navigation_selection_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/abc_action_bar_default_height_material"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:contentInsetStart="72dp" />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="68dp"
-        android:background="@null"
-        android:fontFamily="sans-serif"
-        android:gravity="start|center_vertical"
-        android:paddingLeft="8dp"
-        android:text="@string/change_starting_point"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="12sp" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="68dp"
+            android:background="@null"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_vertical"
+            android:paddingLeft="8dp"
+            android:text="@string/change_starting_point"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
 
-    <Button
-        android:id="@+id/navigation_appbar_startingloc_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/navigation_selection_toolbar"
-        android:layout_marginStart="64dp"
-        android:background="?selectableItemBackground"
-        android:fontFamily="sans-serif"
-        android:gravity="start"
-        android:paddingLeft="8dp"
-        android:paddingTop="8dp"
-        android:text="@string/your_location"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
+        <Button
+            android:id="@+id/navigation_appbar_startingloc_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/navigation_selection_toolbar"
+            android:layout_marginStart="64dp"
+            android:background="?selectableItemBackground"
+            android:fontFamily="sans-serif"
+            android:gravity="start"
+            android:paddingLeft="8dp"
+            android:paddingTop="8dp"
+            android:text="@string/your_location"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/navigation_appbar_startingloc_button"
-        android:layout_marginStart="64dp"
-        android:background="@null"
-        android:fontFamily="sans-serif"
-        android:gravity="start|center_vertical"
-        android:paddingLeft="8dp"
-        android:text="@string/choose_destination_below"
-        android:textAllCaps="false"
-        android:textColor="#87ffffff"
-        android:textSize="16sp" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/navigation_appbar_startingloc_button"
+            android:layout_marginStart="64dp"
+            android:background="@null"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_vertical"
+            android:paddingLeft="8dp"
+            android:text="@string/choose_destination_below"
+            android:textAllCaps="false"
+            android:textColor="#87ffffff"
+            android:textSize="16sp" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/navigation_appbar_startingloc_button"
-        android:layout_marginLeft="72dp"
-        android:background="#67ffffff" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/navigation_appbar_startingloc_button"
+            android:layout_marginLeft="72dp"
+            android:background="#67ffffff" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="80dp"
-        android:src="@drawable/ic_expand_more_white_24dp" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="80dp"
+            android:src="@drawable/ic_expand_more_white_24dp" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="86dp"
-        android:src="@drawable/ic_expand_more_white_24dp" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="86dp"
+            android:src="@drawable/ic_expand_more_white_24dp" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="92dp"
-        android:src="@drawable/ic_expand_more_white_24dp" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="92dp"
+            android:src="@drawable/ic_expand_more_white_24dp" />
 
     </RelativeLayout>
 

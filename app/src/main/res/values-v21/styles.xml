@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MVHSApp.Light" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
+    <style name="Theme.MVHSApp.Light" parent="Base.Theme.MVHSApp.Light">
+        <item name="toolbarShadow">@null</item>
+    </style>
+
+    <style name="Theme.MVHSApp.Light.WithNavDrawer" parent="Base.Theme.MVHSApp.Light">
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="toolbarShadow">@null</item>
+    </style>
+
+    <style name="Theme.MVHSApp.Light.Map" parent="Base.Theme.MVHSApp.Light">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>

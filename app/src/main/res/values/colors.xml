@@ -2,5 +2,7 @@
 <resources>
     <item name="primary_dark" type="color">#FBC02D</item>
     <item name="primary" type="color">#FDD835</item>
-    <item name="accent" type="color">#FFEE58</item>
+    <item name="accent" type="color">#448AFF</item>
+
+    <item name="disabled_button" type="color">#1fffffff</item>
 </resources>

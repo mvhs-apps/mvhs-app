@@ -3,7 +3,7 @@
     android:id="@id/fragment_list_recycler"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:windowBackground"
+    android:background="@color/background_material_light"
     android:clipToPadding="false"
     android:paddingBottom="8dp"
     android:paddingTop="8dp" />

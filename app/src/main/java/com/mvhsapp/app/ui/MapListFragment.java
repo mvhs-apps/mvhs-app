@@ -1,4 +1,4 @@
-package com.mvhsapp.app;
+package com.mvhsapp.app.ui;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.mvhsapp.app.R;
 import com.mvhsapp.app.map.LocationNode;
 import com.mvhsapp.app.map.MapData;
 

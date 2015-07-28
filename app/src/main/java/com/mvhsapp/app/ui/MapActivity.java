@@ -1,4 +1,4 @@
-package com.mvhsapp.app;
+package com.mvhsapp.app.ui;
 
 import android.animation.ObjectAnimator;
 import android.app.Dialog;
@@ -38,6 +38,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.mvhsapp.app.R;
+import com.mvhsapp.app.Utils;
 import com.mvhsapp.app.map.LocationNode;
 import com.mvhsapp.app.map.MapData;
 import com.mvhsapp.app.map.Node;
@@ -671,7 +673,7 @@ public class MapActivity extends AppCompatActivity {
         mNavSelectionFab.setImageResource(R.drawable.ic_directions_black_24dp);
 
         if (mDestinationMarker != null)
-            mDestinationMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.map_icon));
+            mDestinationMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker));
 
         MapData.cleanTempNodes();
         if (mNavPathPolylines != null) {
@@ -697,7 +699,7 @@ public class MapActivity extends AppCompatActivity {
                 new LatLng(37.361323, -122.065080));
         GroundOverlayOptions schoolMap = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(
-                        mDebugMode ? R.drawable.map2 : R.drawable.map))
+                        mDebugMode ? R.drawable.map_debug : R.drawable.map))
                 .transparency(0.1f)
                 .positionFromBounds(mapBounds);
         googleMap.addGroundOverlay(schoolMap);
@@ -707,7 +709,7 @@ public class MapActivity extends AppCompatActivity {
                     .title(node.getName())
                     .snippet("Press for navigation");
             if (!mDebugMode) {
-                options.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_icon));
+                options.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker));
             }
             mMarkers.put(node, googleMap.addMarker(options));
         }
