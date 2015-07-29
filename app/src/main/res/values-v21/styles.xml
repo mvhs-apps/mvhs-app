@@ -10,7 +10,7 @@
         <item name="toolbarShadow">@null</item>
     </style>
 
-    <style name="Theme.MVHSApp.Light.Map" parent="Base.Theme.MVHSApp.Light">
+    <style name="Theme.MVHSApp.Light.Map" parent="Theme.MVHSApp.Light.WithNavDrawer">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>

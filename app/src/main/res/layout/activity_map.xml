@@ -1,114 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@id/activity_drawer_drawerlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@id/activity_map_fragment_container"
+    <RelativeLayout
+        android:id="@id/activity_drawer_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/activity_map_showlist_framelayout" />
+        android:layout_height="match_parent">
 
-    <CheckBox
-        android:id="@id/activity_map_checkbox_debug"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/activity_map_my_loc_fab"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:paddingRight="8dp"
-        android:text="Debug Mode"
-        android:textColor="@android:color/white"
-        tools:visibility="gone" />
-
-    <FrameLayout
-        android:id="@id/activity_map_showlist_framelayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@android:color/white"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:id="@id/activity_map_showlist_linearlayout"
+        <FrameLayout
+            android:id="@id/activity_map_fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="?selectableItemBackground"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:layout_above="@id/activity_map_showlist_framelayout" />
 
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@string/list"
-                android:padding="14dp"
-                android:src="@drawable/ic_list_white"
-                android:tint="@android:color/black" />
+        <CheckBox
+            android:id="@id/activity_map_checkbox_debug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/activity_map_my_loc_fab"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:paddingRight="8dp"
+            android:text="Debug Mode"
+            android:textColor="@android:color/white"
+            tools:visibility="gone" />
 
-            <TextView
+        <FrameLayout
+            android:id="@id/activity_map_showlist_framelayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/white"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@id/activity_map_showlist_linearlayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="start|center_vertical"
-                android:text="@string/list_of_classrooms"
-                android:textAllCaps="false" />
-        </LinearLayout>
+                android:layout_height="48dp"
+                android:background="?selectableItemBackground"
+                android:orientation="horizontal">
 
-    </FrameLayout>
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="@string/list"
+                    android:padding="14dp"
+                    android:src="@drawable/ic_list_white"
+                    android:tint="@android:color/black" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@id/activity_map_my_loc_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/activity_map_nav_fab"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:src="@drawable/ic_my_location_black_24dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/list_of_classrooms"
+                    android:textAllCaps="false" />
+            </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@id/activity_map_nav_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/activity_map_showlist_framelayout"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_directions_black_24dp" />
+        </FrameLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_above="@id/activity_map_showlist_framelayout"
-        android:background="@drawable/toolbar_shadow"
-        android:scaleY="-1" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@id/activity_map_my_loc_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/activity_map_nav_fab"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_my_location_black_24dp" />
 
-    <View
-        android:id="@id/activity_map_searchbox_background"
-        android:layout_width="match_parent"
-        android:layout_height="88dp"
-        android:alpha="0"
-        android:background="@color/background_material_light" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@id/activity_map_nav_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/activity_map_showlist_framelayout"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_directions_black_24dp" />
 
-    <FrameLayout
-        android:id="@id/activity_map_list_fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="16dp"
-        tools:visibility="gone" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_above="@id/activity_map_showlist_framelayout"
+            android:background="@drawable/toolbar_shadow"
+            android:scaleY="-1" />
 
-    <com.mvhsapp.app.widget.SearchView
-        android:id="@id/activity_map_searchbox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp" />
+        <View
+            android:id="@id/activity_map_searchbox_background"
+            android:layout_width="match_parent"
+            android:layout_height="88dp"
+            android:alpha="0"
+            android:background="@color/background_material_light" />
 
-    <include
-        layout="@layout/navigation_selection_appbar"
-        tools:visibility="gone" />
+        <FrameLayout
+            android:id="@id/activity_map_list_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="16dp"
+            tools:visibility="gone" />
 
-    <include
-        layout="@layout/navigation_appbar"
-        tools:visibility="gone" />
+        <com.mvhsapp.app.widget.SearchView
+            android:id="@id/activity_map_searchbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp" />
 
-</RelativeLayout>
+        <include
+            layout="@layout/appbar_navigation_start_dest"
+            tools:visibility="gone" />
+
+        <include
+            layout="@layout/appbar_navigating"
+            tools:visibility="gone" />
+
+    </RelativeLayout>
+
+    <include layout="@layout/drawer" />
+
+</android.support.v4.widget.DrawerLayout>

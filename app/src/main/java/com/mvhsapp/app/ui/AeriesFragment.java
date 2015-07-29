@@ -80,7 +80,6 @@ public class AeriesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
 
         mCredentialsApiClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(Auth.CREDENTIALS_API)
@@ -99,7 +98,9 @@ public class AeriesFragment extends Fragment {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                ((AeriesActivity) getActivity()).setProgressBarProgress(newProgress);
+                if (getActivity() != null) {
+                    ((AeriesActivity) getActivity()).setProgressBarProgress(newProgress);
+                }
             }
         });
 
@@ -209,11 +210,15 @@ public class AeriesFragment extends Fragment {
     }
 
     private void showIndeterminateProgressBar() {
-        ((AeriesActivity) getActivity()).showIndeterminateProgressBar();
+        if (getActivity() != null) {
+            ((AeriesActivity) getActivity()).showIndeterminateProgressBar();
+        }
     }
 
     private void finishAllLoading() {
-        ((AeriesActivity) getActivity()).hideIndeterminateProgressBar();
+        if (getActivity() != null) {
+            ((AeriesActivity) getActivity()).hideIndeterminateProgressBar();
+        }
 
         if (mSavingSnackbar != null) {
             mSavingSnackbar.dismiss();
@@ -329,19 +334,22 @@ public class AeriesFragment extends Fragment {
         @Override
         public void onReceivedError(final WebView view, int errorCode, String description, final String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            mErrorSnackbar = Snackbar.make(view, "Error " + errorCode + ": " + description, Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Try Again", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            mErrorSnackbar.dismiss();
-                            view.loadUrl(failingUrl);
-                        }
-                    });
-            mErrorSnackbar.show();
 
-            finishAllLoading();
-            mLoginButton.setEnabled(false);
-            mLoginButton.setText(R.string.error);
+            if (view != null) {
+                mErrorSnackbar = Snackbar.make(view, "Error " + errorCode + ": " + description, Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Try Again", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mErrorSnackbar.dismiss();
+                                view.loadUrl(failingUrl);
+                            }
+                        });
+                mErrorSnackbar.show();
+
+                finishAllLoading();
+                mLoginButton.setEnabled(false);
+                mLoginButton.setText(R.string.error);
+            }
         }
 
         @Override
@@ -371,6 +379,7 @@ public class AeriesFragment extends Fragment {
                     finishAllLoading();
                 }
 
+                //TODO: Use WebView.findAll for compat
                 Utils.executeJavascript(mWebView, "document.getElementById(\"errorMessage_password\").innerText", new ValueCallback<String>() {
                     @Override
                     public void onReceiveValue(String value) {

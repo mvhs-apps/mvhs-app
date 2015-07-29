@@ -59,7 +59,7 @@ public class SearchView extends RelativeLayout {
 
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.searchbox, this, true);
+        inflater.inflate(R.layout.searchview, this, true);
 
         mSearchboxEditText = (SearchboxEditText) findViewById(R.id.searchbox_edittext);
         mSearchboxEditText.addTextChangedListener(new TextWatcher() {

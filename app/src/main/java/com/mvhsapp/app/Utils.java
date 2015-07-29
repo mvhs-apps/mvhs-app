@@ -38,7 +38,6 @@ public class Utils {
     }
 
     public static void executeJavascript(WebView view, String javascript, ValueCallback<String> valueCallback) {
-        //TODO: callback before kitkat? perhaps by injecting javascript to call Android function
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             view.evaluateJavascript(javascript, valueCallback);
         } else {
@@ -52,5 +51,15 @@ public class Utils {
             //If keyboard is open
             imm.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(), 0);
         }
+    }
+
+    public static double bearing(double lat1, double lon1, double lat2, double lon2) {
+        double latitude1 = Math.toRadians(lat1);
+        double latitude2 = Math.toRadians(lat2);
+        double longDiff = Math.toRadians(lon2 - lon1);
+        double y = Math.sin(longDiff) * Math.cos(latitude2);
+        double x = Math.cos(latitude1) * Math.sin(latitude2) - Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(longDiff);
+
+        return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
     }
 }

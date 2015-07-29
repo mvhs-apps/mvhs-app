@@ -23,18 +23,20 @@ import com.mvhsapp.app.R;
  * Base Activity with the Navigation Drawer
  */
 public abstract class DrawerActivity extends AppCompatActivity {
-    //TODO: Drawer shadow
+    protected static final int NAVDRAWER_ITEM_AERIES = 0;
+    protected static final int NAVDRAWER_ITEM_MAP = 1;
+    protected static final int NAVDRAWER_ITEM_CALENDAR = 2;
 
-    private static final int NAVDRAWER_ITEM_AERIES = 0;
-    private static final int NAVDRAWER_ITEM_MAP = 1;
     private static final int NAVDRAWER_ITEM_SETTINGS = -3;
     //private static final int NAVDRAWER_ITEM_HELP = -4;
     private static final int NAVDRAWER_ITEM_ABOUT = -5;
     private static final int NAVDRAWER_ITEM_INVALID = -1;
     private static final int NAVDRAWER_ITEM_SEPARATOR = -2;
+
     private static final int[] NAVDRAWER_ITEMS = new int[]{
             NAVDRAWER_ITEM_AERIES,
             NAVDRAWER_ITEM_MAP,
+            NAVDRAWER_ITEM_CALENDAR,
             NAVDRAWER_ITEM_SEPARATOR,
             NAVDRAWER_ITEM_SETTINGS,
             //NAVDRAWER_ITEM_HELP,
@@ -44,7 +46,6 @@ public abstract class DrawerActivity extends AppCompatActivity {
     private static final int MAIN_CONTENT_FADEOUT_DURATION = 150;
     private static final int MAIN_CONTENT_FADEIN_DURATION = 250;
 
-    private String[] mNavDrawerStrings;
     private DrawerLayout mDrawerLayout;
 
     private Handler mHandler;
@@ -84,7 +85,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_drawer_drawerlayout);
         Resources resources = getResources();
 
-        mNavDrawerStrings = resources.getStringArray(R.array.nav_drawer_items);
+        String[] navDrawerStrings = resources.getStringArray(R.array.nav_drawer_items);
 
         if (mActionBarToolbar != null) {
             mActionBarToolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
@@ -92,7 +93,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
                     .OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mDrawerLayout.openDrawer(GravityCompat.START);
+                    openDrawer();
                 }
             });
         }
@@ -119,7 +120,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             }
         });
 
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         ScrollView mDrawerScrollView = (ScrollView) findViewById(R.id
                 .activity_drawer_drawer_scrollview);
@@ -153,7 +154,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
                         mDrawerListLinearLayout, false));
             } else {
                 TextView v = (TextView) getLayoutInflater().inflate(R.layout.list_item_drawer, mDrawerListLinearLayout, false);
-                v.setText(mNavDrawerStrings[i]);
+                v.setText(navDrawerStrings[i]);
                 v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -166,25 +167,13 @@ public abstract class DrawerActivity extends AppCompatActivity {
         }
     }
 
+    protected void openDrawer() {
+        mDrawerLayout.openDrawer(GravityCompat.START);
+    }
+
     void resetTitle() {
-        /*setTitle(NAVDRAWER_ACTIONBAR_TITLE_RES_ID[getSelfNavDrawerItem()]);
-        ViewTreeObserver vto = findViewById(android.R.id.content).getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @SuppressWarnings("deprecation")
-            @Override
-            public void onGlobalLayout() {
-                if (getActionBarToolbar().isTitleTruncated()) {
-                    setTitle(null);
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    findViewById(android.R.id.content).getViewTreeObserver()
-                            .removeOnGlobalLayoutListener(this);
-                } else {
-                    findViewById(android.R.id.content).getViewTreeObserver()
-                            .removeGlobalOnLayoutListener(this);
-                }
-            }
-        });*/
+        String[] toolbarStrings = getResources().getStringArray(R.array.nav_drawer_toolbar_names);
+        setTitle(getString(R.string.nav_drawer_toolbar_prefix) + toolbarStrings[getSelfNavDrawerItem()]);
     }
 
     void lockDrawer(boolean lock) {

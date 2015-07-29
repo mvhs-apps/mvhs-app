@@ -6,11 +6,11 @@
         <item name="toolbarShadow">@drawable/shadow</item>
     </style>
 
-    <style name="Theme.MVHSApp.Light.Map" parent="Base.Theme.MVHSApp.Light" />
-
     <style name="Theme.MVHSApp.Light.WithNavDrawer" parent="Base.Theme.MVHSApp.Light">
         <item name="toolbarShadow">@drawable/shadow</item>
     </style>
+
+    <style name="Theme.MVHSApp.Light.Map" parent="Theme.MVHSApp.Light.WithNavDrawer"/>
 
     <style name="Base.Theme.MVHSApp.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>

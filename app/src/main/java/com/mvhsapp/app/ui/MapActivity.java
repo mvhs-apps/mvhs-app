@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +37,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.mvhsapp.app.BuildConfig;
 import com.mvhsapp.app.R;
 import com.mvhsapp.app.Utils;
 import com.mvhsapp.app.map.LocationNode;
@@ -59,10 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- *
- */
-public class MapActivity extends AppCompatActivity {
+public class MapActivity extends DrawerActivity {
 
     public static final String STATE_MAP_MODE = "mapMode";
     public static final String FRAGMENT_LIST = "List";
@@ -87,17 +84,11 @@ public class MapActivity extends AppCompatActivity {
     private FloatingActionButton mNavSelectionFab;
     private View mNavigationSelectionAppBar;
     private Button mStartingLocationButton;
-    private ViewGroup mNavigationAppBar;
     private Toolbar mNavToolbar;
 
-    protected static double bearing(double lat1, double lon1, double lat2, double lon2) {
-        double latitude1 = Math.toRadians(lat1);
-        double latitude2 = Math.toRadians(lat2);
-        double longDiff = Math.toRadians(lon2 - lon1);
-        double y = Math.sin(longDiff) * Math.cos(latitude2);
-        double x = Math.cos(latitude1) * Math.sin(latitude2) - Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(longDiff);
-
-        return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+    @Override
+    int getSelfNavDrawerItem() {
+        return NAVDRAWER_ITEM_MAP;
     }
 
     @Override
@@ -171,7 +162,7 @@ public class MapActivity extends AppCompatActivity {
         listFrame.setPadding(0, 0, 0, Utils.convertDpToPx(this, listMarginTop));
 
         mListShowing = true;
-        mSearchView.setDrawerIconVisibility(true, true);
+        mSearchView.setDrawerIconState(false, true);
     }
 
     private void hideList() {
@@ -193,7 +184,7 @@ public class MapActivity extends AppCompatActivity {
         animator2.start();
 
         mListShowing = false;
-        mSearchView.setDrawerIconVisibility(false, true);
+        mSearchView.setDrawerIconState(true, true);
     }
 
     @Override
@@ -236,7 +227,7 @@ public class MapActivity extends AppCompatActivity {
                 updateMapOverlays(mapFragment.getMap());
             }
         });
-        debug.setVisibility(/*BuildConfig.DEBUG*/false ? View.VISIBLE : View.GONE);
+        debug.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
 
         LinearLayout openListBar = (LinearLayout) findViewById(R.id.activity_map_showlist_linearlayout);
         openListBar.setOnClickListener(new View.OnClickListener() {
@@ -265,12 +256,16 @@ public class MapActivity extends AppCompatActivity {
 
             @Override
             public void onDrawerIconClicked() {
-                onBackPressed();
-                mSearchView.clearFocus();
-                mSearchView.clearText();
+                if (mChoosingDestination || mChoosingStart || mListShowing) {
+                    onBackPressed();
+                    mSearchView.clearFocus();
+                    mSearchView.clearText();
+                } else {
+                    openDrawer();
+                }
             }
         });
-        mSearchView.setDrawerIconState(false, false);
+        mSearchView.setDrawerIconState(true, false);
 
         mNavigationSelectionAppBar = findViewById(R.id.navigation_selection_appbar);
 
@@ -322,6 +317,7 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         });
+        mNavSelectionFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.primary)));
 
         FloatingActionButton myLocFab = (FloatingActionButton) findViewById(R.id.activity_map_my_loc_fab);
         myLocFab.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
@@ -330,13 +326,14 @@ public class MapActivity extends AppCompatActivity {
             public void onClick(View v) {
                 GoogleMap map = getMap();
                 Location myLocation = map.getMyLocation();
-                LatLng latLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
-                map.animateCamera(cameraUpdate);
+                if (myLocation != null) {
+                    LatLng latLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
+                    map.animateCamera(cameraUpdate);
+                }
             }
         });
 
-        mNavigationAppBar = (ViewGroup) findViewById(R.id.navigation_appbar);
         mNavToolbar = (Toolbar) findViewById(R.id.navigation_toolbar);
         mNavToolbar.setNavigationIcon(R.drawable.abc_ic_clear_mtrl_alpha);
         mNavToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -363,7 +360,7 @@ public class MapActivity extends AppCompatActivity {
                     listFragmentFrame.setTranslationY(listFragmentFrame.getMeasuredHeight());
                 }
             });
-            mSearchView.setDrawerIconVisibility(false, true);
+            mSearchView.setDrawerIconState(true, true);
         }
 
 
@@ -378,6 +375,9 @@ public class MapActivity extends AppCompatActivity {
         });
 
         mMarkers = new HashMap<>();
+
+
+        overridePendingTransition(0, 0);
     }
 
     private void enterChoosingStart() {
@@ -470,7 +470,7 @@ public class MapActivity extends AppCompatActivity {
                         }
                     }
                 }
-                Log.e("Test", "" + cameraPosition.zoom);
+                Log.e("CameraZoom", "" + cameraPosition.zoom);
                 if (!done[0]) {
                     updateMapOverlays(googleMap);
                     done[0] = true;
@@ -504,8 +504,16 @@ public class MapActivity extends AppCompatActivity {
 
         Node startPlace;
         if (mStartingLocation == null) {
-            double myLat = googleMap.getMyLocation().getLatitude();
-            double myLong = googleMap.getMyLocation().getLongitude();
+            Location myLocation = googleMap.getMyLocation();
+            if (myLocation == null) {
+                Toast.makeText(MapActivity.this,
+                        "Your location cannot be obtained",
+                        Toast.LENGTH_LONG).show();
+                enterChoosingDestination();
+                return;
+            }
+            double myLat = myLocation.getLatitude();
+            double myLong = myLocation.getLongitude();
             startPlace = new Node(myLat, myLong);
         } else {
             startPlace = MapData.locationNodeMap.get(mStartingLocation);
@@ -558,7 +566,7 @@ public class MapActivity extends AppCompatActivity {
                 if (!MapData.nodesLiesOnOnePath(navPath.subList(i - 1, test + 1))) {
                     break;
                 }
-                Log.e("Test", "Test successed:" + navPath.subList(i - 1, test + 1).toString());
+                Log.e("Nav Succeeded", navPath.subList(i - 1, test + 1).toString());
                 index = test;
             }
 
@@ -583,8 +591,8 @@ public class MapActivity extends AppCompatActivity {
             LatLng n = latLngs.get(0);
             LatLng n2 = latLngs.get(1);
 
-            double bearing = bearing(n.latitude, n.longitude, n2.latitude, n2.longitude);
-            Log.e("Test", "Bearing " + bearing + " for points " + n + ", " + n2);
+            double bearing = Utils.bearing(n.latitude, n.longitude, n2.latitude, n2.longitude);
+            Log.e("NavCalc", "Bearing " + bearing + " for points " + n + ", " + n2);
             String nav = null;
             if (i == 1) {
                 if (bearing < 45 || bearing >= 315) {

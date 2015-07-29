@@ -71,5 +71,8 @@ public class AeriesActivity extends DrawerActivity {
         mProgressBar.setVisibility(View.GONE);
     }
 
-
+    @Override
+    int getSelfNavDrawerItem() {
+        return NAVDRAWER_ITEM_AERIES;
+    }
 }
