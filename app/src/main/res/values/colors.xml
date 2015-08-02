@@ -5,4 +5,5 @@
     <item name="accent" type="color">#448AFF</item>
 
     <item name="disabled_button" type="color">#10000000</item>
+    <item name="nav_drawer_icon" type="color">#8a000000</item>
 </resources>

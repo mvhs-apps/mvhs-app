@@ -14,7 +14,7 @@ import android.webkit.WebView;
 /**
  * Utilities
  */
-public class Utils {
+public abstract class Utils {
 
 
     public static void addOnGlobalLayoutListener(final View view, final Runnable r) {
