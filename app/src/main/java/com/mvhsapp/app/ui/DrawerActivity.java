@@ -2,10 +2,15 @@ package com.mvhsapp.app.ui;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,11 +18,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mvhsapp.app.PrefUtils;
 import com.mvhsapp.app.R;
 
 /**
@@ -45,6 +52,17 @@ public abstract class DrawerActivity extends AppCompatActivity {
             //NAVDRAWER_ITEM_HELP,
             NAVDRAWER_ITEM_ABOUT
     };
+    private static final int[] NAVDRAWER_ITEMS_ICONS = new int[]{
+            R.drawable.ic_grade_black_24dp,
+            R.drawable.ic_map_black_24dp,
+            R.drawable.ic_web_black_24dp,
+            R.drawable.ic_view_agenda_black_24dp,
+            NAVDRAWER_ITEM_SEPARATOR,
+            R.drawable.ic_settings_black_24dp,
+            //NAVDRAWER_ITEM_HELP,
+            R.drawable.ic_info_black_24dp
+    };
+
     private static final int NAVDRAWER_LAUNCH_DELAY = 250;
     private static final int MAIN_CONTENT_FADEOUT_DURATION = 150;
     private static final int MAIN_CONTENT_FADEIN_DURATION = 250;
@@ -88,7 +106,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_drawer_drawerlayout);
         Resources resources = getResources();
 
-        String[] navDrawerStrings = resources.getStringArray(R.array.nav_drawer_items);
+
 
         if (mActionBarToolbar != null) {
             mActionBarToolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
@@ -142,11 +160,12 @@ public abstract class DrawerActivity extends AppCompatActivity {
         LinearLayout mDrawerListLinearLayout = (LinearLayout) findViewById(R.id
                 .activity_drawer_drawer_linearlayout);
 
-        /*if (!PrefUtils.isWelcomeDone(this)) {
+        if (!PrefUtils.isWelcomeDone(this)) {
             PrefUtils.markWelcomeDone(this);
-            mDrawerLayout.openDrawer(Gravity.START);
-        }*/
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }
 
+        String[] navDrawerStrings = resources.getStringArray(R.array.nav_drawer_items);
         //INFLATE LAYOUTS AND SET CLICK LISTENERS
         for (int i = 0; i < NAVDRAWER_ITEMS.length; i++) {
             final int itemId = NAVDRAWER_ITEMS[i];
@@ -154,17 +173,35 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 mDrawerListLinearLayout.addView(getLayoutInflater().inflate(R.layout.list_item_separator,
                         mDrawerListLinearLayout, false));
             } else {
-                TextView v = (TextView) getLayoutInflater().inflate(R.layout.list_item_drawer, mDrawerListLinearLayout, false);
+                FrameLayout layout = (FrameLayout) getLayoutInflater().inflate(R.layout.list_item_drawer, mDrawerListLinearLayout, false);
+                TextView v = (TextView) layout.findViewById(android.R.id.text1);
                 v.setText(navDrawerStrings[i]);
-                if (itemId == getSelfNavDrawerItem())
+
+                Drawable drawable = ContextCompat.getDrawable(this, NAVDRAWER_ITEMS_ICONS[i]);
+                drawable = DrawableCompat.wrap(drawable);
+                drawable.mutate();
+                DrawableCompat.setTintMode(drawable, PorterDuff.Mode.DST_IN);
+                DrawableCompat.setTint(drawable, getResources().getColor(R.color.nav_drawer_icon));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    v.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null);
+                }
+
+                v.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+
+
+                if (itemId == getSelfNavDrawerItem()) {
+                    v.setBackgroundColor(getResources().getColor(R.color.ripple_material_light));
                     setTitle(getString(R.string.nav_drawer_toolbar_prefix) + navDrawerStrings[i]);
-                v.setOnClickListener(new View.OnClickListener() {
+                } else {
+                    v.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                }
+                layout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         onNavDrawerItemClicked(itemId);
                     }
                 });
-                mDrawerListLinearLayout.addView(v);
+                mDrawerListLinearLayout.addView(layout);
             }
 
         }
@@ -243,7 +280,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
     private boolean isNormalItem(int itemId) {
         return itemId != NAVDRAWER_ITEM_SETTINGS
                 //&& itemId != NAVDRAWER_ITEM_HELP
-                && itemId != NAVDRAWER_ITEM_ABOUT;
+                && itemId != NAVDRAWER_ITEM_ABOUT
+                && itemId != NAVDRAWER_ITEM_MVHSSITE;
     }
 
     boolean isNavDrawerOpen() {
@@ -269,7 +307,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse("http://www.mvla.net/MVHS/"));
                 startActivity(i);
-                return;
+                break;
             case NAVDRAWER_ITEM_SETTINGS:
                 i = new Intent(this, SettingsActivity.class);
                 break;
