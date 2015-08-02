@@ -34,4 +34,10 @@
     <item name="activity_aeries_fragment" type="id" />
     <item name="activity_aeries_progress_bar" type="id" />
     <item name="fragment_aeries_login_linear" type="id" />
+    <item name="activity_setup_fragment" type="id" />
+    <item name="list_item_setup_period_text" type="id" />
+    <item name="list_item_setup_room_edit" type="id" />
+    <item name="list_item_setup_subject_edit" type="id" />
+    <item name="menu_setup_done" type="id" />
+    <item name="activity_with_toolbar_content_framelayout" type="id" />
 </resources>

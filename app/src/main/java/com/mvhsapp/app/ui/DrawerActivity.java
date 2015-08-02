@@ -2,6 +2,7 @@ package com.mvhsapp.app.ui;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -23,9 +24,10 @@ import com.mvhsapp.app.R;
  * Base Activity with the Navigation Drawer
  */
 public abstract class DrawerActivity extends AppCompatActivity {
-    protected static final int NAVDRAWER_ITEM_AERIES = 0;
-    protected static final int NAVDRAWER_ITEM_MAP = 1;
-    protected static final int NAVDRAWER_ITEM_CALENDAR = 2;
+    protected static final int NAVDRAWER_ITEM_AERIES = 2;
+    protected static final int NAVDRAWER_ITEM_MAP = 4;
+    protected static final int NAVDRAWER_ITEM_CALENDAR = 6;
+    protected static final int NAVDRAWER_ITEM_MVHSSITE = 8;
 
     private static final int NAVDRAWER_ITEM_SETTINGS = -3;
     //private static final int NAVDRAWER_ITEM_HELP = -4;
@@ -36,6 +38,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
     private static final int[] NAVDRAWER_ITEMS = new int[]{
             NAVDRAWER_ITEM_AERIES,
             NAVDRAWER_ITEM_MAP,
+            NAVDRAWER_ITEM_MVHSSITE,
             NAVDRAWER_ITEM_CALENDAR,
             NAVDRAWER_ITEM_SEPARATOR,
             NAVDRAWER_ITEM_SETTINGS,
@@ -139,8 +142,6 @@ public abstract class DrawerActivity extends AppCompatActivity {
         LinearLayout mDrawerListLinearLayout = (LinearLayout) findViewById(R.id
                 .activity_drawer_drawer_linearlayout);
 
-        resetTitle();
-
         /*if (!PrefUtils.isWelcomeDone(this)) {
             PrefUtils.markWelcomeDone(this);
             mDrawerLayout.openDrawer(Gravity.START);
@@ -155,6 +156,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
             } else {
                 TextView v = (TextView) getLayoutInflater().inflate(R.layout.list_item_drawer, mDrawerListLinearLayout, false);
                 v.setText(navDrawerStrings[i]);
+                if (itemId == getSelfNavDrawerItem())
+                    setTitle(getString(R.string.nav_drawer_toolbar_prefix) + navDrawerStrings[i]);
                 v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -169,11 +172,6 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
     protected void openDrawer() {
         mDrawerLayout.openDrawer(GravityCompat.START);
-    }
-
-    void resetTitle() {
-        String[] toolbarStrings = getResources().getStringArray(R.array.nav_drawer_toolbar_names);
-        setTitle(getString(R.string.nav_drawer_toolbar_prefix) + toolbarStrings[getSelfNavDrawerItem()]);
     }
 
     void lockDrawer(boolean lock) {
@@ -207,7 +205,6 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        resetTitle();
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -268,10 +265,15 @@ public abstract class DrawerActivity extends AppCompatActivity {
             case NAVDRAWER_ITEM_MAP:
                 i = new Intent(this, MapActivity.class);
                 break;
-            /*case NAVDRAWER_ITEM_SETTINGS:
+            case NAVDRAWER_ITEM_MVHSSITE:
+                i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse("http://www.mvla.net/MVHS/"));
+                startActivity(i);
+                return;
+            case NAVDRAWER_ITEM_SETTINGS:
                 i = new Intent(this, SettingsActivity.class);
                 break;
-            case NAVDRAWER_ITEM_ABOUT:
+            /*case NAVDRAWER_ITEM_ABOUT:
                 i = new Intent(this, AboutActivity.class);
                 break;*/
             default:

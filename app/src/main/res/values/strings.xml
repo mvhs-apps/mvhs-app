@@ -2,6 +2,7 @@
     <string name="app_name">MVHS App</string>
     <string name="logo">Logo</string>
 
+    <string name="mvhs_site">MVHS Website</string>
     <string name="aeries">Aeries SIS</string>
     <string name="map">School Map</string>
     <string name="calendar">Calendar</string>
@@ -11,6 +12,7 @@
     <string-array name="nav_drawer_items">
         <item>@string/aeries</item>
         <item>@string/map</item>
+        <item>@string/mvhs_site</item>
         <item>@string/calendar</item>
         <item>SEPARATOR</item>
         <item>@string/settings</item>
@@ -20,6 +22,7 @@
     <string-array name="nav_drawer_toolbar_names">
         <item>@string/aeries</item>
         <item>@string/map</item>
+        <item>@string/mvhs_site</item>
         <item>@string/calendar</item>
     </string-array>
     <string name="nav_drawer_toolbar_prefix">"MVHS - "</string>
@@ -73,4 +76,10 @@
     <string name="saving_credentials">Saving Smart Lock Credentials…</string>
     <string name="error">Error</string>
     <string name="incorrect_login">The username or password entered is incorrect.</string>
+    <string name="room">Room</string>
+    <string name="subject">Subject</string>
+    <string name="save_setup">Save Setup</string>
+    <string name="enter_schedule_warning">Please enter your schedule details.</string>
+    <string name="schedule_setup">Schedule Setup</string>
+    <string name="pref_open_schedule_setup_title">Change Schedule Setup</string>
 </resources>

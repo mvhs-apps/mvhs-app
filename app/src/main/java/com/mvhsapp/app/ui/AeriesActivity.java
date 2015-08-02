@@ -7,9 +7,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.mvhsapp.app.PrefUtils;
 import com.mvhsapp.app.R;
 
 public class AeriesActivity extends DrawerActivity {
+
 
     private ProgressBar mProgressBar;
 
@@ -17,6 +19,11 @@ public class AeriesActivity extends DrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aeries);
+
+        if (!PrefUtils.isWelcomeDone(this)) {
+            startActivity(new Intent(this, SetupActivity.class));
+            PrefUtils.markWelcomeDone(this);
+        }
 
         FragmentManager fm = getFragmentManager();
         Fragment f = fm.findFragmentById(R.id.activity_aeries_fragment);
@@ -42,7 +49,7 @@ public class AeriesActivity extends DrawerActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == AeriesFragment.RC_SAVE || requestCode == AeriesFragment.RC_READ) {
+        if (requestCode == AeriesFragment.RC_SAVE || requestCode == AeriesFragment.RC_READ || requestCode == AeriesFragment.RC_HINT) {
             Fragment f = getFragmentManager().findFragmentById(R.id.activity_aeries_fragment);
             f.onActivityResult(requestCode, resultCode, data);
         } else {
