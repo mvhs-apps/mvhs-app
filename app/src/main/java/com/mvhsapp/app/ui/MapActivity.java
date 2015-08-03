@@ -556,6 +556,7 @@ public class MapActivity extends DrawerActivity {
             updateMapOverlays(googleMap);
         }
 
+        int totalDistance = 0;
         mNavPathPolylines = new ArrayList<>();
         for (int i = 1; i < navPath.size(); ) {
             Node n = navPath.get(i - 1);
@@ -578,6 +579,10 @@ public class MapActivity extends DrawerActivity {
                             .zIndex(1000)
             );
 
+            float[] results = new float[3];
+            Location.distanceBetween(n.latLng.latitude, n.latLng.longitude,
+                    navPath.get(index).latLng.latitude, navPath.get(index).latLng.longitude, results);
+            totalDistance += results[0];
             mNavPathPolylines.add(polyline);
             i += index - i + 1;
         }
@@ -638,6 +643,8 @@ public class MapActivity extends DrawerActivity {
         } else {
             mNavToolbar.setTitle(String.format(getString(R.string.path_to), "your location", endLocationNode.getName()));
         }
+
+        mNavToolbar.setSubtitle(String.format(getString(R.string.total), totalDistance * 3.28084, totalDistance * 0.001 / 5 * 60));
         Toast.makeText(this, getString(R.string.proceed), Toast.LENGTH_SHORT).show();
     }
 

@@ -29,6 +29,7 @@
 
     <string name="proceed">To proceed, press yellow circle with arrow.</string>
     <string name="path_to">Path from %1$s to %2$s</string>
+    <string name="total">Total: %1$.0f feet, about %2$.1f minutes</string>
     <string name="north">Go north</string>
     <string name="east">Go east</string>
     <string name="south">Go south</string>
@@ -45,24 +46,6 @@
     <string name="list">List</string>
     <string name="list_of_classrooms">List of classrooms and locations</string>
 
-
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Save your classes</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="Commit">Choose</string>
-    <string name="Summary">Insert Event Summary</string>
-    <string name="Location">Insert Event Location</string>
-    <string name="Insert">INSERT HERE</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="title_activity_calendar_main">CalendarMainActivity</string>
-    <string name="title_activity_create_event">CreateEvent</string>
-    <string name="title_activity_create_event_code">CreateEventCode</string>
-    <string name="title_activity_upcoming_events">UpcomingEventsActivity</string>
 
 
     <string name="credentials_saved">Credentials saved</string>
