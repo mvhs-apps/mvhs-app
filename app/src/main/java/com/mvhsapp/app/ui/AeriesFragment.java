@@ -101,6 +101,7 @@ public class AeriesFragment extends Fragment {
                     @Override
                     public void onConnectionFailed(ConnectionResult connectionResult) {
                         mConnected = false;
+                        mConnectionFailed = true;
                     }
                 })
                 .addApi(Auth.CREDENTIALS_API)
@@ -374,9 +375,11 @@ public class AeriesFragment extends Fragment {
                                                 status.startResolutionForResult(getActivity(), RC_SAVE);
                                             } catch (IntentSender.SendIntentException e) {
                                                 // Could not resolve the request
+                                                finishAllLoading();
                                                 onCredentialsSaveFailed();
                                             }
                                         } else {
+                                            finishAllLoading();
                                             onCredentialsSaveFailed();
                                         }
                                     }

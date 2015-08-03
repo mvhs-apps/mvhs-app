@@ -45,8 +45,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
     private static final int[] NAVDRAWER_ITEMS = new int[]{
             NAVDRAWER_ITEM_AERIES,
             NAVDRAWER_ITEM_MAP,
-            NAVDRAWER_ITEM_MVHSSITE,
             NAVDRAWER_ITEM_CALENDAR,
+            NAVDRAWER_ITEM_MVHSSITE,
             NAVDRAWER_ITEM_SEPARATOR,
             NAVDRAWER_ITEM_SETTINGS,
             //NAVDRAWER_ITEM_HELP,
@@ -55,8 +55,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
     private static final int[] NAVDRAWER_ITEMS_ICONS = new int[]{
             R.drawable.ic_grade_black_24dp,
             R.drawable.ic_map_black_24dp,
-            R.drawable.ic_web_black_24dp,
             R.drawable.ic_view_agenda_black_24dp,
+            R.drawable.ic_web_black_24dp,
             NAVDRAWER_ITEM_SEPARATOR,
             R.drawable.ic_settings_black_24dp,
             //NAVDRAWER_ITEM_HELP,
@@ -312,6 +312,9 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse("http://www.mvla.net/MVHS/"));
                 startActivity(i);
+                break;
+            case NAVDRAWER_ITEM_CALENDAR:
+                i = new Intent(this, CalendarActivity.class);
                 break;
             case NAVDRAWER_ITEM_SETTINGS:
                 i = new Intent(this, SettingsActivity.class);

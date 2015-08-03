@@ -12,8 +12,8 @@
     <string-array name="nav_drawer_items">
         <item>@string/aeries</item>
         <item>@string/map</item>
-        <item>@string/mvhs_site</item>
         <item>@string/calendar</item>
+        <item>@string/mvhs_site</item>
         <item>SEPARATOR</item>
         <item>@string/settings</item>
         <item>@string/about</item>
@@ -22,8 +22,8 @@
     <string-array name="nav_drawer_toolbar_names">
         <item>@string/aeries</item>
         <item>@string/map</item>
-        <item>@string/mvhs_site</item>
         <item>@string/calendar</item>
+        <item>@string/mvhs_site</item>
     </string-array>
     <string name="nav_drawer_toolbar_prefix">"MVHS - "</string>
 
