@@ -65,4 +65,9 @@
     <string name="enter_schedule_warning">Please enter your schedule details.</string>
     <string name="schedule_setup">Schedule Setup</string>
     <string name="pref_open_schedule_setup_title">Change Schedule Setup</string>
+    <string name="icon">icon</string>
+    <string name="email_issues_suggestions">Email Suggestions/Issues:</string>
+    <string name="lead_developer">Lead Developer - Daniel Ciao</string>
+    <string name="comp_sci">Comp Sci Teacher - Mr. Nguyen</string>
+    <string name="lead_website">Lead Developer Website</string>
 </resources>

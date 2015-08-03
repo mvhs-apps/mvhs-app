@@ -319,9 +319,9 @@ public abstract class DrawerActivity extends AppCompatActivity {
             case NAVDRAWER_ITEM_SETTINGS:
                 i = new Intent(this, SettingsActivity.class);
                 break;
-            /*case NAVDRAWER_ITEM_ABOUT:
+            case NAVDRAWER_ITEM_ABOUT:
                 i = new Intent(this, AboutActivity.class);
-                break;*/
+                break;
             default:
                 Toast.makeText(getApplicationContext(), "Work in Progress",
                         Toast.LENGTH_SHORT).show();
