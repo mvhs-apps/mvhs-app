@@ -180,12 +180,17 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 Drawable drawable = ContextCompat.getDrawable(this, NAVDRAWER_ITEMS_ICONS[i]);
                 drawable = DrawableCompat.wrap(drawable);
                 drawable.mutate();
-                DrawableCompat.setTintMode(drawable, PorterDuff.Mode.DST_IN);
-                DrawableCompat.setTint(drawable, getResources().getColor(R.color.nav_drawer_icon));
+                DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
+                if (itemId == getSelfNavDrawerItem()) {
+                    DrawableCompat.setTint(drawable, getResources().getColor(R.color.primary_dark));
+                    v.setTextColor(getResources().getColor(R.color.primary_dark));
+                } else {
+                    DrawableCompat.setTint(drawable, getResources().getColor(R.color.nav_drawer_icon));
+                    v.setTextColor(getResources().getColor(R.color.primary_text_default_material_light));
+                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                     v.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null);
                 }
-
                 v.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
 
 

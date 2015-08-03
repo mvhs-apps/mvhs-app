@@ -27,6 +27,7 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
 import com.google.android.gms.auth.api.credentials.CredentialRequest;
 import com.google.android.gms.auth.api.credentials.CredentialRequestResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -56,6 +57,9 @@ public class AeriesFragment extends Fragment {
     private Snackbar mErrorSnackbar;
     private Snackbar mSavingSnackbar;
 
+    private boolean mConnected;
+    private boolean mConnectionFailed;
+
     private boolean mAttemptRequestCredentials = true;
 
     @Override
@@ -82,6 +86,23 @@ public class AeriesFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mCredentialsApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle bundle) {
+                        mConnected = true;
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        mCredentialsApiClient.reconnect();
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        mConnected = false;
+                    }
+                })
                 .addApi(Auth.CREDENTIALS_API)
                 .build();
     }
@@ -180,33 +201,53 @@ public class AeriesFragment extends Fragment {
     private void attemptRequestCredentials() {
         mLoginButton.setText(getString(R.string.retrieving_credentials));
 
-        CredentialRequest request = new CredentialRequest.Builder()
-                .setSupportsPasswordLogin(true)
-                .build();
-
-        Auth.CredentialsApi.request(mCredentialsApiClient, request).setResultCallback(
-                new ResultCallback<CredentialRequestResult>() {
-                    @Override
-                    public void onResult(CredentialRequestResult credentialRequestResult) {
-                        if (credentialRequestResult.getStatus().isSuccess()) {
-                            // Single credential and auto sign-in enabled.
-                            //Request 2
-                            processRetrievedCredential(credentialRequestResult.getCredential(), false);
-                            finishAllLoading();
-                        } else {
-                            Status status = credentialRequestResult.getStatus();
-                            if (status.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
-                                // Needs to save credentials
-                                //Request 4
-                                resolveResult(status, RC_HINT);
-                            } else {
-                                // Multiple credentials - pick one
-                                //Request 3
-                                resolveResult(status, RC_READ);
-                            }
-                        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int attempt = 0; attempt < 10 && !mConnected && !mConnectionFailed; attempt++) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                });
+                }
+
+                if (!mConnected || mConnectionFailed) {
+                    //Failed
+                    finishAllLoading();
+                    return;
+                }
+
+                CredentialRequest request = new CredentialRequest.Builder()
+                        .setSupportsPasswordLogin(true)
+                        .build();
+
+                Auth.CredentialsApi.request(mCredentialsApiClient, request).setResultCallback(
+                        new ResultCallback<CredentialRequestResult>() {
+                            @Override
+                            public void onResult(CredentialRequestResult credentialRequestResult) {
+                                if (credentialRequestResult.getStatus().isSuccess()) {
+                                    // Single credential and auto sign-in enabled.
+                                    //Request 2
+                                    processRetrievedCredential(credentialRequestResult.getCredential(), false);
+                                    finishAllLoading();
+                                } else {
+                                    Status status = credentialRequestResult.getStatus();
+                                    if (status.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
+                                        // Needs to save credentials
+                                        //Request 4
+                                        resolveResult(status, RC_HINT);
+                                    } else {
+                                        // Multiple credentials - pick one
+                                        //Request 3
+                                        resolveResult(status, RC_READ);
+                                    }
+                                }
+                            }
+                        });
+            }
+        }).start();
+
     }
 
     private void showIndeterminateProgressBar() {
@@ -288,7 +329,7 @@ public class AeriesFragment extends Fragment {
         if (!mUsernameEditText.getText().toString().isEmpty()
                 && !mPasswordEditText.getText().toString().isEmpty()) {
 
-            Credential credential = new Credential.Builder(mUsernameEditText.getText().toString())
+            final Credential credential = new Credential.Builder(mUsernameEditText.getText().toString())
                     .setPassword(mPasswordEditText.getText().toString())
                     .build();
 
@@ -299,32 +340,52 @@ public class AeriesFragment extends Fragment {
 
             mCurrentCredential = credential;
 
-            Auth.CredentialsApi.save(mCredentialsApiClient, credential).setResultCallback(
-                    new ResultCallback<Status>() {
-                        @Override
-                        public void onResult(Status status) {
-                            if (status.isSuccess()) {
-                                // Credentials were saved
-                                onCredentialsSaved();
-                                finishAllLoading();
-                            } else {
-                                if (status.hasResolution()) {
-                                    // Try to resolve the save request. This will prompt the user if
-                                    // the credential is new.
-                                    try {
-                                        status.startResolutionForResult(getActivity(), RC_SAVE);
-                                    } catch (IntentSender.SendIntentException e) {
-                                        // Could not resolve the request
-                                        onCredentialsSaveFailed();
-                                    }
-                                } else {
-                                    onCredentialsSaveFailed();
-                                }
-                            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int attempt = 0; attempt < 10 && !mConnected && !mConnectionFailed; attempt++) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
 
-            );
+                    if (!mConnected || mConnectionFailed) {
+                        //Failed
+                        finishAllLoading();
+                        onCredentialsSaveFailed();
+                        return;
+                    }
+
+                    Auth.CredentialsApi.save(mCredentialsApiClient, credential).setResultCallback(
+                            new ResultCallback<Status>() {
+                                @Override
+                                public void onResult(Status status) {
+                                    if (status.isSuccess()) {
+                                        // Credentials were saved
+                                        onCredentialsSaved();
+                                        finishAllLoading();
+                                    } else {
+                                        if (status.hasResolution()) {
+                                            // Try to resolve the save request. This will prompt the user if
+                                            // the credential is new.
+                                            try {
+                                                status.startResolutionForResult(getActivity(), RC_SAVE);
+                                            } catch (IntentSender.SendIntentException e) {
+                                                // Could not resolve the request
+                                                onCredentialsSaveFailed();
+                                            }
+                                        } else {
+                                            onCredentialsSaveFailed();
+                                        }
+                                    }
+                                }
+                            }
+
+                    );
+                }
+            }).start();
         }
     }
 

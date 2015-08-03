@@ -30,6 +30,11 @@ android {
     }
 }
 
+repositories {
+    //TODO: Remove when Android M releases and switch to stable LeakCanary
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.balysv.materialmenu:material-menu:1.+'
@@ -40,4 +45,7 @@ dependencies {
     compile 'com.android.support:design:22.+'
 
     compile 'com.google.android.gms:play-services-identity:7.+'
+
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-SNAPSHOT'
 }
