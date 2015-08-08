@@ -57,8 +57,8 @@ public class SettingsActivity extends AppCompatActivity {
             openSchdSetup.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(getActivity(), SetupActivity.class);
-                    intent.putExtra(SetupActivity.EXTRA_OPTIONAL, true);
+                    Intent intent = new Intent(getActivity(), ScheduleSetupActivity.class);
+                    intent.putExtra(ScheduleSetupActivity.EXTRA_OPTIONAL, true);
                     startActivity(intent);
                     return true;
                 }

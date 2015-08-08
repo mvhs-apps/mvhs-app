@@ -21,8 +21,7 @@ public class AeriesActivity extends DrawerActivity {
         setContentView(R.layout.activity_aeries);
 
         if (!PrefUtils.isWelcomeDone(this)) {
-            startActivity(new Intent(this, SetupActivity.class));
-            PrefUtils.markWelcomeDone(this);
+            startActivity(new Intent(this, WelcomeActivity.class));
         }
 
         FragmentManager fm = getFragmentManager();

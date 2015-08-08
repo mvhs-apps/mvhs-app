@@ -70,4 +70,7 @@
     <string name="lead_developer">Lead Developer - Daniel Ciao</string>
     <string name="comp_sci">Comp Sci Teacher - Mr. Nguyen</string>
     <string name="lead_website">Lead Developer Website</string>
+    <string name="student">Student</string>
+    <string name="guest">Guest</string>
+    <string name="student_guest_question">Are you a student or a guest?</string>
 </resources>

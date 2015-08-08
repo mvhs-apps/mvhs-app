@@ -31,7 +31,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.SetupActivity" />
+        <activity android:name=".ui.ScheduleSetupActivity" />
+
+        <activity android:name=".ui.WelcomeActivity" />
 
         <activity
             android:name=".ui.SettingsActivity"

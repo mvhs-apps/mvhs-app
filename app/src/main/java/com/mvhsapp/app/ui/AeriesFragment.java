@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
+import android.util.AndroidRuntimeException;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -265,8 +266,12 @@ public class AeriesFragment extends Fragment {
         if (mSavingSnackbar != null) {
             mSavingSnackbar.dismiss();
         }
-        mLoginButton.setEnabled(true);
-        mLoginButton.setText(getString(R.string.login));
+        try {
+            mLoginButton.setEnabled(true);
+            mLoginButton.setText(getString(R.string.login));
+        } catch (AndroidRuntimeException exception) {
+            //ignore
+        }
     }
 
     private void resolveResult(Status status, int requestCode) {

@@ -29,14 +29,14 @@ import com.mvhsapp.app.model.Period;
 /**
  * Setting up classes/rooms
  */
-public class SetupActivity extends AppCompatActivity {
+public class ScheduleSetupActivity extends AppCompatActivity {
 
     //TODO: Move into PrefUtils
     public static final String PREF_SCHEDULE_PREFIX = "pref_schd_prd";
     public static final String PREF_SCHEDULE_ROOM = "_room";
     public static final String PREF_SCHEDULE_SBJCT = "_subjct";
 
-    public static final String EXTRA_OPTIONAL = "com.mvhsapp.app.ui.SetupActivity.OPTIONAL";
+    public static final String EXTRA_OPTIONAL = "com.mvhsapp.app.ui.ScheduleSetupActivity.OPTIONAL";
     public static final int ROOM_EMPTY_DATA = -1;
 
     private Toolbar mActionBarToolbar;
@@ -55,7 +55,7 @@ public class SetupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setup);
+        setContentView(R.layout.activity_sched_setup);
 
         mOptional = getIntent().getBooleanExtra(EXTRA_OPTIONAL, false);
 
@@ -159,7 +159,7 @@ public class SetupActivity extends AppCompatActivity {
 
             @Override
             public SetupViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-                View view = LayoutInflater.from(getActivity()).inflate(R.layout.list_item_setup, viewGroup, false);
+                View view = LayoutInflater.from(getActivity()).inflate(R.layout.list_item_sched_setup, viewGroup, false);
                 SetupViewHolder holder = new SetupViewHolder(view);
                 holder.period = (TextView) view.findViewById(R.id.list_item_setup_period_text);
                 holder.room = (EditText) view.findViewById(R.id.list_item_setup_room_edit);

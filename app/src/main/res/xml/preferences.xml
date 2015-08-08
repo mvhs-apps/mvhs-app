@@ -6,4 +6,8 @@
         android:key="pref_open_schedule_setup"
         android:title="@string/pref_open_schedule_setup_title" />
 
+    <CheckBoxPreference
+        android:key="pref_guest_mode"
+        android:title="Guest Mode" />
+
 </PreferenceScreen>

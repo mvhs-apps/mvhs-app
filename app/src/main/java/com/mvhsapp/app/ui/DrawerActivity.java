@@ -73,6 +73,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
     @Nullable
     private Toolbar mActionBarToolbar;
+    private LinearLayout mDrawerListLinearLayout;
 
     /**
      * Returns the navigation drawer item that corresponds to this Activity.
@@ -157,8 +158,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
         params.width = navDrawerWidth;
         mDrawerScrollView.setLayoutParams(params);
 
-        LinearLayout mDrawerListLinearLayout = (LinearLayout) findViewById(R.id
-                .activity_drawer_drawer_linearlayout);
+        mDrawerListLinearLayout = (LinearLayout) findViewById(R.id.activity_drawer_drawer_linearlayout);
 
         if (!PrefUtils.isWelcomeDone(this)) {
             PrefUtils.markWelcomeDone(this);
@@ -169,9 +169,12 @@ public abstract class DrawerActivity extends AppCompatActivity {
         //INFLATE LAYOUTS AND SET CLICK LISTENERS
         for (int i = 0; i < NAVDRAWER_ITEMS.length; i++) {
             final int itemId = NAVDRAWER_ITEMS[i];
+
+            View view = null;
             if (itemId == NAVDRAWER_ITEM_SEPARATOR) {
-                mDrawerListLinearLayout.addView(getLayoutInflater().inflate(R.layout.list_item_separator,
-                        mDrawerListLinearLayout, false));
+                view = getLayoutInflater().inflate(R.layout.list_item_separator,
+                        mDrawerListLinearLayout, false);
+                mDrawerListLinearLayout.addView(view);
             } else {
                 FrameLayout layout = (FrameLayout) getLayoutInflater().inflate(R.layout.list_item_drawer, mDrawerListLinearLayout, false);
                 TextView v = (TextView) layout.findViewById(android.R.id.text1);
@@ -200,14 +203,21 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 } else {
                     v.setBackgroundColor(getResources().getColor(android.R.color.transparent));
                 }
+
+
                 layout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         onNavDrawerItemClicked(itemId);
                     }
                 });
+
                 mDrawerListLinearLayout.addView(layout);
+
+                view = layout;
             }
+
+            view.setTag(itemId);
 
         }
     }
@@ -243,6 +253,26 @@ public abstract class DrawerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHandler = new Handler();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (PrefUtils.isGuest(this) && getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES) {
+            goToNavDrawerItem(NAVDRAWER_ITEM_MAP);
+        }
+
+        for (int i = 0; i < mDrawerListLinearLayout.getChildCount(); i++) {
+            View item = mDrawerListLinearLayout.getChildAt(i);
+            int itemId = (int) item.getTag();
+
+            if (PrefUtils.isGuest(this) && itemId == NAVDRAWER_ITEM_AERIES) {
+                item.setVisibility(View.GONE);
+            } else {
+                item.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override

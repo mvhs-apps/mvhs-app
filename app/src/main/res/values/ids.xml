@@ -44,4 +44,7 @@
     <item name="activity_about_email_lead" type="id" />
     <item name="activity_about_email_compsci" type="id" />
     <item name="activity_about_lead_website" type="id" />
+    <item name="activity_welcome_student" type="id" />
+    <item name="activity_welcome_guest" type="id" />
+    <item name="activity_welcome_buttonbar" type="id" />
 </resources>
