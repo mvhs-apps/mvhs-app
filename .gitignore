@@ -119,6 +119,7 @@ crashlytics-build.properties
 
 ### Crashlytics ###
 #Crashlytics
+fabric.properties
 crashlytics-build.properties
 com_crashlytics_export_strings.xml
 

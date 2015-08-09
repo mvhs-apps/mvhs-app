@@ -48,7 +48,7 @@
         </activity>
 
         <activity
-            android:name=".ui.CalendarActivity"
+            android:name=".ui.StudentCalendarActivity"
             android:launchMode="singleTop">
 
         </activity>

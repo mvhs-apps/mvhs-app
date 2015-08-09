@@ -438,6 +438,10 @@ public class AeriesFragment extends Fragment {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
+            if (!isAdded()) {
+                return;
+            }
+
             //Login page
             if (url.equalsIgnoreCase("https://mvla.asp.aeries.net/student/LoginParent.aspx")) {
 
@@ -474,6 +478,10 @@ public class AeriesFragment extends Fragment {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
+
+            if (!isAdded()) {
+                return;
+            }
 
             if (url.equalsIgnoreCase("https://mvla.asp.aeries.net/student/LoginParent.aspx")) {
                 //Login page

@@ -259,7 +259,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (PrefUtils.isGuest(this) && getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES) {
+        //TODO: Array of guest mode hidden items
+        if (PrefUtils.isGuest(this) && (getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES || getSelfNavDrawerItem() == NAVDRAWER_ITEM_CALENDAR)) {
             goToNavDrawerItem(NAVDRAWER_ITEM_MAP);
         }
 
@@ -267,7 +268,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             View item = mDrawerListLinearLayout.getChildAt(i);
             int itemId = (int) item.getTag();
 
-            if (PrefUtils.isGuest(this) && itemId == NAVDRAWER_ITEM_AERIES) {
+            if (PrefUtils.isGuest(this) && (itemId == NAVDRAWER_ITEM_AERIES || itemId == NAVDRAWER_ITEM_CALENDAR)) {
                 item.setVisibility(View.GONE);
             } else {
                 item.setVisibility(View.VISIBLE);
@@ -344,7 +345,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 startActivity(i);
                 break;
             case NAVDRAWER_ITEM_CALENDAR:
-                i = new Intent(this, CalendarActivity.class);
+                i = new Intent(this, StudentCalendarActivity.class);
                 break;
             case NAVDRAWER_ITEM_SETTINGS:
                 i = new Intent(this, SettingsActivity.class);

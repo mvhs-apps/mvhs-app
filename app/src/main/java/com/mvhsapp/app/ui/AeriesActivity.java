@@ -7,8 +7,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.crashlytics.android.Crashlytics;
+import com.mvhsapp.app.BuildConfig;
 import com.mvhsapp.app.PrefUtils;
 import com.mvhsapp.app.R;
+
+import io.fabric.sdk.android.Fabric;
 
 public class AeriesActivity extends DrawerActivity {
 
@@ -18,6 +22,9 @@ public class AeriesActivity extends DrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!BuildConfig.DEBUG) {
+            Fabric.with(this, new Crashlytics());
+        }
         setContentView(R.layout.activity_aeries);
 
         if (!PrefUtils.isWelcomeDone(this)) {
