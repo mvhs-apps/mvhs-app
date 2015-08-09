@@ -342,7 +342,6 @@ public abstract class DrawerActivity extends AppCompatActivity {
             case NAVDRAWER_ITEM_MVHSSITE:
                 i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse("http://www.mvla.net/MVHS/"));
-                startActivity(i);
                 break;
             case NAVDRAWER_ITEM_CALENDAR:
                 i = new Intent(this, StudentCalendarActivity.class);

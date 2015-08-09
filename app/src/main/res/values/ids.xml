@@ -40,11 +40,18 @@
     <item name="list_item_setup_subject_edit" type="id" />
     <item name="menu_setup_done" type="id" />
     <item name="activity_with_toolbar_content_framelayout" type="id" />
+
     <item name="activity_about_appname_textview" type="id" />
-    <item name="activity_about_email_lead" type="id" />
-    <item name="activity_about_email_compsci" type="id" />
-    <item name="activity_about_lead_website" type="id" />
+    <item name="activity_about_recycler" type="id" />
+
+
     <item name="activity_welcome_student" type="id" />
     <item name="activity_welcome_guest" type="id" />
     <item name="activity_welcome_buttonbar" type="id" />
+    <item name="list_item_about_name" type="id" />
+    <item name="list_item_about_subtitle" type="id" />
+    <item name="list_item_about_desc" type="id" />
+    <item name="list_item_about_website_button" type="id" />
+    <item name="list_item_about_email_button" type="id" />
+    <item name="list_item_about_actions_bar" type="id" />
 </resources>
