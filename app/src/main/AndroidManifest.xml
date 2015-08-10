@@ -49,7 +49,8 @@
 
         <activity
             android:name=".ui.StudentCalendarActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer">
 
         </activity>
 

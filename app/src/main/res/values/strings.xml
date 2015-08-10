@@ -68,10 +68,9 @@
     <string name="icon">icon</string>
     <string name="email_issues_suggestions">Email Suggestions/Issues:</string>
 
-    <string name="comp_sci">Comp Sci Teacher - Mr. Nguyen</string>
-
     <string name="student">Student</string>
     <string name="guest">Guest</string>
     <string name="student_guest_question">Are you a student or a guest?</string>
+
     <string name="website">Website</string>
 </resources>

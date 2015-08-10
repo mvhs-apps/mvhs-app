@@ -10,8 +10,7 @@
     <RelativeLayout
         android:id="@id/activity_drawer_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.Toolbar
             android:id="@id/toolbar_actionbar"

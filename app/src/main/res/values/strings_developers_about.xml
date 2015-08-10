@@ -22,4 +22,9 @@
     <string name="about_dev5_subtitle">Class of 2015</string>
     <string name="about_dev5_desc">Collected information for the school map.</string>
 
+    <string name="about_dev6">Ly Nguyen</string>
+    <string name="about_dev6_subtitle">Computer Science Teacher</string>
+    <string name="about_dev6_desc">Coordinates the computer science club and meetings.</string>
+    <string name="about_dev6_email">ly.nguyen@mvla.net</string>
+
 </resources>
