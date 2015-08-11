@@ -54,4 +54,8 @@
     <item name="list_item_about_website_button" type="id" />
     <item name="list_item_about_email_button" type="id" />
     <item name="list_item_about_actions_bar" type="id" />
+    <item name="activity_schedule_fragment" type="id" />
+    <item name="list_item_sched_subject_text" type="id" />
+    <item name="list_item_sched_room_text" type="id" />
+    <item name="list_item_sched_period_text" type="id" />
 </resources>

@@ -104,7 +104,7 @@
             android:elevation="16dp"
             tools:visibility="gone" />
 
-        <com.mvhsapp.app.widget.SearchView
+        <net.mvla.mvhs.widget.SearchView
             android:id="@id/activity_map_searchbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

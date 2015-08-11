@@ -3,6 +3,7 @@
     <string name="logo">Logo</string>
 
     <string name="mvhs_site">MVHS Website</string>
+    <string name="todays_schedule">Today\'s Schedule</string>
     <string name="aeries">Aeries SIS</string>
     <string name="map">School Map</string>
     <string name="calendar">Student Calendar</string>
@@ -11,6 +12,7 @@
 
     <string-array name="nav_drawer_items">
         <item>@string/aeries</item>
+        <item>@string/todays_schedule</item>
         <item>@string/map</item>
         <item>@string/calendar</item>
         <item>@string/mvhs_site</item>
@@ -19,12 +21,6 @@
         <item>@string/about</item>
     </string-array>
 
-    <string-array name="nav_drawer_toolbar_names">
-        <item>@string/aeries</item>
-        <item>@string/map</item>
-        <item>@string/calendar</item>
-        <item>@string/mvhs_site</item>
-    </string-array>
     <string name="nav_drawer_toolbar_prefix">"MVHS - "</string>
 
     <string name="proceed">To proceed, press yellow circle with arrow.</string>
@@ -73,4 +69,5 @@
     <string name="student_guest_question">Are you a student or a guest?</string>
 
     <string name="website">Website</string>
+    <string name="na">N/A</string>
 </resources>

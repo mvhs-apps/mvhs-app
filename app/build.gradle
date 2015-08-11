@@ -18,34 +18,19 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.mvhsapp.app"
+        applicationId "net.mvla.mvhs"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
         versionName "1.0.0"
     }
 
-    if (project.hasProperty("RELEASE_STORE_FILE") && project.hasProperty("RELEASE_KEY_ALIAS_MVHS")) {
-        signingConfigs {
-            release {
-                storeFile file(RELEASE_STORE_FILE)
-                storePassword RELEASE_STORE_PASSWORD
-                keyAlias RELEASE_KEY_ALIAS_MVHS
-                keyPassword RELEASE_KEY_PASSWORD_MVHS
-            }
-        }
-    }
 
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            if (project.hasProperty("RELEASE_STORE_FILE") && project.hasProperty("RELEASE_KEY_ALIAS_MVHS")) {
-                signingConfig signingConfigs.release
-            } else {
-                signingConfig signingConfigs.debug
-            }
         }
         debug {
             applicationIdSuffix '.debug'

@@ -27,23 +27,11 @@
             android:layout_below="@id/toolbar_actionbar"
             android:background="?toolbarShadow" />
 
-        <Button
-            android:id="@+id/activity_calendar_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/toolbar_actionbar"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
-            android:text="Add Event/Homework" />
-
-        <Button
-            android:id="@+id/activity_calendar_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/activity_calendar_add"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:text="List Events" />
+        <FrameLayout
+            android:id="@id/activity_schedule_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar_actionbar" />
 
     </RelativeLayout>
 
