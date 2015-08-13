@@ -16,25 +16,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.webkit.ValueCallback;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
 import com.google.android.gms.auth.api.credentials.CredentialRequest;
-import com.google.android.gms.auth.api.credentials.CredentialRequestResult;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import net.mvla.mvhs.BuildConfig;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.Utils;
 
@@ -100,12 +97,9 @@ public class AeriesFragment extends Fragment {
                         mCredentialsApiClient.reconnect();
                     }
                 })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult connectionResult) {
-                        mConnected = false;
-                        mConnectionFailed = true;
-                    }
+                .addOnConnectionFailedListener(connectionResult -> {
+                    mConnected = false;
+                    mConnectionFailed = true;
                 })
                 .addApi(Auth.CREDENTIALS_API)
                 .build();
@@ -128,30 +122,26 @@ public class AeriesFragment extends Fragment {
                 }
             }
         });
+        mWebView.addJavascriptInterface(this, "android");
 
         mLoginLayout = view.findViewById(R.id.fragment_aeries_login_linear);
         mUsernameEditText = (EditText) view.findViewById(R.id.fragment_aeries_login_username);
         mPasswordEditText = (EditText) view.findViewById(R.id.fragment_aeries_login_password);
-        mPasswordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                        actionId == EditorInfo.IME_ACTION_DONE ||
-                        event.getAction() == KeyEvent.ACTION_DOWN &&
-                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    mLoginButton.callOnClick();
-                    return true;
-                }
-                return false;
+        mPasswordEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                    actionId == EditorInfo.IME_ACTION_DONE ||
+                    event.getAction() == KeyEvent.ACTION_DOWN &&
+                            event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                mLoginButton.callOnClick();
+                return true;
             }
+            return false;
         });
         mLoginButton = (Button) view.findViewById(R.id.fragment_aeries_login_button);
-        mLoginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                login(mUsernameEditText.getText().toString(), mPasswordEditText.getText().toString());
-                Utils.hideSoftKeyBoard(getActivity());
-            }
+        mLoginButton.setOnClickListener(v -> {
+            mAttemptRequestCredentials = false;
+            login(mUsernameEditText.getText().toString(), mPasswordEditText.getText().toString());
+            Utils.hideSoftKeyBoard(getActivity());
         });
 
         ViewCompat.setBackgroundTintList(mLoginButton, getResources().getColorStateList(R.color.button_color_list));
@@ -168,9 +158,9 @@ public class AeriesFragment extends Fragment {
     }
 
     private void login(String username, String password) {
-        Utils.executeJavascript(mWebView, "document.getElementById(\"portalAccountUsername\").value=\"" + username + "\"", null);
-        Utils.executeJavascript(mWebView, "document.getElementById(\"portalAccountPassword\").value=\"" + password + "\"", null);
-        Utils.executeJavascript(mWebView, "document.getElementById(\"LoginButton\").click()", null);
+        Utils.executeJavascript(mWebView, "document.getElementById(\"portalAccountUsername\").value=\"" + username + "\"");
+        Utils.executeJavascript(mWebView, "document.getElementById(\"portalAccountPassword\").value=\"" + password + "\"");
+        Utils.executeJavascript(mWebView, "document.getElementById(\"LoginButton\").click()");
     }
 
     /**
@@ -205,51 +195,45 @@ public class AeriesFragment extends Fragment {
     private void attemptRequestCredentials() {
         mLoginButton.setText(getString(R.string.retrieving_credentials));
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int attempt = 0; attempt < 10 && !mConnected && !mConnectionFailed; attempt++) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+        new Thread(() -> {
+            for (int attempt = 0; attempt < 10 && !mConnected && !mConnectionFailed; attempt++) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
-                if (!mConnected || mConnectionFailed) {
-                    //Failed
-                    finishAllLoading();
-                    return;
-                }
-
-                CredentialRequest request = new CredentialRequest.Builder()
-                        .setSupportsPasswordLogin(true)
-                        .build();
-
-                Auth.CredentialsApi.request(mCredentialsApiClient, request).setResultCallback(
-                        new ResultCallback<CredentialRequestResult>() {
-                            @Override
-                            public void onResult(CredentialRequestResult credentialRequestResult) {
-                                if (credentialRequestResult.getStatus().isSuccess()) {
-                                    // Single credential and auto sign-in enabled.
-                                    //Request 2
-                                    processRetrievedCredential(credentialRequestResult.getCredential(), false);
-                                    finishAllLoading();
-                                } else {
-                                    Status status = credentialRequestResult.getStatus();
-                                    if (status.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
-                                        // Needs to save credentials
-                                        //Request 4
-                                        resolveResult(status, RC_HINT);
-                                    } else {
-                                        // Multiple credentials - pick one
-                                        //Request 3
-                                        resolveResult(status, RC_READ);
-                                    }
-                                }
-                            }
-                        });
             }
+
+            if (!mConnected || mConnectionFailed) {
+                //Failed
+                finishAllLoading();
+                return;
+            }
+
+            CredentialRequest request = new CredentialRequest.Builder()
+                    .setSupportsPasswordLogin(true)
+                    .build();
+
+            Auth.CredentialsApi.request(mCredentialsApiClient, request).setResultCallback(
+                    credentialRequestResult -> {
+                        if (credentialRequestResult.getStatus().isSuccess()) {
+                            // Single credential and auto sign-in enabled.
+                            //Request 2
+                            processRetrievedCredential(credentialRequestResult.getCredential(), false);
+                            finishAllLoading();
+                        } else {
+                            Status status = credentialRequestResult.getStatus();
+                            if (status.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
+                                // Needs to save credentials
+                                //Request 4
+                                resolveResult(status, RC_HINT);
+                            } else {
+                                // Multiple credentials - pick one
+                                //Request 3
+                                resolveResult(status, RC_READ);
+                            }
+                        }
+                    });
         }).start();
 
     }
@@ -278,7 +262,8 @@ public class AeriesFragment extends Fragment {
             mLoginButton.setText(getString(R.string.login));
         } catch (AndroidRuntimeException e) {
             e.printStackTrace();
-            Crashlytics.logException(e);
+            if (!BuildConfig.DEBUG)
+                Crashlytics.logException(e);
         }
     }
 
@@ -354,57 +339,57 @@ public class AeriesFragment extends Fragment {
 
             mCurrentCredential = credential;
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int attempt = 0; attempt < 10 && !mConnected && !mConnectionFailed; attempt++) {
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+            new Thread(() -> {
+                for (int attempt = 0; attempt < 10 && !mConnected && !mConnectionFailed; attempt++) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
+                }
 
-                    if (!mConnected || mConnectionFailed) {
-                        //Failed
-                        finishAllLoading();
-                        onCredentialsSaveFailed();
-                        return;
-                    }
+                if (!mConnected || mConnectionFailed) {
+                    //Failed
+                    finishAllLoading();
+                    onCredentialsSaveFailed();
+                    return;
+                }
 
-                    Auth.CredentialsApi.save(mCredentialsApiClient, credential).setResultCallback(
-                            new ResultCallback<Status>() {
-                                @Override
-                                public void onResult(Status status) {
-                                    if (status.isSuccess()) {
-                                        // Credentials were saved
-                                        onCredentialsSaved();
+                Auth.CredentialsApi.save(mCredentialsApiClient, credential).setResultCallback(
+                        status -> {
+                            if (status.isSuccess()) {
+                                // Credentials were saved
+                                onCredentialsSaved();
+                                finishAllLoading();
+                            } else {
+                                if (status.hasResolution()) {
+                                    // Try to resolve the save request. This will prompt the user if
+                                    // the credential is new.
+                                    try {
+                                        status.startResolutionForResult(getActivity(), RC_SAVE);
+                                    } catch (IntentSender.SendIntentException e) {
+                                        // Could not resolve the request
                                         finishAllLoading();
-                                    } else {
-                                        if (status.hasResolution()) {
-                                            // Try to resolve the save request. This will prompt the user if
-                                            // the credential is new.
-                                            try {
-                                                status.startResolutionForResult(getActivity(), RC_SAVE);
-                                            } catch (IntentSender.SendIntentException e) {
-                                                // Could not resolve the request
-                                                finishAllLoading();
-                                                onCredentialsSaveFailed();
-                                            }
-                                        } else {
-                                            finishAllLoading();
-                                            onCredentialsSaveFailed();
-                                        }
+                                        onCredentialsSaveFailed();
                                     }
+                                } else {
+                                    finishAllLoading();
+                                    onCredentialsSaveFailed();
                                 }
                             }
+                        }
 
-                    );
-                }
+                );
             }).start();
         }
     }
 
+    @JavascriptInterface
+    public void onFind(String value) {
+        if (!value.equalsIgnoreCase("null")) {
+            Snackbar.make(mWebView, R.string.incorrect_login, Snackbar.LENGTH_LONG).show();
+        }
+    }
 
     private class AeriesWebViewClient extends WebViewClient {
 
@@ -453,6 +438,8 @@ public class AeriesFragment extends Fragment {
             //Login page
             if (url.equalsIgnoreCase("https://mvla.asp.aeries.net/student/LoginParent.aspx")) {
 
+                //TODO: Use WebView.findAll for compat
+
                 if (mAttemptRequestCredentials) {
                     showIndeterminateProgressBar();
                     attemptRequestCredentials();
@@ -460,26 +447,9 @@ public class AeriesFragment extends Fragment {
                     finishAllLoading();
                 }
 
-                //TODO: Use WebView.findAll for compat
-                Utils.executeJavascript(mWebView, "document.getElementById(\"errorMessage_password\").innerText", new ValueCallback<String>() {
-                    @Override
-                    public void onReceiveValue(String value) {
-                        if (!value.equalsIgnoreCase("null")) {
-                            Snackbar.make(mWebView, getString(R.string.incorrect_login), Snackbar.LENGTH_LONG);
-                        }
-                    }
-                });
-
-                Utils.executeJavascript(mWebView, "document.getElementById(\"errorMessage_username\").innerText", new ValueCallback<String>() {
-                    @Override
-                    public void onReceiveValue(String value) {
-                        if (!value.equalsIgnoreCase("null")) {
-                            Snackbar.make(mWebView, getString(R.string.incorrect_login), Snackbar.LENGTH_LONG);
-                        }
-                    }
-                });
-            } else if (url.startsWith("https://mvla.asp.aeries.net/student/m/loginparent.html")) {
-                mAttemptRequestCredentials = false;
+                for (String error : new String[]{"errorMessage_password", "errorMessage_username"}) {
+                    Utils.executeJavascript(mWebView, "android.onFind(document.getElementById(\"" + error + "\").innerText)");
+                }
             }
         }
 

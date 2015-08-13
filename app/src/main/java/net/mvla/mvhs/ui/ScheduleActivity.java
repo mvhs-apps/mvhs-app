@@ -2,7 +2,10 @@ package net.mvla.mvhs.ui;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -13,16 +16,63 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.calendar.model.Events;
+
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.model.Period;
 
+import java.io.IOException;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+
 public class ScheduleActivity extends DrawerActivity {
+
+    private boolean isDeviceOnline() {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
+
+        Observable.create(new Observable.OnSubscribe<Events>() {
+            @Override
+            public void call(Subscriber<? super Events> subscriber) {
+                HttpTransport transport = new NetHttpTransport();
+                JsonFactory factory = GsonFactory.getDefaultInstance();
+                com.google.api.services.calendar.Calendar service =
+                        new com.google.api.services.calendar.Calendar.Builder(transport, factory, null).build();
+                try {
+                    Events calendar = service.events().list("kci7ig724mqv7ps1mkn54cc9rs@group.calendar.google.com")
+                            .setOrderBy("startTime").execute();
+                    subscriber.onNext(calendar);
+                    subscriber.onCompleted();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Events>() {
+                    @Override
+                    public void call(Events events) {
+                        //Toast.makeText(ScheduleActivity.this,"Hi",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
 
         FragmentManager fm = getFragmentManager();
         Fragment f = fm.findFragmentById(R.id.activity_schedule_fragment);

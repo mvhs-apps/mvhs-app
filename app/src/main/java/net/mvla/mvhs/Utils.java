@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
 /**
@@ -37,9 +36,9 @@ public abstract class Utils {
         return (int) (dp * context.getResources().getDisplayMetrics().density + 0.5f);
     }
 
-    public static void executeJavascript(WebView view, String javascript, ValueCallback<String> valueCallback) {
+    public static void executeJavascript(WebView view, String javascript) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            view.evaluateJavascript(javascript, valueCallback);
+            view.evaluateJavascript(javascript, null);
         } else {
             view.loadUrl("javascript:" + javascript);
         }
