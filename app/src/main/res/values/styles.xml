@@ -26,7 +26,7 @@
 
     <style name="SearchboxDrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="drawableSize">24dp</item>
-        <item name="barSize">18dp</item>
+        <item name="barLength">18dp</item>
     </style>
 
 </resources>

@@ -3,6 +3,7 @@ package net.mvla.mvhs.widget;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
 

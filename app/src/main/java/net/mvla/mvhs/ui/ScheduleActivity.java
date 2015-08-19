@@ -108,8 +108,7 @@ public class ScheduleActivity extends DrawerActivity {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             for (int i = 0; i < mPeriods.length; i++) {
                 mPeriods[i] = new Period();
-                String room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_ROOM, "");
-                mPeriods[i].room = room.isEmpty() ? ScheduleSetupActivity.ROOM_EMPTY_DATA : Integer.parseInt(room);
+                mPeriods[i].room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_ROOM, "");
                 mPeriods[i].subject = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_SBJCT, "");
             }
 
@@ -135,8 +134,8 @@ public class ScheduleActivity extends DrawerActivity {
                 holder.period.setText("Period " + i + ": ");
 
                 Period period = mPeriods[i];
-                if (period.room != ScheduleSetupActivity.ROOM_EMPTY_DATA) {
-                    holder.room.setText("" + period.room);
+                if (!period.room.isEmpty()) {
+                    holder.room.setText(period.room);
                 } else {
                     holder.room.setText(R.string.na);
                 }

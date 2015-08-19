@@ -33,7 +33,6 @@ import net.mvla.mvhs.model.Period;
 public class ScheduleSetupActivity extends AppCompatActivity {
 
     public static final String EXTRA_OPTIONAL = "ScheduleSetupActivity.OPTIONAL";
-    public static final int ROOM_EMPTY_DATA = -1;
 
     private Toolbar mActionBarToolbar;
     private boolean mOptional;
@@ -114,8 +113,7 @@ public class ScheduleSetupActivity extends AppCompatActivity {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             for (int i = 0; i < mPeriods.length; i++) {
                 mPeriods[i] = new Period();
-                String room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_ROOM, "");
-                mPeriods[i].room = room.isEmpty() ? ROOM_EMPTY_DATA : Integer.parseInt(room);
+                mPeriods[i].room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_ROOM, "");
                 mPeriods[i].subject = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_SBJCT, "");
             }
 
@@ -166,9 +164,7 @@ public class ScheduleSetupActivity extends AppCompatActivity {
             @Override
             public void onBindViewHolder(SetupViewHolder holder, final int i) {
                 holder.period.setText("Period " + i + ": ");
-                if (mPeriods[i].room != ROOM_EMPTY_DATA) {
-                    holder.room.setText("" + mPeriods[i].room);
-                }
+                holder.room.setText(mPeriods[i].room);
                 holder.subject.setText(mPeriods[i].subject);
 
 
@@ -186,7 +182,7 @@ public class ScheduleSetupActivity extends AppCompatActivity {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        mPeriods[i].room = s.toString().isEmpty() ? ROOM_EMPTY_DATA : Integer.parseInt(s.toString());
+                        mPeriods[i].room = s.toString();
                     }
                 };
                 holder.room.addTextChangedListener(watcher);

@@ -397,14 +397,11 @@ public class AeriesFragment extends Fragment {
         public void onReceivedError(final WebView view, int errorCode, String description, final String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
 
-            if (view != null) {
+            if (view != null && view.getContext() != null) {
                 mErrorSnackbar = Snackbar.make(view, "Error " + errorCode + ": " + description, Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Try Again", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                mErrorSnackbar.dismiss();
-                                view.loadUrl(failingUrl);
-                            }
+                        .setAction("Try Again", v -> {
+                            mErrorSnackbar.dismiss();
+                            view.loadUrl(failingUrl);
                         });
                 mErrorSnackbar.show();
 
