@@ -66,4 +66,6 @@ dependencies {
     compile 'com.google.api-client:google-api-client-android:1.+'
     compile 'com.google.api-client:google-api-client-gson:1.+'
     compile 'com.google.apis:google-api-services-calendar:+'
+
+    compile 'com.squareup.retrofit:retrofit:1.+'
 }
