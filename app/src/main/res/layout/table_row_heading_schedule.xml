@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
+
+    <TextView
+        android:layout_height="48dp"
+        android:fontFamily="@string/font_fontFamily_medium"
+        android:gravity="center_vertical"
+        android:text="@string/period"
+        android:textColor="@color/secondary_text_default_material_light"
+        android:textSize="12sp"
+        android:textStyle="@integer/font_textStyle_medium" />
+
+    <TextView
+        android:layout_height="48dp"
+        android:fontFamily="@string/font_fontFamily_medium"
+        android:gravity="center_vertical"
+        android:paddingLeft="56dp"
+        android:paddingStart="56dp"
+        android:text="@string/time"
+        android:textColor="@color/secondary_text_default_material_light"
+        android:textSize="12sp"
+        android:textStyle="@integer/font_textStyle_medium"
+        tools:ignore="NewApi,RtlSymmetry" />
+
+    <TextView
+        android:layout_height="48dp"
+        android:fontFamily="@string/font_fontFamily_medium"
+        android:gravity="center_vertical"
+        android:paddingLeft="56dp"
+        android:paddingStart="56dp"
+        android:text="@string/room"
+        android:textColor="@color/secondary_text_default_material_light"
+        android:textSize="12sp"
+        android:textStyle="@integer/font_textStyle_medium"
+        tools:ignore="NewApi,RtlSymmetry" />
+
+    <TextView
+        android:layout_height="48dp"
+        android:fontFamily="@string/font_fontFamily_medium"
+        android:gravity="center_vertical"
+        android:paddingLeft="56dp"
+        android:paddingStart="56dp"
+        android:text="@string/subject"
+        android:textColor="@color/secondary_text_default_material_light"
+        android:textSize="12sp"
+        android:textStyle="@integer/font_textStyle_medium"
+        tools:ignore="NewApi,RtlSymmetry" />
+</TableRow>

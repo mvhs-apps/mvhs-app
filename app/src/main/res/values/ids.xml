@@ -57,5 +57,8 @@
     <item name="activity_schedule_fragment" type="id" />
     <item name="list_item_sched_subject_text" type="id" />
     <item name="list_item_sched_room_text" type="id" />
-    <item name="list_item_sched_period_text" type="id" />
+    <item name="list_item_sched_period_name_text" type="id" />
+    <item name="fragment_schedule_table" type="id" />
+    <item name="fragment_schedule_loading_progress" type="id" />
+    <item name="list_item_sched_period_time_text" type="id" />
 </resources>

@@ -1,6 +1,7 @@
 package net.mvla.mvhs.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BellSchedule {
@@ -10,6 +11,10 @@ public class BellSchedule {
 
     public BellSchedule() {
         bellSchedulePeriods = new ArrayList<>();
+    }
+
+    public void sort() {
+        Collections.sort(bellSchedulePeriods);
     }
 
     @Override

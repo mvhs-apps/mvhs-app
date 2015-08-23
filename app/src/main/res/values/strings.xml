@@ -70,4 +70,6 @@
 
     <string name="website">Website</string>
     <string name="na">N/A</string>
+    <string name="period">Period</string>
+    <string name="time">Time</string>
 </resources>
