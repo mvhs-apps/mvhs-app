@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
+import net.mvla.mvhs.Utils;
 import net.mvla.mvhs.model.BellSchedule;
 import net.mvla.mvhs.model.BellSchedulePeriod;
 import net.mvla.mvhs.model.Schedule;
@@ -39,6 +40,10 @@ public class ScheduleFragment extends Fragment {
         mAdapter.setSchedule(aSchedule);
     }
 
+    public void setErrorMessage(String error) {
+        mAdapter.setErrorMessage(error);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,6 +63,7 @@ public class ScheduleFragment extends Fragment {
     private class ScheduleRecyclerAdapter extends RecyclerView.Adapter<ScheduleRecyclerAdapter.ViewHolder> {
 
         private List<Schedule> mScheduleList;
+        private String mError;
 
         public ScheduleRecyclerAdapter() {
             mScheduleList = new ArrayList<>();
@@ -69,6 +75,11 @@ public class ScheduleFragment extends Fragment {
             notifyItemChanged(0);
         }
 
+        void setErrorMessage(String error) {
+            mError = error;
+            notifyItemChanged(0);
+        }
+
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_schedule, parent, false);
@@ -77,6 +88,15 @@ public class ScheduleFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
+            if (mError != null) {
+                holder.progressBar.setVisibility(View.GONE);
+                holder.table.setVisibility(View.GONE);
+                holder.name.setText(mError);
+                holder.name.setPadding(0, 0, 0, Utils.convertDpToPx(getActivity(), 24));
+                holder.subtitle.setVisibility(View.GONE);
+                return;
+            }
+
             Schedule schedule = mScheduleList.get(position);
             if (!schedule.initialized) {
                 holder.progressBar.setVisibility(View.VISIBLE);

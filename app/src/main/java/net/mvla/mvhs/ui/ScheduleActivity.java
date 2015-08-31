@@ -78,6 +78,13 @@ public class ScheduleActivity extends DrawerActivity {
                     }))
                     .observeOn(Schedulers.io())
                     .flatMap(this::getBellSchedule)
+                    .switchIfEmpty(Observable.create(subscriber -> {
+                        FragmentManager fm = getFragmentManager();
+                        ScheduleFragment f = (ScheduleFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
+                        f.setErrorMessage("No school today!");
+
+                        subscriber.onCompleted();
+                    }))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<BellSchedule>() {
                         @Override
@@ -88,7 +95,10 @@ public class ScheduleActivity extends DrawerActivity {
                         @Override
                         public void onError(Throwable e) {
                             e.printStackTrace();
-                            Toast.makeText(ScheduleActivity.this, "Error - cannot retrieve online bell schedule", Toast.LENGTH_LONG).show();
+
+                            FragmentManager fm = getFragmentManager();
+                            ScheduleFragment f = (ScheduleFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
+                            f.setErrorMessage("Error - cannot retrieve online bell schedule.");
                         }
 
                         @Override
@@ -99,7 +109,7 @@ public class ScheduleActivity extends DrawerActivity {
                             ScheduleFragment f = (ScheduleFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
                             f.setBellSchedule(bellSchedule);
 
-                            Toast.makeText(ScheduleActivity.this, bellSchedule.toString(), Toast.LENGTH_LONG).show();
+                            //Toast.makeText(ScheduleActivity.this, bellSchedule.toString(), Toast.LENGTH_LONG).show();
                         }
                     });
         } else {
@@ -144,7 +154,7 @@ public class ScheduleActivity extends DrawerActivity {
                         if (cellRow.equals("1")) {
                             //Iterating through schedule names - decide column
                             for (String eventName : eventsToday) {
-                                if (cellContent.startsWith(eventName)) {
+                                if (cellContent.startsWith(eventName.split("\\|")[0])) {
                                     schedule.name = cellContent;
                                     findCol = cellCol;
                                 }
@@ -167,11 +177,10 @@ public class ScheduleActivity extends DrawerActivity {
                                     schedule.name = "Sched. C";
                                     findCol = "D";
                                     break;
-                                //TODO: Special case for weekends
                                 default:
-                                    schedule.name = "Sched. A";
-                                    findCol = "B";
-                                    break;
+                                    //Weekend
+                                    subscriber.onCompleted();
+                                    return;
                             }
                             //cellCol is now at "A" - we're in second row
                             addScheduleName(schedule, cellContent);
