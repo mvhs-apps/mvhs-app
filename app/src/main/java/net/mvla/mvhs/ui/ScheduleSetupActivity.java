@@ -24,7 +24,7 @@ import android.widget.TextView;
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.Utils;
-import net.mvla.mvhs.model.Period;
+import net.mvla.mvhs.model.StudentPeriodInfo;
 
 
 /**
@@ -103,16 +103,16 @@ public class ScheduleSetupActivity extends AppCompatActivity {
     public static class SetupFragment extends Fragment {
         private RecyclerView mRecyclerView;
         private SetupAdapter mAdapter;
-        private Period[] mPeriods;
+        private StudentPeriodInfo[] mPeriods;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setHasOptionsMenu(true);
-            mPeriods = new Period[8];
+            mPeriods = new StudentPeriodInfo[8];
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             for (int i = 0; i < mPeriods.length; i++) {
-                mPeriods[i] = new Period();
+                mPeriods[i] = new StudentPeriodInfo();
                 mPeriods[i].room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_ROOM, "");
                 mPeriods[i].subject = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_SBJCT, "");
             }
@@ -125,7 +125,7 @@ public class ScheduleSetupActivity extends AppCompatActivity {
                 case R.id.menu_setup_done:
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                     for (int i = 0; i < mPeriods.length; i++) {
-                        Period period = mPeriods[i];
+                        StudentPeriodInfo period = mPeriods[i];
                         preferences.edit().putString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_ROOM,
                                 String.valueOf(period.room)).apply();
                         preferences.edit().putString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_SBJCT,

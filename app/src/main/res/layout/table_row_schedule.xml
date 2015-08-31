@@ -7,14 +7,14 @@
     android:paddingRight="16dp">
 
     <TextView
-        android:id="@id/list_item_sched_period_name_text"
+        android:id="@id/table_row_schedule_period_name_text"
         android:layout_height="48dp"
         android:gravity="center_vertical"
         android:textSize="13sp"
         tools:text="3" />
 
     <TextView
-        android:id="@id/list_item_sched_period_time_text"
+        android:id="@id/table_row_schedule_period_time_text"
         android:layout_height="48dp"
         android:gravity="center_vertical"
         android:paddingLeft="56dp"
@@ -24,7 +24,7 @@
         tools:text="10:25-11:25" />
 
     <TextView
-        android:id="@id/list_item_sched_room_text"
+        android:id="@id/table_row_schedule_room_text"
         android:layout_height="48dp"
         android:gravity="center_vertical"
         android:paddingLeft="56dp"
@@ -34,7 +34,7 @@
         tools:text="Packard Hall" />
 
     <TextView
-        android:id="@id/list_item_sched_subject_text"
+        android:id="@id/table_row_schedule_subject_text"
         android:layout_height="48dp"
         android:gravity="center_vertical"
         android:paddingLeft="56dp"

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 import android.widget.Toast;
 
@@ -31,6 +32,7 @@ import retrofit.http.Query;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class ScheduleActivity extends DrawerActivity {
 
@@ -53,31 +55,10 @@ public class ScheduleActivity extends DrawerActivity {
                 .build();
 
         if (isDeviceOnline()) {
-
-            Calendar calendar = Calendar.getInstance();
-            String defaultSchedule = null;
-            switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-                case Calendar.MONDAY:
-                case Calendar.TUESDAY:
-                case Calendar.FRIDAY:
-                    defaultSchedule = "Sched. A";
-                    break;
-                case Calendar.WEDNESDAY:
-                    defaultSchedule = "Sched. B";
-                    break;
-                case Calendar.THURSDAY:
-                    defaultSchedule = "Sched. C";
-                    break;
-                //TODO: Special case for weekends
-                default:
-                    defaultSchedule = "Sched. A";
-                    break;
-            }
-
             CalendarService service = restAdapter.create(CalendarService.class);
             String apiKey = getString(R.string.web_api_key);
             service.listEvents(apiKey)
-                    .flatMap(eventList -> {
+                    .flatMap(eventList -> Observable.<List<String>>create(subscriber -> {
                         List<Item> items = eventList.getItems();
                         List<String> eventsToday = new ArrayList<>();
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -92,67 +73,11 @@ public class ScheduleActivity extends DrawerActivity {
                                 e.printStackTrace();
                             }
                         }
-                        return Observable.from(eventsToday);
-                    })
-                    .defaultIfEmpty(defaultSchedule)
-                    .flatMap(eventName -> Observable.create(new Observable.OnSubscribe<BellSchedule>() {
-                        @Override
-                        public void call(Subscriber<? super BellSchedule> subscriber) {
-                            if (mBellInitialized) return;
-
-                            //TODO: Get Spreadsheet once.
-                            BellSchedule schedule = new BellSchedule();
-
-                            RestAdapter restAdapter = new RestAdapter.Builder()
-                                    .setEndpoint("https://spreadsheets.google.com")
-                                    .build();
-                            SheetService service = restAdapter.create(SheetService.class);
-                            service.getRootElement()
-                                    .subscribe(rootSheetElement -> {
-                                        List<Entry> entries = rootSheetElement.getFeed().getEntry();
-                                        String findCol = null;
-                                        for (Entry entry : entries) {
-                                            String cellCoord = entry.getTitle().get$t();
-                                            String cellContent = entry.getContent().get$t();
-                                            if (findCol == null) {
-                                                if (cellCoord.charAt(1) == '1' && cellContent.startsWith(eventName)) {
-                                                    schedule.name = cellContent;
-                                                    findCol = cellCoord.substring(0, 1);
-                                                }
-                                            } else {
-                                                if (cellCoord.substring(0, 1).equals("A")) {
-                                                    //Period name column
-                                                    BellSchedulePeriod period = new BellSchedulePeriod();
-                                                    period.name = cellContent;
-                                                    schedule.bellSchedulePeriods.add(period);
-                                                } else if (findCol.equals(cellCoord.substring(0, 1))) {
-                                                    BellSchedulePeriod period = schedule.bellSchedulePeriods.get(schedule.bellSchedulePeriods.size() - 1);
-                                                    String[] time = cellContent.split("[\\s:\\-]");
-                                                    period.startHour = Integer.parseInt(time[0]);
-                                                    period.startMinute = Integer.parseInt(time[1]);
-                                                    period.endHour = Integer.parseInt(time[2]);
-                                                    period.endMinute = Integer.parseInt(time[3]);
-                                                }
-                                            }
-                                        }
-
-                                        for (Iterator<BellSchedulePeriod> iterator = schedule.bellSchedulePeriods.iterator(); iterator.hasNext(); ) {
-                                            BellSchedulePeriod period = iterator.next();
-                                            if (period.startHour == 0) {
-                                                iterator.remove();
-                                            }
-                                        }
-
-                                        if (!schedule.bellSchedulePeriods.isEmpty()) {
-                                            mBellInitialized = true;
-                                            subscriber.onNext(schedule);
-                                            subscriber.onCompleted();
-                                        } else {
-                                            subscriber.onCompleted();
-                                        }
-                                    });
-                        }
+                        subscriber.onNext(eventsToday);
+                        subscriber.onCompleted();
                     }))
+                    .observeOn(Schedulers.io())
+                    .flatMap(this::getBellSchedule)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<BellSchedule>() {
                         @Override
@@ -193,6 +118,100 @@ public class ScheduleActivity extends DrawerActivity {
         overridePendingTransition(0, 0);
     }
 
+    @NonNull
+    private Observable<BellSchedule> getBellSchedule(final List<String> eventsToday) {
+        return Observable.create(new Observable.OnSubscribe<BellSchedule>() {
+            @Override
+            public void call(Subscriber<? super BellSchedule> subscriber) {
+                if (mBellInitialized) return;
+
+                BellSchedule schedule = new BellSchedule();
+
+                RestAdapter restAdapter1 = new RestAdapter.Builder()
+                        .setEndpoint("https://spreadsheets.google.com")
+                        .build();
+                SheetService service1 = restAdapter1.create(SheetService.class);
+                RootSheetElement rootSheetElement = service1.getRootElement();
+                List<Entry> entries = rootSheetElement.getFeed().getEntry();
+
+                String findCol = null;
+                for (Entry entry : entries) {
+                    String cellCoord = entry.getTitle().get$t();
+                    String cellRow = cellCoord.substring(1, 2);
+                    String cellCol = cellCoord.substring(0, 1);
+                    String cellContent = entry.getContent().get$t();
+                    if (findCol == null) {
+                        if (cellRow.equals("1")) {
+                            //Iterating through schedule names - decide column
+                            for (String eventName : eventsToday) {
+                                if (cellContent.startsWith(eventName)) {
+                                    schedule.name = cellContent;
+                                    findCol = cellCol;
+                                }
+                            }
+                        } else {
+                            //If go through all, and none are it, choose standard schedule
+                            Calendar calendar = Calendar.getInstance();
+                            switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+                                case Calendar.MONDAY:
+                                case Calendar.TUESDAY:
+                                case Calendar.FRIDAY:
+                                    schedule.name = "Sched. A";
+                                    findCol = "B";
+                                    break;
+                                case Calendar.WEDNESDAY:
+                                    schedule.name = "Sched. B";
+                                    findCol = "C";
+                                    break;
+                                case Calendar.THURSDAY:
+                                    schedule.name = "Sched. C";
+                                    findCol = "D";
+                                    break;
+                                //TODO: Special case for weekends
+                                default:
+                                    schedule.name = "Sched. A";
+                                    findCol = "B";
+                                    break;
+                            }
+                            //cellCol is now at "A" - we're in second row
+                            addScheduleName(schedule, cellContent);
+                        }
+                    } else {
+                        if (cellCol.equals("A")) {
+                            addScheduleName(schedule, cellContent);
+                        } else if (findCol.equals(cellCol)) {
+                            //Got the schedule
+                            BellSchedulePeriod period = schedule.bellSchedulePeriods.get(schedule.bellSchedulePeriods.size() - 1);
+                            String[] time = cellContent.split("[\\s:\\-]");
+                            period.startHour = Integer.parseInt(time[0]);
+                            period.startMinute = Integer.parseInt(time[1]);
+                            period.endHour = Integer.parseInt(time[2]);
+                            period.endMinute = Integer.parseInt(time[3]);
+                        }
+                    }
+                }
+
+                for (Iterator<BellSchedulePeriod> iterator = schedule.bellSchedulePeriods.iterator(); iterator.hasNext(); ) {
+                    BellSchedulePeriod period = iterator.next();
+                    if (period.startHour == 0) {
+                        iterator.remove();
+                    }
+                }
+
+                mBellInitialized = true;
+                subscriber.onNext(schedule);
+                subscriber.onCompleted();
+            }
+        });
+    }
+
+    private void addScheduleName(BellSchedule schedule, String cellContent) {
+        //Period name column
+        BellSchedulePeriod period = new BellSchedulePeriod();
+        period.name = cellContent;
+        schedule.bellSchedulePeriods.add(period);
+    }
+
     @Override
     int getSelfNavDrawerItem() {
         return NAVDRAWER_ITEM_TODAYS_SCHED;
@@ -205,7 +224,7 @@ public class ScheduleActivity extends DrawerActivity {
 
     public interface SheetService {
         @GET("/feeds/cells/1BBGLmF4GgV7SjtZyfMANa6CVxr4-GY-_O1l1ZJX6Ooo/od6/public/basic?alt=json")
-        Observable<RootSheetElement> getRootElement();
+        RootSheetElement getRootElement();
     }
 
 }

@@ -32,6 +32,7 @@
             android:layout_marginBottom="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
+            android:textColor="?android:textColorSecondary"
             android:textSize="14sp"
             tools:text="Lead Developer, Class of 2018" />
 

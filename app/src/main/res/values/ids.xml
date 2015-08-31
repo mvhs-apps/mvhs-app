@@ -1,64 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="activity_map_fragment_container" type="id" />
-    <item name="activity_map_checkbox_debug" type="id" />
-    <item name="activity_map_searchbox" type="id" />
-    <item name="activity_map_list_fragment_container" type="id" />
 
-    <item name="fragment_list_recycler" type="id" />
-
-    <item name="list_item_location_title_textview" type="id" />
-    <item name="list_item_location_desc_textview" type="id" />
-    <item name="activity_map_showlist_framelayout" type="id" />
-    <item name="activity_map_showlist_linearlayout" type="id" />
-    <item name="searchbox_menu_button" type="id" />
-    <item name="searchbox_edittext" type="id" />
-    <item name="activity_map_searchbox_background" type="id" />
-    <item name="activity_map_nav_fab" type="id" />
-    <item name="activity_map_my_loc_fab" type="id" />
-    <item name="navigation_selection_appbar" type="id" />
-    <item name="navigation_selection_toolbar" type="id" />
-    <item name="navigation_appbar" type="id" />
-    <item name="navigation_toolbar" type="id" />
-    <item name="fragment_aeries_webview" type="id" />
-
-
-    <item name="fragment_aeries_login_username" type="id" />
-    <item name="fragment_aeries_login_password" type="id" />
-    <item name="fragment_aeries_login_button" type="id" />
+    <!-- DrawerActivity -->
     <item name="activity_drawer_drawerlayout" type="id" />
     <item name="activity_drawer_drawer_scrollview" type="id" />
     <item name="activity_drawer_drawer_linearlayout" type="id" />
     <item name="activity_drawer_content" type="id" />
-    <item name="toolbar_actionbar" type="id" />
-    <item name="activity_aeries_fragment" type="id" />
-    <item name="activity_aeries_progress_bar" type="id" />
-    <item name="fragment_aeries_login_linear" type="id" />
-    <item name="activity_setup_fragment" type="id" />
-    <item name="list_item_setup_period_text" type="id" />
-    <item name="list_item_setup_room_edit" type="id" />
-    <item name="list_item_setup_subject_edit" type="id" />
-    <item name="menu_setup_done" type="id" />
-    <item name="activity_with_toolbar_content_framelayout" type="id" />
 
-    <item name="activity_about_appname_textview" type="id" />
-    <item name="activity_about_recycler" type="id" />
+    <!-- MapActivity -->
+    <item name="activity_map_fragment_container" type="id" />
+    <item name="activity_map_checkbox_debug" type="id" />
+    <item name="activity_map_searchbox" type="id" />
+    <item name="activity_map_list_fragment_container" type="id" />
+    <item name="activity_map_showlist_framelayout" type="id" />
+    <item name="activity_map_showlist_linearlayout" type="id" />
+    <item name="activity_map_searchbox_background" type="id" />
+    <item name="activity_map_nav_fab" type="id" />
+    <item name="activity_map_my_loc_fab" type="id" />
+    <!-- Map location list layout -->
+    <item name="list_item_location_title_textview" type="id" />
+    <item name="list_item_location_desc_textview" type="id" />
+    <!-- Navigation selection -->
+    <item name="navigation_selection_appbar" type="id" />
+    <item name="navigation_selection_toolbar" type="id" />
+    <!-- Navigating app bar -->
+    <item name="navigation_appbar" type="id" />
+    <item name="navigation_toolbar" type="id" />
 
 
+    <!-- WelcomeActivity -->
     <item name="activity_welcome_student" type="id" />
     <item name="activity_welcome_guest" type="id" />
     <item name="activity_welcome_buttonbar" type="id" />
+
+    <!-- Recycler list layout -->
+    <item name="fragment_list_recycler" type="id" />
+
+    <item name="searchbox_menu_button" type="id" />
+    <item name="searchbox_edittext" type="id" />
+
+    <!-- AeriesActivity -->
+    <item name="activity_aeries_fragment" type="id" />
+    <item name="activity_aeries_progress_bar" type="id" />
+    <!-- AeriesFragment -->
+    <item name="fragment_aeries_webview" type="id" />
+    <item name="fragment_aeries_login_username" type="id" />
+    <item name="fragment_aeries_login_password" type="id" />
+    <item name="fragment_aeries_login_button" type="id" />
+    <item name="fragment_aeries_login_linear" type="id" />
+
+    <!-- Toolbar/Action Bar -->
+    <item name="toolbar_actionbar" type="id" />
+
+    <!-- SetupActivity -->
+    <item name="activity_setup_fragment" type="id" />
+    <!-- SetupActivity toolbar done -->
+    <item name="menu_setup_done" type="id" />
+    <!-- SetupFragment list item -->
+    <item name="list_item_setup_period_text" type="id" />
+    <item name="list_item_setup_room_edit" type="id" />
+    <item name="list_item_setup_subject_edit" type="id" />
+
+    <!--Activity with Toolbar-->
+    <item name="activity_with_toolbar_content_framelayout" type="id" />
+
+    <!-- AboutActivity -->
+    <item name="activity_about_appname_textview" type="id" />
+    <item name="activity_about_recycler" type="id" />
+    <!-- About card list item -->
     <item name="list_item_about_name" type="id" />
     <item name="list_item_about_subtitle" type="id" />
     <item name="list_item_about_desc" type="id" />
     <item name="list_item_about_website_button" type="id" />
     <item name="list_item_about_email_button" type="id" />
     <item name="list_item_about_actions_bar" type="id" />
+
+    <!-- ScheduleActivity -->
     <item name="activity_schedule_fragment" type="id" />
-    <item name="list_item_sched_subject_text" type="id" />
-    <item name="list_item_sched_room_text" type="id" />
-    <item name="list_item_sched_period_name_text" type="id" />
-    <item name="fragment_schedule_table" type="id" />
-    <item name="fragment_schedule_loading_progress" type="id" />
-    <item name="list_item_sched_period_time_text" type="id" />
+    <!-- Schedule list item card -->
+    <item name="list_item_schedule_name" type="id" />
+    <item name="list_item_schedule_subtitle" type="id" />
+    <item name="list_item_schedule_table" type="id" />
+    <item name="list_item_schedule_progress" type="id" />
+    <!-- Schedule card table rows -->
+    <item name="table_row_schedule_subject_text" type="id" />
+    <item name="table_row_schedule_room_text" type="id" />
+    <item name="table_row_schedule_period_name_text" type="id" />
+    <item name="table_row_schedule_period_time_text" type="id" />
+
+
 </resources>

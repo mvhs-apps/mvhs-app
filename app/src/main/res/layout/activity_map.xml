@@ -111,7 +111,7 @@
             android:layout_marginTop="24dp" />
 
         <include
-            layout="@layout/appbar_navigation_start_dest"
+            layout="@layout/appbar_navigation_selection"
             tools:visibility="gone" />
 
         <include
