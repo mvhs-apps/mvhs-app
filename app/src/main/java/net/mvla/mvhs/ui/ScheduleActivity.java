@@ -13,22 +13,24 @@ import android.widget.Toast;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.model.BellSchedule;
 import net.mvla.mvhs.model.BellSchedulePeriod;
-import net.mvla.mvhs.model.event.EventList;
-import net.mvla.mvhs.model.event.Item;
 import net.mvla.mvhs.model.sheet.Entry;
 import net.mvla.mvhs.model.sheet.RootSheetElement;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import biweekly.Biweekly;
+import biweekly.ICalendar;
+import biweekly.component.VEvent;
 import retrofit.RestAdapter;
+import retrofit.client.OkClient;
+import retrofit.client.Response;
 import retrofit.http.GET;
-import retrofit.http.Query;
+import retrofit.mime.TypedByteArray;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -37,6 +39,25 @@ import rx.schedulers.Schedulers;
 public class ScheduleActivity extends DrawerActivity {
 
     private boolean mBellInitialized;
+
+    public static void saveBytesToFile(byte[] bytes, String path) {
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(path);
+            fileOutputStream.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fileOutputStream != null) {
+                    fileOutputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
@@ -51,40 +72,19 @@ public class ScheduleActivity extends DrawerActivity {
         setContentView(R.layout.activity_schedule);
 
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("https://www.googleapis.com/calendar/v3/calendars/kci7ig724mqv7ps1mkn54cc9rs%40group.calendar.google.com")
+                .setEndpoint("http://www.mvla.net")
+                .setClient(new OkClient())
                 .build();
 
         if (isDeviceOnline()) {
-            CalendarService service = restAdapter.create(CalendarService.class);
-            String apiKey = getString(R.string.web_api_key);
-            service.listEvents(apiKey)
-                    .flatMap(eventList -> Observable.<List<String>>create(subscriber -> {
-                        List<Item> items = eventList.getItems();
-                        List<String> eventsToday = new ArrayList<>();
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-                        for (Item item : items) {
-                            //Toast.makeText(ScheduleActivity.this, item.getSummary() + "\n" + item.getStart().getDateTime(), Toast.LENGTH_SHORT).show();
-                            try {
-                                Date start = format.parse(item.getStart().getDateTime());
-                                if (DateUtils.isToday(start.getTime())) {
-                                    eventsToday.add(item.getSummary());
-                                }
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        subscriber.onNext(eventsToday);
-                        subscriber.onCompleted();
-                    }))
+            CalendarIcalService service = restAdapter.create(CalendarIcalService.class);
+            //String apiKey = getString(R.string.web_api_key);
+            service.getCalendarFile()
                     .observeOn(Schedulers.io())
+                    .flatMap(this::getEventList)
+                    .flatMap(this::getEventsToday)
                     .flatMap(this::getBellSchedule)
-                    .switchIfEmpty(Observable.create(subscriber -> {
-                        FragmentManager fm = getFragmentManager();
-                        ScheduleFragment f = (ScheduleFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
-                        f.setErrorMessage("No school today!");
-
-                        subscriber.onCompleted();
-                    }))
+                    .switchIfEmpty(getNoSchoolAlt())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<BellSchedule>() {
                         @Override
@@ -129,88 +129,129 @@ public class ScheduleActivity extends DrawerActivity {
     }
 
     @NonNull
-    private Observable<BellSchedule> getBellSchedule(final List<String> eventsToday) {
-        return Observable.create(new Observable.OnSubscribe<BellSchedule>() {
-            @Override
-            public void call(Subscriber<? super BellSchedule> subscriber) {
-                if (mBellInitialized) return;
+    private Observable<BellSchedule> getNoSchoolAlt() {
+        return Observable.create(subscriber -> {
+            FragmentManager fm = getFragmentManager();
+            ScheduleFragment f = (ScheduleFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
+            f.setErrorMessage("No school today!");
 
-                BellSchedule schedule = new BellSchedule();
+            subscriber.onCompleted();
+        });
+    }
 
-                RestAdapter restAdapter1 = new RestAdapter.Builder()
-                        .setEndpoint("https://spreadsheets.google.com")
-                        .build();
-                SheetService service1 = restAdapter1.create(SheetService.class);
-                RootSheetElement rootSheetElement = service1.getRootElement();
-                List<Entry> entries = rootSheetElement.getFeed().getEntry();
+    @NonNull
+    private Observable<List<VEvent>> getEventList(Response calendarResponse) {
+        return Observable.create(subscriber -> {
+            byte[] calBytes = ((TypedByteArray) calendarResponse.getBody()).getBytes();
+            File file = new File(getCacheDir(), "calendar.ics");
+            saveBytesToFile(calBytes, file.getPath());
+            ICalendar calendar;
+            try {
+                calendar = Biweekly.parse(file).first();
+            } catch (IOException e) {
+                subscriber.onError(e);
+                return;
+            }
 
-                String findCol = null;
-                for (Entry entry : entries) {
-                    String cellCoord = entry.getTitle().get$t();
-                    String cellRow = cellCoord.substring(1, 2);
-                    String cellCol = cellCoord.substring(0, 1);
-                    String cellContent = entry.getContent().get$t();
-                    if (findCol == null) {
-                        if (cellRow.equals("1")) {
-                            //Iterating through schedule names - decide column
-                            for (String eventName : eventsToday) {
-                                if (cellContent.startsWith(eventName.split("\\|")[0])) {
-                                    schedule.name = cellContent;
-                                    findCol = cellCol;
-                                }
+            subscriber.onNext(calendar.getEvents());
+            subscriber.onCompleted();
+        });
+    }
+
+    @NonNull
+    private Observable<List<VEvent>> getEventsToday(final List<VEvent> eventList) {
+        return Observable.create(subscriber -> {
+            List<VEvent> eventsToday = new ArrayList<>();
+            for (VEvent event : eventList) {
+                if (DateUtils.isToday(event.getDateStart().getValue().getTime())) {
+                    eventsToday.add(event);
+                }
+            }
+            subscriber.onNext(eventsToday);
+            subscriber.onCompleted();
+        });
+    }
+
+    @NonNull
+    private Observable<BellSchedule> getBellSchedule(final List<VEvent> eventsToday) {
+        return Observable.create(subscriber -> {
+            if (mBellInitialized) return;
+
+            BellSchedule schedule = new BellSchedule();
+
+            RestAdapter restAdapter1 = new RestAdapter.Builder()
+                    .setEndpoint("https://spreadsheets.google.com")
+                    .build();
+            SheetService service1 = restAdapter1.create(SheetService.class);
+            RootSheetElement rootSheetElement = service1.getRootElement();
+            List<Entry> entries = rootSheetElement.getFeed().getEntry();
+
+            String findCol = null;
+            for (Entry entry : entries) {
+                String cellCoord = entry.getTitle().get$t();
+                String cellRow = cellCoord.substring(1, 2);
+                String cellCol = cellCoord.substring(0, 1);
+                String cellContent = entry.getContent().get$t();
+                if (findCol == null) {
+                    if (cellRow.equals("1")) {
+                        //Iterating through schedule names - decide column
+                        for (VEvent vEvent : eventsToday) {
+                            if (cellContent.startsWith(vEvent.getSummary().getValue().split("\\|")[0])) {
+                                schedule.name = cellContent;
+                                findCol = cellCol;
                             }
-                        } else {
-                            //If go through all, and none are it, choose standard schedule
-                            Calendar calendar = Calendar.getInstance();
-                            switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-                                case Calendar.MONDAY:
-                                case Calendar.TUESDAY:
-                                case Calendar.FRIDAY:
-                                    schedule.name = "Sched. A";
-                                    findCol = "B";
-                                    break;
-                                case Calendar.WEDNESDAY:
-                                    schedule.name = "Sched. B";
-                                    findCol = "C";
-                                    break;
-                                case Calendar.THURSDAY:
-                                    schedule.name = "Sched. C";
-                                    findCol = "D";
-                                    break;
-                                default:
-                                    //Weekend
-                                    subscriber.onCompleted();
-                                    return;
-                            }
-                            //cellCol is now at "A" - we're in second row
-                            addScheduleName(schedule, cellContent);
                         }
                     } else {
-                        if (cellCol.equals("A")) {
-                            addScheduleName(schedule, cellContent);
-                        } else if (findCol.equals(cellCol)) {
-                            //Got the schedule
-                            BellSchedulePeriod period = schedule.bellSchedulePeriods.get(schedule.bellSchedulePeriods.size() - 1);
-                            String[] time = cellContent.split("[\\s:\\-]");
-                            period.startHour = Integer.parseInt(time[0]);
-                            period.startMinute = Integer.parseInt(time[1]);
-                            period.endHour = Integer.parseInt(time[2]);
-                            period.endMinute = Integer.parseInt(time[3]);
+                        //If go through all, and none are it, choose standard schedule
+                        java.util.Calendar calendar = java.util.Calendar.getInstance();
+                        switch (calendar.get(java.util.Calendar.DAY_OF_WEEK)) {
+                            case java.util.Calendar.MONDAY:
+                            case java.util.Calendar.TUESDAY:
+                            case java.util.Calendar.FRIDAY:
+                                schedule.name = "Sched. A";
+                                findCol = "B";
+                                break;
+                            case java.util.Calendar.WEDNESDAY:
+                                schedule.name = "Sched. B";
+                                findCol = "C";
+                                break;
+                            case java.util.Calendar.THURSDAY:
+                                schedule.name = "Sched. C";
+                                findCol = "D";
+                                break;
+                            default:
+                                //Weekend
+                                subscriber.onCompleted();
+                                return;
                         }
+                        //cellCol is now at "A" - we're in second row
+                        addScheduleName(schedule, cellContent);
+                    }
+                } else {
+                    if (cellCol.equals("A")) {
+                        addScheduleName(schedule, cellContent);
+                    } else if (findCol.equals(cellCol)) {
+                        //Got the schedule
+                        BellSchedulePeriod period = schedule.bellSchedulePeriods.get(schedule.bellSchedulePeriods.size() - 1);
+                        String[] time = cellContent.split("[\\s:\\-]");
+                        period.startHour = Integer.parseInt(time[0]);
+                        period.startMinute = Integer.parseInt(time[1]);
+                        period.endHour = Integer.parseInt(time[2]);
+                        period.endMinute = Integer.parseInt(time[3]);
                     }
                 }
-
-                for (Iterator<BellSchedulePeriod> iterator = schedule.bellSchedulePeriods.iterator(); iterator.hasNext(); ) {
-                    BellSchedulePeriod period = iterator.next();
-                    if (period.startHour == 0) {
-                        iterator.remove();
-                    }
-                }
-
-                mBellInitialized = true;
-                subscriber.onNext(schedule);
-                subscriber.onCompleted();
             }
+
+            for (Iterator<BellSchedulePeriod> iterator = schedule.bellSchedulePeriods.iterator(); iterator.hasNext(); ) {
+                BellSchedulePeriod period = iterator.next();
+                if (period.startHour == 0) {
+                    iterator.remove();
+                }
+            }
+
+            mBellInitialized = true;
+            subscriber.onNext(schedule);
+            subscriber.onCompleted();
         });
     }
 
@@ -226,14 +267,16 @@ public class ScheduleActivity extends DrawerActivity {
         return NAVDRAWER_ITEM_TODAYS_SCHED;
     }
 
-    public interface CalendarService {
-        @GET("/events?orderBy=startTime&singleEvents=true&fields=items")
-        Observable<EventList> listEvents(@Query("key") String key);
-    }
+
 
     public interface SheetService {
         @GET("/feeds/cells/1BBGLmF4GgV7SjtZyfMANa6CVxr4-GY-_O1l1ZJX6Ooo/od6/public/basic?alt=json")
         RootSheetElement getRootElement();
+    }
+
+    public interface CalendarIcalService {
+        @GET("/rss.cfm?a=Events&s=MVHS&format=ical")
+        Observable<Response> getCalendarFile();
     }
 
 }
