@@ -61,8 +61,6 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.+'
 
     compile 'com.squareup.retrofit:retrofit:1.+'
-    compile 'com.squareup.okhttp:okhttp:2.+'
-    compile 'com.squareup.okio:okio:1.+'
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-SNAPSHOT'

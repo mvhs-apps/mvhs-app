@@ -10,6 +10,8 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 
+import java.util.Calendar;
+
 /**
  * Utilities
  */
@@ -30,6 +32,11 @@ public abstract class Utils {
                 }
             }
         });
+    }
+
+    public static boolean sameDay(Calendar cal, Calendar cal2) {
+        return cal.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 
     public static int convertDpToPx(Context context, float dp) {

@@ -7,10 +7,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.text.format.DateUtils;
+import android.util.Pair;
 import android.widget.Toast;
 
 import net.mvla.mvhs.R;
+import net.mvla.mvhs.Utils;
 import net.mvla.mvhs.model.BellSchedule;
 import net.mvla.mvhs.model.BellSchedulePeriod;
 import net.mvla.mvhs.model.sheet.Entry;
@@ -20,6 +21,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,18 +30,18 @@ import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
 import retrofit.RestAdapter;
-import retrofit.client.OkClient;
 import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.mime.TypedByteArray;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class ScheduleActivity extends DrawerActivity {
 
-    private boolean mBellInitialized;
+    private Calendar mNow;
 
     public static void saveBytesToFile(byte[] bytes, String path) {
         FileOutputStream fileOutputStream = null;
@@ -71,18 +74,12 @@ public class ScheduleActivity extends DrawerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("http://www.mvla.net")
-                .setClient(new OkClient())
-                .build();
+        mNow = Calendar.getInstance();
 
         if (isDeviceOnline()) {
-            CalendarIcalService service = restAdapter.create(CalendarIcalService.class);
-            //String apiKey = getString(R.string.web_api_key);
-            service.getCalendarFile()
-                    .observeOn(Schedulers.io())
-                    .flatMap(this::getEventList)
-                    .flatMap(this::getEventsToday)
+            //Fetch today's events (from calendar) and bell schedule sheet entries in parallel
+            Observable.combineLatest(getEventsToday(), getBellScheduleSheetEntries(),
+                    (Func2<List<VEvent>, List<Entry>, Pair<List<VEvent>, List<Entry>>>) Pair::new)
                     .flatMap(this::getBellSchedule)
                     .switchIfEmpty(getNoSchoolAlt())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -113,7 +110,7 @@ public class ScheduleActivity extends DrawerActivity {
                         }
                     });
         } else {
-            Toast.makeText(ScheduleActivity.this, "Cannot retrieve online bell schedule", Toast.LENGTH_LONG).show();
+            Toast.makeText(ScheduleActivity.this, "Not online - cannot retrieve online bell schedule", Toast.LENGTH_LONG).show();
         }
 
         FragmentManager fm = getFragmentManager();
@@ -126,6 +123,35 @@ public class ScheduleActivity extends DrawerActivity {
         }
 
         overridePendingTransition(0, 0);
+    }
+
+    private Observable<List<VEvent>> getEventsToday() {
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint("http://www.mvla.net")
+                .build();
+        CalendarIcalService service = restAdapter.create(CalendarIcalService.class);
+        return service.getCalendarFile()
+                .observeOn(Schedulers.io())
+                .flatMap(this::getEventList)
+                .flatMap(this::getEventsTodayFromList);
+    }
+
+    @NonNull
+    private Observable<List<Entry>> getBellScheduleSheetEntries() {
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint("https://spreadsheets.google.com")
+                .build();
+        SheetService service = restAdapter.create(SheetService.class);
+
+        return service.getRootElement()
+                .observeOn(Schedulers.io())
+                .flatMap(rootSheetElement -> Observable.create(new Observable.OnSubscribe<List<Entry>>() {
+                    @Override
+                    public void call(Subscriber<? super List<Entry>> subscriber) {
+                        subscriber.onNext(rootSheetElement.getFeed().getEntry());
+                        subscriber.onCompleted();
+                    }
+                }));
     }
 
     @NonNull
@@ -159,11 +185,13 @@ public class ScheduleActivity extends DrawerActivity {
     }
 
     @NonNull
-    private Observable<List<VEvent>> getEventsToday(final List<VEvent> eventList) {
+    private Observable<List<VEvent>> getEventsTodayFromList(final List<VEvent> eventList) {
         return Observable.create(subscriber -> {
             List<VEvent> eventsToday = new ArrayList<>();
             for (VEvent event : eventList) {
-                if (DateUtils.isToday(event.getDateStart().getValue().getTime())) {
+                Calendar time = new GregorianCalendar();
+                time.setTime(event.getDateStart().getValue());
+                if (Utils.sameDay(time, mNow)) {
                     eventsToday.add(event);
                 }
             }
@@ -173,21 +201,13 @@ public class ScheduleActivity extends DrawerActivity {
     }
 
     @NonNull
-    private Observable<BellSchedule> getBellSchedule(final List<VEvent> eventsToday) {
+    private Observable<BellSchedule> getBellSchedule(final Pair<List<VEvent>, List<Entry>> eventsAndBellSched) {
         return Observable.create(subscriber -> {
-            if (mBellInitialized) return;
 
             BellSchedule schedule = new BellSchedule();
 
-            RestAdapter restAdapter1 = new RestAdapter.Builder()
-                    .setEndpoint("https://spreadsheets.google.com")
-                    .build();
-            SheetService service1 = restAdapter1.create(SheetService.class);
-            RootSheetElement rootSheetElement = service1.getRootElement();
-            List<Entry> entries = rootSheetElement.getFeed().getEntry();
-
             String findCol = null;
-            for (Entry entry : entries) {
+            for (Entry entry : eventsAndBellSched.second) {
                 String cellCoord = entry.getTitle().get$t();
                 String cellRow = cellCoord.substring(1, 2);
                 String cellCol = cellCoord.substring(0, 1);
@@ -195,7 +215,7 @@ public class ScheduleActivity extends DrawerActivity {
                 if (findCol == null) {
                     if (cellRow.equals("1")) {
                         //Iterating through schedule names - decide column
-                        for (VEvent vEvent : eventsToday) {
+                        for (VEvent vEvent : eventsAndBellSched.first) {
                             if (cellContent.startsWith(vEvent.getSummary().getValue().split("\\|")[0])) {
                                 schedule.name = cellContent;
                                 findCol = cellCol;
@@ -203,8 +223,7 @@ public class ScheduleActivity extends DrawerActivity {
                         }
                     } else {
                         //If go through all, and none are it, choose standard schedule
-                        java.util.Calendar calendar = java.util.Calendar.getInstance();
-                        switch (calendar.get(java.util.Calendar.DAY_OF_WEEK)) {
+                        switch (mNow.get(java.util.Calendar.DAY_OF_WEEK)) {
                             case java.util.Calendar.MONDAY:
                             case java.util.Calendar.TUESDAY:
                             case java.util.Calendar.FRIDAY:
@@ -249,7 +268,6 @@ public class ScheduleActivity extends DrawerActivity {
                 }
             }
 
-            mBellInitialized = true;
             subscriber.onNext(schedule);
             subscriber.onCompleted();
         });
@@ -271,7 +289,7 @@ public class ScheduleActivity extends DrawerActivity {
 
     public interface SheetService {
         @GET("/feeds/cells/1BBGLmF4GgV7SjtZyfMANa6CVxr4-GY-_O1l1ZJX6Ooo/od6/public/basic?alt=json")
-        RootSheetElement getRootElement();
+        Observable<RootSheetElement> getRootElement();
     }
 
     public interface CalendarIcalService {
