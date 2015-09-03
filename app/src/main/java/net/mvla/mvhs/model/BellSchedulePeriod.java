@@ -2,7 +2,9 @@ package net.mvla.mvhs.model;
 
 import android.support.annotation.NonNull;
 
-public class BellSchedulePeriod implements Comparable {
+import java.io.Serializable;
+
+public class BellSchedulePeriod implements Comparable, Serializable {
     public String name;
 
     public int startHour;

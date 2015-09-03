@@ -1,16 +1,9 @@
 package net.mvla.mvhs.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Schedule {
-    public boolean initialized;
-
+public class Schedule implements Serializable {
     public BellSchedule bellSchedule;
-    public List<StudentPeriodInfo> studentPeriodInfos;
-
-    public void init(Schedule o) {
-        bellSchedule = o.bellSchedule;
-        studentPeriodInfos = o.studentPeriodInfos;
-        initialized = true;
-    }
+    public List<UserPeriodInfo> userPeriodInfos;
 }

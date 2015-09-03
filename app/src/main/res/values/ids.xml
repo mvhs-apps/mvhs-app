@@ -87,6 +87,7 @@
     <item name="table_row_schedule_room_text" type="id" />
     <item name="table_row_schedule_period_name_text" type="id" />
     <item name="table_row_schedule_period_time_text" type="id" />
+    <item name="fragment_schedule_scrollview" type="id" />
 
 
 </resources>

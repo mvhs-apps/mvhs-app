@@ -41,7 +41,7 @@ import rx.schedulers.Schedulers;
 
 public class ScheduleActivity extends DrawerActivity {
 
-    private Calendar mNow;
+    private Calendar mToday;
 
     public static void saveBytesToFile(byte[] bytes, String path) {
         FileOutputStream fileOutputStream = null;
@@ -74,8 +74,21 @@ public class ScheduleActivity extends DrawerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
 
-        mNow = Calendar.getInstance();
+        mToday = Calendar.getInstance();
 
+        FragmentManager fm = getFragmentManager();
+        Fragment f = fm.findFragmentById(R.id.activity_schedule_fragment);
+        if (f == null) {
+            f = new ScheduleFragment();
+            fm.beginTransaction()
+                    .replace(R.id.activity_schedule_fragment, f)
+                    .commit();
+        }
+
+        overridePendingTransition(0, 0);
+    }
+
+    public void retrieveBellSchedule() {
         if (isDeviceOnline()) {
             //Fetch today's events (from calendar) and bell schedule sheet entries in parallel
             Observable.combineLatest(getEventsToday(), getBellScheduleSheetEntries(),
@@ -112,17 +125,6 @@ public class ScheduleActivity extends DrawerActivity {
         } else {
             Toast.makeText(ScheduleActivity.this, "Not online - cannot retrieve online bell schedule", Toast.LENGTH_LONG).show();
         }
-
-        FragmentManager fm = getFragmentManager();
-        Fragment f = fm.findFragmentById(R.id.activity_schedule_fragment);
-        if (f == null) {
-            f = new ScheduleFragment();
-            fm.beginTransaction()
-                    .replace(R.id.activity_schedule_fragment, f)
-                    .commit();
-        }
-
-        overridePendingTransition(0, 0);
     }
 
     private Observable<List<VEvent>> getEventsToday() {
@@ -191,7 +193,7 @@ public class ScheduleActivity extends DrawerActivity {
             for (VEvent event : eventList) {
                 Calendar time = new GregorianCalendar();
                 time.setTime(event.getDateStart().getValue());
-                if (Utils.sameDay(time, mNow)) {
+                if (Utils.sameDay(time, mToday)) {
                     eventsToday.add(event);
                 }
             }
@@ -223,7 +225,7 @@ public class ScheduleActivity extends DrawerActivity {
                         }
                     } else {
                         //If go through all, and none are it, choose standard schedule
-                        switch (mNow.get(java.util.Calendar.DAY_OF_WEEK)) {
+                        switch (mToday.get(java.util.Calendar.DAY_OF_WEEK)) {
                             case java.util.Calendar.MONDAY:
                             case java.util.Calendar.TUESDAY:
                             case java.util.Calendar.FRIDAY:

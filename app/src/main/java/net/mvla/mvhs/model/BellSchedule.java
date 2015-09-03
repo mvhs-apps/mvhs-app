@@ -1,10 +1,11 @@
 package net.mvla.mvhs.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BellSchedule {
+public class BellSchedule implements Serializable {
 
     public String name;
     public List<BellSchedulePeriod> bellSchedulePeriods;
