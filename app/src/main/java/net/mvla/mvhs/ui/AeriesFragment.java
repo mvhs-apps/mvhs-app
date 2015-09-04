@@ -1,16 +1,19 @@
 package net.mvla.mvhs.ui;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
-import android.util.AndroidRuntimeException;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +21,13 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
 import com.google.android.gms.auth.api.credentials.CredentialRequest;
@@ -31,7 +35,6 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 
-import net.mvla.mvhs.BuildConfig;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.Utils;
 
@@ -48,6 +51,8 @@ public class AeriesFragment extends Fragment {
     private EditText mUsernameEditText;
     private EditText mPasswordEditText;
     private WebView mWebView;
+
+    private Handler mHandler;
 
     private boolean mLoggedIn;
     private GoogleApiClient mCredentialsApiClient;
@@ -84,6 +89,8 @@ public class AeriesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mHandler = new Handler(getActivity().getMainLooper());
 
         mCredentialsApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -144,7 +151,7 @@ public class AeriesFragment extends Fragment {
             Utils.hideSoftKeyBoard(getActivity());
         });
 
-        ViewCompat.setBackgroundTintList(mLoginButton, getResources().getColorStateList(R.color.button_color_list));
+        ViewCompat.setBackgroundTintList(mLoginButton, ContextCompat.getColorStateList(getActivity(), R.color.button_color_list));
 
         if (savedInstanceState == null) {
             mWebView.loadUrl("https://mvla.asp.aeries.net/student/LoginParent.aspx");
@@ -249,22 +256,18 @@ public class AeriesFragment extends Fragment {
             return;
         }
 
-        if (getActivity() != null) {
-            ((AeriesActivity) getActivity()).hideIndeterminateProgressBar();
-        }
+        mHandler.post(() -> {
+            if (getActivity() != null) {
+                ((AeriesActivity) getActivity()).hideIndeterminateProgressBar();
+            }
 
-        if (mSavingSnackbar != null) {
-            mSavingSnackbar.dismiss();
-        }
+            if (mSavingSnackbar != null) {
+                mSavingSnackbar.dismiss();
+            }
 
-        try {
             mLoginButton.setEnabled(true);
             mLoginButton.setText(getString(R.string.login));
-        } catch (AndroidRuntimeException e) {
-            e.printStackTrace();
-            if (!BuildConfig.DEBUG)
-                Crashlytics.logException(e);
-        }
+        });
     }
 
     private void resolveResult(Status status, int requestCode) {
@@ -393,10 +396,23 @@ public class AeriesFragment extends Fragment {
 
     private class AeriesWebViewClient extends WebViewClient {
 
+        @SuppressWarnings("deprecation")
         @Override
         public void onReceivedError(final WebView view, int errorCode, String description, final String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
 
+            onError(view, errorCode, description, failingUrl);
+        }
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            super.onReceivedError(view, request, error);
+
+            onError(view, error.getErrorCode(), error.getDescription().toString(), request.getUrl().toString());
+        }
+
+        private void onError(WebView view, int errorCode, String description, String failingUrl) {
             if (view != null && view.getContext() != null) {
                 mErrorSnackbar = Snackbar.make(view, "Error " + errorCode + ": " + description, Snackbar.LENGTH_INDEFINITE)
                         .setAction("Try Again", v -> {
@@ -434,8 +450,6 @@ public class AeriesFragment extends Fragment {
 
             //Login page
             if (url.equalsIgnoreCase("https://mvla.asp.aeries.net/student/LoginParent.aspx")) {
-
-                //TODO: Use WebView.findAll for compat
 
                 if (mAttemptRequestCredentials) {
                     showIndeterminateProgressBar();
