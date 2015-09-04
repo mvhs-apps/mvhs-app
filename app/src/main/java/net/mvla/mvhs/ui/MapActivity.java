@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -27,9 +27,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -220,23 +218,17 @@ public class MapActivity extends DrawerActivity {
         }
 
         CheckBox debug = (CheckBox) findViewById(R.id.activity_map_checkbox_debug);
-        debug.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mDebugMode = isChecked;
-                MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container);
-                updateMapOverlays(mapFragment.getMap());
-            }
+        debug.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            mDebugMode = isChecked;
+            MapFragment mapFragment1 = (MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container);
+            updateMapOverlays(mapFragment1.getMap());
         });
         debug.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
 
         LinearLayout openListBar = (LinearLayout) findViewById(R.id.activity_map_showlist_linearlayout);
-        openListBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showList(80);
-                ((MapListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_LIST)).updateDataAndSearch("");
-            }
+        openListBar.setOnClickListener(v -> {
+            showList(80);
+            ((MapListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_LIST)).updateDataAndSearch("");
         });
 
         mSearchView = (SearchView) findViewById(R.id.activity_map_searchbox);
@@ -271,12 +263,7 @@ public class MapActivity extends DrawerActivity {
         mNavigationSelectionAppBar = findViewById(R.id.navigation_selection_appbar);
 
         mStartingLocationButton = (Button) findViewById(R.id.navigation_appbar_startingloc_button);
-        mStartingLocationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                enterChoosingStart();
-            }
-        });
+        mStartingLocationButton.setOnClickListener(v -> enterChoosingStart());
 
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mNavigationSelectionAppBar.getLayoutParams();
         params.height += getStatusBarHeight();
@@ -284,65 +271,49 @@ public class MapActivity extends DrawerActivity {
 
         Toolbar navSelection = (Toolbar) findViewById(R.id.navigation_selection_toolbar);
         navSelection.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        navSelection.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                exitChoosingDestination();
-            }
-        });
+        navSelection.setNavigationOnClickListener(v -> exitChoosingDestination());
 
         mNavSelectionFab = (FloatingActionButton) findViewById(R.id.activity_map_nav_fab);
-        mNavSelectionFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mNavigating) {
-                    enterChoosingDestination();
-                } else {
-                    //nav step = how many lines travelled
+        mNavSelectionFab.setOnClickListener(v -> {
+            if (!mNavigating) {
+                enterChoosingDestination();
+            } else {
+                //nav step = how many lines travelled
 
-                    if (mNavPathStep < mNavPathPolylines.size()) {
-                        //nav step = how many lines travelled-1
-                        mNavPathPolylines.get(mNavPathStep).setColor(Color.argb(255, 255, 255, 0));
-                        mNavToolbar.setTitle(mNavTexts.get(mNavPathStep));
-                        mNavPathStep++;
-                    } else {
-                        mNavPathStep = 0;
-                        mNavToolbar.setTitle(mNavTexts.get(0));
-                        for (Polyline p : mNavPathPolylines) {
-                            if (p != null) {
-                                p.setColor(Color.argb(127, 255, 255, 0));
-                            }
+                if (mNavPathStep < mNavPathPolylines.size()) {
+                    //nav step = how many lines travelled-1
+                    mNavPathPolylines.get(mNavPathStep).setColor(Color.argb(255, 255, 255, 0));
+                    mNavToolbar.setTitle(mNavTexts.get(mNavPathStep));
+                    mNavPathStep++;
+                } else {
+                    mNavPathStep = 0;
+                    mNavToolbar.setTitle(mNavTexts.get(0));
+                    for (Polyline p : mNavPathPolylines) {
+                        if (p != null) {
+                            p.setColor(Color.argb(127, 255, 255, 0));
                         }
-                        mNavPathStep++;
                     }
+                    mNavPathStep++;
                 }
             }
         });
-        mNavSelectionFab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.primary)));
+        mNavSelectionFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary)));
 
         FloatingActionButton myLocFab = (FloatingActionButton) findViewById(R.id.activity_map_my_loc_fab);
         myLocFab.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
-        myLocFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GoogleMap map = getMap();
-                Location myLocation = map.getMyLocation();
-                if (myLocation != null) {
-                    LatLng latLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
-                    map.animateCamera(cameraUpdate);
-                }
+        myLocFab.setOnClickListener(v -> {
+            GoogleMap map = getMap();
+            Location myLocation = map.getMyLocation();
+            if (myLocation != null) {
+                LatLng latLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
+                map.animateCamera(cameraUpdate);
             }
         });
 
         mNavToolbar = (Toolbar) findViewById(R.id.navigation_toolbar);
         mNavToolbar.setNavigationIcon(R.drawable.abc_ic_clear_mtrl_alpha);
-        mNavToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        mNavToolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         ViewGroup.MarginLayoutParams params2 = (ViewGroup.MarginLayoutParams) mNavToolbar.getLayoutParams();
         params2.topMargin = getStatusBarHeight();
@@ -354,25 +325,19 @@ public class MapActivity extends DrawerActivity {
             showList(80);
             ((MapListFragment) getFragmentManager().findFragmentByTag(FRAGMENT_LIST)).updateDataAndSearch("");
         } else {
-            Utils.addOnGlobalLayoutListener(findViewById(R.id.activity_map_list_fragment_container), new Runnable() {
-                @Override
-                public void run() {
-                    final FrameLayout listFragmentFrame = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
-                    listFragmentFrame.setTranslationY(listFragmentFrame.getMeasuredHeight());
-                }
+            Utils.addOnGlobalLayoutListener(findViewById(R.id.activity_map_list_fragment_container), () -> {
+                final FrameLayout listFragmentFrame = (FrameLayout) findViewById(R.id.activity_map_list_fragment_container);
+                listFragmentFrame.setTranslationY(listFragmentFrame.getMeasuredHeight());
             });
             mSearchView.setDrawerIconState(true, true);
         }
 
 
-        Utils.addOnGlobalLayoutListener(findViewById(R.id.navigation_selection_appbar), new Runnable() {
-            @Override
-            public void run() {
-                final View listFragmentFrame = findViewById(R.id.navigation_selection_appbar);
-                listFragmentFrame.setTranslationY(-listFragmentFrame.getMeasuredHeight());
-                final View listFragment = findViewById(R.id.navigation_appbar);
-                listFragment.setTranslationY(-listFragment.getMeasuredHeight());
-            }
+        Utils.addOnGlobalLayoutListener(findViewById(R.id.navigation_selection_appbar), () -> {
+            final View listFragmentFrame = findViewById(R.id.navigation_selection_appbar);
+            listFragmentFrame.setTranslationY(-listFragmentFrame.getMeasuredHeight());
+            final View listFragment1 = findViewById(R.id.navigation_appbar);
+            listFragment1.setTranslationY(-listFragment1.getMeasuredHeight());
         });
 
         mMarkers = new HashMap<>();
@@ -417,17 +382,8 @@ public class MapActivity extends DrawerActivity {
 
     private void initMap(MapFragment map, final boolean initCamera) {
         final MapFragment finalMap = map;
-        Utils.addOnGlobalLayoutListener(findViewById(R.id.activity_map_fragment_container), new Runnable() {
-            @Override
-            public void run() {
-                finalMap.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(final GoogleMap googleMap) {
-                        MapActivity.this.onMapReady(googleMap, initCamera);
-                    }
-                });
-            }
-        });
+        Utils.addOnGlobalLayoutListener(findViewById(R.id.activity_map_fragment_container), () ->
+                finalMap.getMapAsync(googleMap -> MapActivity.this.onMapReady(googleMap, initCamera)));
     }
 
     private void onMapReady(final GoogleMap googleMap, boolean initCamera) {
@@ -446,36 +402,25 @@ public class MapActivity extends DrawerActivity {
                     mapBounds, Utils.convertDpToPx(MapActivity.this, 8)));
         }
 
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                MapActivity.this.onMarkerClick(marker);
-                return false;
-            }
+        googleMap.setOnMarkerClickListener(marker -> {
+            MapActivity.this.onMarkerClick(marker);
+            return false;
         });
 
-        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                MapActivity.this.startNavigation(marker, googleMap);
-            }
-        });
+        googleMap.setOnInfoWindowClickListener(marker -> MapActivity.this.startNavigation(marker, googleMap));
 
-        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition cameraPosition) {
-                if (mNavigating) {
-                    for (Polyline line : mNavPathPolylines) {
-                        if (line != null) {
-                            line.setWidth((cameraPosition.zoom - 14.7f) * 6f);
-                        }
+        googleMap.setOnCameraChangeListener(cameraPosition -> {
+            if (mNavigating) {
+                for (Polyline line : mNavPathPolylines) {
+                    if (line != null) {
+                        line.setWidth((cameraPosition.zoom - 14.7f) * 6f);
                     }
                 }
-                Log.e("CameraZoom", "" + cameraPosition.zoom);
-                if (!done[0]) {
-                    updateMapOverlays(googleMap);
-                    done[0] = true;
-                }
+            }
+            Log.e("CameraZoom", "" + cameraPosition.zoom);
+            if (!done[0]) {
+                updateMapOverlays(googleMap);
+                done[0] = true;
             }
         });
     }
