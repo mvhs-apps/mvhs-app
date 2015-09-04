@@ -7,7 +7,7 @@ apply plugin: 'me.tatarka.retrolambda'
 //noinspection GroovyMissingReturnStatement
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "net.mvla.mvhs"
