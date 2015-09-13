@@ -94,8 +94,8 @@ public class ScheduleActivity extends DrawerActivity {
             Observable.combineLatest(getEventsToday(), getBellScheduleSheetEntries(),
                     (Func2<List<VEvent>, List<Entry>, Pair<List<VEvent>, List<Entry>>>) Pair::new)
                     .flatMap(this::getBellSchedule)
-                    .switchIfEmpty(getNoSchoolAlt())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .switchIfEmpty(getNoSchoolAlt())
                     .subscribe(new Subscriber<BellSchedule>() {
                         @Override
                         public void onCompleted() {
@@ -129,7 +129,7 @@ public class ScheduleActivity extends DrawerActivity {
 
     private Observable<List<VEvent>> getEventsToday() {
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("http://www.mvla.net")
+                .setEndpoint("https://www.google.com/calendar/ical")
                 .build();
         CalendarIcalService service = restAdapter.create(CalendarIcalService.class);
         return service.getCalendarFile()
@@ -295,7 +295,7 @@ public class ScheduleActivity extends DrawerActivity {
     }
 
     public interface CalendarIcalService {
-        @GET("/rss.cfm?a=Events&s=MVHS&format=ical")
+        @GET("/mvla.net_3236303434383738363838%40resource.calendar.google.com/public/basic.ics")
         Observable<Response> getCalendarFile();
     }
 
