@@ -44,7 +44,7 @@ retrolambda {
 }
 
 dependencies {
-    compile 'com.prolificinteractive:material-calendarview:0.8.1'
+    compile 'com.prolificinteractive:material-calendarview:0.+'
     compile 'net.sf.biweekly:biweekly:0.+'
 
     compile 'com.android.support:recyclerview-v7:23.+'

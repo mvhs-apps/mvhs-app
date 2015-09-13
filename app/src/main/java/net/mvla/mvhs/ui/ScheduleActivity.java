@@ -75,6 +75,8 @@ public class ScheduleActivity extends DrawerActivity {
         setContentView(R.layout.activity_schedule);
 
         mToday = Calendar.getInstance();
+        //mToday.set(Calendar.MONTH, Calendar.SEPTEMBER);
+        //mToday.set(Calendar.DAY_OF_MONTH, 23);
 
         FragmentManager fm = getFragmentManager();
         Fragment f = fm.findFragmentById(R.id.activity_schedule_fragment);
@@ -129,7 +131,8 @@ public class ScheduleActivity extends DrawerActivity {
 
     private Observable<List<VEvent>> getEventsToday() {
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("https://www.google.com/calendar/ical")
+                //.setEndpoint("https://www.google.com/calendar/ical")
+                .setEndpoint("http://www.mvla.net")
                 .build();
         CalendarIcalService service = restAdapter.create(CalendarIcalService.class);
         return service.getCalendarFile()
@@ -295,7 +298,8 @@ public class ScheduleActivity extends DrawerActivity {
     }
 
     public interface CalendarIcalService {
-        @GET("/mvla.net_3236303434383738363838%40resource.calendar.google.com/public/basic.ics")
+        //@GET("/mvla.net_3236303434383738363838%40resource.calendar.google.com/public/basic.ics")
+        @GET("/rss.cfm?a=Events&s=MVHS&format=ical")
         Observable<Response> getCalendarFile();
     }
 

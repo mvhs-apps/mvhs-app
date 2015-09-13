@@ -93,6 +93,8 @@ public class ScheduleFragment extends Fragment {
 
     private void initSchedule() {
         Calendar now = Calendar.getInstance();
+        //now.set(Calendar.MONTH, Calendar.SEPTEMBER);
+        //now.set(Calendar.DAY_OF_MONTH, 23);
 
 
         mNameText.setText("Today - " +
@@ -103,14 +105,17 @@ public class ScheduleFragment extends Fragment {
         mTableLayout.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
 
-        View heading = getActivity().getLayoutInflater().inflate(R.layout.table_row_heading_schedule, mTableLayout, false);
+        View heading = getActivity().getLayoutInflater()
+                .inflate(R.layout.table_row_heading_schedule, mTableLayout, false);
         mTableLayout.addView(heading);
 
         UserPeriodInfo[] roomSubjectPeriods = new UserPeriodInfo[8];
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         for (BellSchedulePeriod period : mSchedule.bellSchedule.bellSchedulePeriods) {
-            mTableLayout.addView(getActivity().getLayoutInflater().inflate(R.layout.table_row_divider, mTableLayout, false));
-            TableRow tableRow = (TableRow) getActivity().getLayoutInflater().inflate(R.layout.table_row_schedule, mTableLayout, false);
+            mTableLayout.addView(getActivity().getLayoutInflater()
+                    .inflate(R.layout.table_row_divider, mTableLayout, false));
+            TableRow tableRow = (TableRow) getActivity().getLayoutInflater()
+                    .inflate(R.layout.table_row_schedule, mTableLayout, false);
 
             Calendar start = Calendar.getInstance();
             start.set(Calendar.HOUR_OF_DAY, period.startHour);
@@ -132,8 +137,10 @@ public class ScheduleFragment extends Fragment {
                 //is integer (is a number period)
                 int i = Integer.parseInt(period.name.substring(0, 1));
                 roomSubjectPeriods[i] = new UserPeriodInfo();
-                roomSubjectPeriods[i].room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_ROOM, "");
-                roomSubjectPeriods[i].subject = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_SBJCT, "");
+                roomSubjectPeriods[i].room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX
+                        + i + PrefUtils.PREF_SCHEDULE_ROOM, "");
+                roomSubjectPeriods[i].subject = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX
+                        + i + PrefUtils.PREF_SCHEDULE_SBJCT, "");
 
                 if (!roomSubjectPeriods[i].room.isEmpty()) {
                     room.setText(roomSubjectPeriods[i].room);
@@ -149,7 +156,8 @@ public class ScheduleFragment extends Fragment {
             }
 
             periodText.setText(period.name);
-            timeText.setText(String.format("%02d:%02d-%02d:%02d", period.startHour, period.startMinute, period.endHour, period.endMinute));
+            timeText.setText(String.format("%02d:%02d-%02d:%02d",
+                    period.startHour, period.startMinute, period.endHour, period.endMinute));
 
             mTableLayout.addView(tableRow);
         }
