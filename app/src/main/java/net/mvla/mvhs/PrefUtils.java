@@ -14,6 +14,7 @@ public abstract class PrefUtils {
     public static final String PREF_SCHEDULE_PREFIX = "pref_schd_prd";
     public static final String PREF_SCHEDULE_ROOM = "_room";
     public static final String PREF_SCHEDULE_SBJCT = "_subjct";
+    public static final String PREF_SCHEDULE_RALLY_B = "pref_schd_rally_b";
 
     public static void markWelcomeDone(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);

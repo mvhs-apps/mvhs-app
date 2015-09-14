@@ -75,8 +75,8 @@ public class ScheduleActivity extends DrawerActivity {
         setContentView(R.layout.activity_schedule);
 
         mToday = Calendar.getInstance();
-        //mToday.set(Calendar.MONTH, Calendar.SEPTEMBER);
-        //mToday.set(Calendar.DAY_OF_MONTH, 23);
+        //mToday.set(Calendar.MONTH, Calendar.OCTOBER);
+        //mToday.set(Calendar.DAY_OF_MONTH, 5);
 
         FragmentManager fm = getFragmentManager();
         Fragment f = fm.findFragmentById(R.id.activity_schedule_fragment);
@@ -212,16 +212,17 @@ public class ScheduleActivity extends DrawerActivity {
             BellSchedule schedule = new BellSchedule();
 
             String findCol = null;
-            for (Entry entry : eventsAndBellSched.second) {
-                String cellCoord = entry.getTitle().get$t();
+            for (Entry cell : eventsAndBellSched.second) {
+                String cellCoord = cell.getTitle().get$t();
                 String cellRow = cellCoord.substring(1, 2);
                 String cellCol = cellCoord.substring(0, 1);
-                String cellContent = entry.getContent().get$t();
+                String cellContent = cell.getContent().get$t();
                 if (findCol == null) {
                     if (cellRow.equals("1")) {
                         //Iterating through schedule names - decide column
                         for (VEvent vEvent : eventsAndBellSched.first) {
-                            if (cellContent.startsWith(vEvent.getSummary().getValue().split("\\|")[0])) {
+                            String value = vEvent.getSummary().getValue();
+                            if (cellContent.startsWith(value.split("\\|")[0])) {
                                 schedule.name = cellContent;
                                 findCol = cellCol;
                             }

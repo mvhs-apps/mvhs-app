@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
 
 import net.mvla.mvhs.PrefUtils;
@@ -19,19 +18,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         Button student = (Button) findViewById(R.id.activity_welcome_student);
         Button guest = (Button) findViewById(R.id.activity_welcome_guest);
-        student.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setChoice(false);
-            }
-        });
+        student.setOnClickListener(v -> setChoice(false));
 
-        guest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setChoice(true);
-            }
-        });
+        guest.setOnClickListener(v -> setChoice(true));
     }
 
     @Override

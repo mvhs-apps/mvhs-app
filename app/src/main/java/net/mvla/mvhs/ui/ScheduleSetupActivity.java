@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import net.mvla.mvhs.PrefUtils;
@@ -67,7 +68,6 @@ public class ScheduleSetupActivity extends AppCompatActivity {
 
         if (mOptional) {
             mActionBarToolbar.setNavigationIcon(R.drawable.ic_close_black_24dp);
-            //TODO: Convert to DP
             mActionBarToolbar.setContentInsetsRelative(Utils.convertDpToPx(this, 72), 0);
         }
 
@@ -104,6 +104,8 @@ public class ScheduleSetupActivity extends AppCompatActivity {
         private RecyclerView mRecyclerView;
         private SetupAdapter mAdapter;
         private UserPeriodInfo[] mPeriods;
+        //true = rally b
+        private boolean mRallyB;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -116,7 +118,7 @@ public class ScheduleSetupActivity extends AppCompatActivity {
                 mPeriods[i].room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_ROOM, "");
                 mPeriods[i].subject = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_SBJCT, "");
             }
-
+            mRallyB = preferences.getBoolean(PrefUtils.PREF_SCHEDULE_RALLY_B, false);
         }
 
         @Override
@@ -131,6 +133,7 @@ public class ScheduleSetupActivity extends AppCompatActivity {
                         preferences.edit().putString(PrefUtils.PREF_SCHEDULE_PREFIX + i + PrefUtils.PREF_SCHEDULE_SBJCT,
                                 String.valueOf(period.subject)).apply();
                     }
+                    preferences.edit().putBoolean(PrefUtils.PREF_SCHEDULE_RALLY_B, mRallyB).apply();
                     getActivity().finish();
                     break;
             }
@@ -152,20 +155,39 @@ public class ScheduleSetupActivity extends AppCompatActivity {
         private class SetupAdapter extends RecyclerView.Adapter<SetupAdapter.SetupViewHolder> {
 
             @Override
-            public SetupViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-                View view = LayoutInflater.from(getActivity()).inflate(R.layout.list_item_sched_setup, viewGroup, false);
+            public int getItemViewType(int position) {
+                return mPeriods.length > position ? 0 : 1;
+            }
+
+            @Override
+            public SetupViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+                View view = LayoutInflater.from(getActivity()).inflate(
+                        viewType == 0 ? R.layout.list_item_sched_setup : R.layout.list_item_sched_setup_rally_toggle,
+                        viewGroup, false);
                 SetupViewHolder holder = new SetupViewHolder(view);
-                holder.period = (TextView) view.findViewById(R.id.list_item_setup_period_text);
-                holder.room = (EditText) view.findViewById(R.id.list_item_setup_room_edit);
-                holder.subject = (EditText) view.findViewById(R.id.list_item_setup_subject_edit);
+                if (viewType == 0) {
+                    holder.period = (TextView) view.findViewById(R.id.list_item_setup_period_text);
+                    holder.room = (EditText) view.findViewById(R.id.list_item_setup_room_edit);
+                    holder.subject = (EditText) view.findViewById(R.id.list_item_setup_subject_edit);
+                } else {
+                    holder.radioGroup = (RadioGroup) view;
+                }
                 return holder;
             }
 
             @Override
-            public void onBindViewHolder(SetupViewHolder holder, final int i) {
-                holder.period.setText("Period " + i + ": ");
-                holder.room.setText(mPeriods[i].room);
-                holder.subject.setText(mPeriods[i].subject);
+            public void onBindViewHolder(SetupViewHolder holder, final int position) {
+                if (getItemViewType(position) == 1) {
+                    holder.radioGroup.check(mRallyB ?
+                            R.id.list_item_sched_setup_rally_b : R.id.list_item_sched_setup_rally_a);
+                    holder.radioGroup.setOnCheckedChangeListener((group, checkedId)
+                            -> mRallyB = checkedId == R.id.list_item_sched_setup_rally_b);
+                    return;
+                }
+
+                holder.period.setText("Period " + position + ": ");
+                holder.room.setText(mPeriods[position].room);
+                holder.subject.setText(mPeriods[position].subject);
 
 
                 if (holder.room.getTag() != null) {
@@ -182,7 +204,7 @@ public class ScheduleSetupActivity extends AppCompatActivity {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        mPeriods[i].room = s.toString();
+                        mPeriods[position].room = s.toString();
                     }
                 };
                 holder.room.addTextChangedListener(watcher);
@@ -202,7 +224,7 @@ public class ScheduleSetupActivity extends AppCompatActivity {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        mPeriods[i].subject = s.toString();
+                        mPeriods[position].subject = s.toString();
                     }
                 };
                 holder.subject.addTextChangedListener(watcherSub);
@@ -211,13 +233,15 @@ public class ScheduleSetupActivity extends AppCompatActivity {
 
             @Override
             public int getItemCount() {
-                return 8;
+                return 9;
             }
 
             class SetupViewHolder extends RecyclerView.ViewHolder {
                 TextView period;
                 EditText room;
                 EditText subject;
+
+                RadioGroup radioGroup;
 
                 public SetupViewHolder(View itemView) {
                     super(itemView);

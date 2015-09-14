@@ -69,7 +69,8 @@
     <string name="student_guest_question">Are you a student or a guest?</string>
 
     <string name="website">Website</string>
-    <string name="na">N/A</string>
     <string name="period">Period</string>
     <string name="time">Time</string>
+    <string name="gym">Gym</string>
+    <string name="rally_blank">Rally %s</string>
 </resources>
