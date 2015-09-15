@@ -114,34 +114,18 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
         if (mActionBarToolbar != null) {
             mActionBarToolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
-            mActionBarToolbar.setNavigationOnClickListener(new View
-                    .OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    openDrawer();
-                }
-            });
+            mActionBarToolbar.setNavigationOnClickListener(view -> openDrawer());
         }
 
-        mDrawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+        mDrawerLayout.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 onNavDrawerSlide(slideOffset);
             }
 
             @Override
-            public void onDrawerOpened(View drawerView) {
-
-            }
-
-            @Override
             public void onDrawerClosed(View drawerView) {
                 onNavDrawerClosed();
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-
             }
         });
 

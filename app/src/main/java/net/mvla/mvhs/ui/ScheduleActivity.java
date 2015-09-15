@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
 import android.util.Pair;
 import android.widget.Toast;
 
+import com.squareup.okhttp.ResponseBody;
+
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.Utils;
 import net.mvla.mvhs.model.BellSchedule;
@@ -29,10 +31,10 @@ import java.util.List;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
-import retrofit.RestAdapter;
-import retrofit.client.Response;
+import retrofit.GsonConverterFactory;
+import retrofit.Retrofit;
+import retrofit.RxJavaCallAdapterFactory;
 import retrofit.http.GET;
-import retrofit.mime.TypedByteArray;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -130,9 +132,10 @@ public class ScheduleActivity extends DrawerActivity {
     }
 
     private Observable<List<VEvent>> getEventsToday() {
-        RestAdapter restAdapter = new RestAdapter.Builder()
+        Retrofit restAdapter = new Retrofit.Builder()
                 //.setEndpoint("https://www.google.com/calendar/ical")
-                .setEndpoint("http://www.mvla.net")
+                .baseUrl("http://www.mvla.net/")
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
         CalendarIcalService service = restAdapter.create(CalendarIcalService.class);
         return service.getCalendarFile()
@@ -143,8 +146,10 @@ public class ScheduleActivity extends DrawerActivity {
 
     @NonNull
     private Observable<List<Entry>> getBellScheduleSheetEntries() {
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("https://spreadsheets.google.com")
+        Retrofit restAdapter = new Retrofit.Builder()
+                .baseUrl("https://spreadsheets.google.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
         SheetService service = restAdapter.create(SheetService.class);
 
@@ -171,9 +176,14 @@ public class ScheduleActivity extends DrawerActivity {
     }
 
     @NonNull
-    private Observable<List<VEvent>> getEventList(Response calendarResponse) {
+    private Observable<List<VEvent>> getEventList(ResponseBody calendarResponse) {
         return Observable.create(subscriber -> {
-            byte[] calBytes = ((TypedByteArray) calendarResponse.getBody()).getBytes();
+            byte[] calBytes = new byte[0];
+            try {
+                calBytes = calendarResponse.bytes();
+            } catch (IOException e) {
+                subscriber.onError(e);
+            }
             File file = new File(getCacheDir(), "calendar.ics");
             saveBytesToFile(calBytes, file.getPath());
             ICalendar calendar;
@@ -294,14 +304,14 @@ public class ScheduleActivity extends DrawerActivity {
 
 
     public interface SheetService {
-        @GET("/feeds/cells/1BBGLmF4GgV7SjtZyfMANa6CVxr4-GY-_O1l1ZJX6Ooo/od6/public/basic?alt=json")
+        @GET("feeds/cells/1BBGLmF4GgV7SjtZyfMANa6CVxr4-GY-_O1l1ZJX6Ooo/od6/public/basic?alt=json")
         Observable<RootSheetElement> getRootElement();
     }
 
     public interface CalendarIcalService {
         //@GET("/mvla.net_3236303434383738363838%40resource.calendar.google.com/public/basic.ics")
-        @GET("/rss.cfm?a=Events&s=MVHS&format=ical")
-        Observable<Response> getCalendarFile();
+        @GET("rss.cfm?a=Events&s=MVHS&format=ical")
+        Observable<ResponseBody> getCalendarFile();
     }
 
 }

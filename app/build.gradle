@@ -51,6 +51,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.+'
     compile 'com.android.support:cardview-v7:23.+'
     compile 'com.android.support:design:23.+'
+    compile 'com.android.support:support-annotations:23.+'
 
     compile 'com.google.android.gms:play-services-maps:7.+'
     compile 'com.google.android.gms:play-services-identity:7.+'
@@ -62,7 +63,9 @@ dependencies {
     }
     compile 'io.reactivex:rxandroid:1.+'
 
-    compile 'com.squareup.retrofit:retrofit:1.+'
+    compile 'com.squareup.retrofit:retrofit:2.+'
+    compile 'com.squareup.retrofit:adapter-rxjava:2.+'
+    compile 'com.squareup.retrofit:converter-gson:2.+'
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-SNAPSHOT'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-SNAPSHOT'
