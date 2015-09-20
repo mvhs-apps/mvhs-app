@@ -3,7 +3,7 @@
     <string name="logo">Logo</string>
 
     <string name="mvhs_site">MVHS Website</string>
-    <string name="todays_schedule">Today\'s Schedule</string>
+    <string name="schedule_and_calendar">Schedule &amp; Calendar</string>
     <string name="aeries">Aeries SIS</string>
     <string name="map">School Map</string>
     <string name="calendar">Student Calendar</string>
@@ -12,7 +12,7 @@
 
     <string-array name="nav_drawer_items">
         <item>@string/aeries</item>
-        <item>@string/todays_schedule</item>
+        <item>@string/schedule_and_calendar</item>
         <item>@string/map</item>
         <item>@string/calendar</item>
         <item>@string/mvhs_site</item>
@@ -73,4 +73,8 @@
     <string name="time">Time</string>
     <string name="gym">Gym</string>
     <string name="rally_blank">Rally %s</string>
+    <string name="bell_schedule">Bell Schedule</string>
+    <string name="school_events">School Events</string>
+    <string name="bell_schedule_no_school">Bell Schedule: No School</string>
+    <string name="no_school_events">School Events: None</string>
 </resources>

@@ -14,6 +14,12 @@ public class BellSchedule implements Serializable {
         bellSchedulePeriods = new ArrayList<>();
     }
 
+    public void addPeriod(String name) {
+        BellSchedulePeriod period = new BellSchedulePeriod();
+        period.name = name;
+        bellSchedulePeriods.add(period);
+    }
+
     public void sort() {
         Collections.sort(bellSchedulePeriods);
     }

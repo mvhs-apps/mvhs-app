@@ -76,10 +76,13 @@
     <item name="list_item_about_actions_bar" type="id" />
 
     <!-- ScheduleActivity -->
+    <item name="activity_schedule_appbar" type="id" />
+    <item name="activity_schedule_title_linear" type="id" />
+    <item name="activity_schedule_calendar" type="id" />
     <item name="activity_schedule_fragment" type="id" />
     <!-- Schedule list item card -->
     <item name="list_item_schedule_name" type="id" />
-    <item name="list_item_schedule_subtitle" type="id" />
+    <item name="list_item_schedule_title" type="id" />
     <item name="list_item_schedule_table" type="id" />
     <item name="list_item_schedule_progress" type="id" />
     <!-- Schedule card table rows -->
@@ -90,6 +93,11 @@
     <item name="fragment_schedule_scrollview" type="id" />
     <item name="list_item_sched_setup_rally_b" type="id"/>
     <item name="list_item_sched_setup_rally_a" type="id"/>
-
+    <item name="activity_schedule_title_text" type="id" />
+    <item name="list_item_calendar_event_name" type="id" />
+    <item name="fragment_schedule_events" type="id" />
+    <item name="fragment_schedule_events_linear" type="id" />
+    <item name="list_item_calendar_event_subtitle" type="id" />
+    <item name="fragment_schedule_events_title" type="id" />
 
 </resources>

@@ -4,12 +4,15 @@ import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -17,47 +20,34 @@ import android.widget.TextView;
 
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
-import net.mvla.mvhs.Utils;
 import net.mvla.mvhs.model.BellSchedule;
 import net.mvla.mvhs.model.BellSchedulePeriod;
 import net.mvla.mvhs.model.UserPeriodInfo;
 
 import java.util.Calendar;
+import java.util.List;
+
+import biweekly.component.VEvent;
+import biweekly.util.ICalDate;
 
 
 public class ScheduleFragment extends Fragment {
 
-    public static final String STATE_BELL_SCHEDULE = "STATE_BELL_SCHEDULE";
-    public static final String STATE_ERROR = "STATE_ERROR";
-    private BellSchedule mSchedule;
-    private String mError;
-
-    private TextView mNameText;
-    private TextView mSubtitleText;
+    private TextView mEventsTitle;
+    private TextView mBellScheduleTitle;
     private TableLayout mTableLayout;
+    private LinearLayout mEventsLayout;
     private ProgressBar mProgressBar;
-
-    public void setBellSchedule(BellSchedule bellSchedule) {
-        mSchedule = bellSchedule;
-
-        initSchedule();
-    }
+    private CardView mBellScheduleCard;
+    private CardView mEventsCard;
 
     public void setErrorMessage(String error) {
-        mError = error;
+        //TODO
         mProgressBar.setVisibility(View.GONE);
         mTableLayout.setVisibility(View.GONE);
-        mNameText.setText(mError);
-        mNameText.setPadding(0, 0, 0, Utils.convertDpToPx(getActivity(), 24));
-        mSubtitleText.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putSerializable(STATE_BELL_SCHEDULE, mSchedule);
-        outState.putString(STATE_ERROR, mError);
+        //mNameText.setText(mError);
+        //mNameText.setPadding(0, 0, 0, Utils.convertDpToPx(getActivity(), 24));
+        mBellScheduleTitle.setVisibility(View.GONE);
     }
 
     @Nullable
@@ -65,53 +55,85 @@ public class ScheduleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
-        if (savedInstanceState != null) {
-            mSchedule = (BellSchedule) savedInstanceState.getSerializable(STATE_BELL_SCHEDULE);
-            mError = savedInstanceState.getString(STATE_ERROR);
-        }
-
-        mNameText = (TextView) view.findViewById(R.id.list_item_schedule_name);
-        mSubtitleText = (TextView) view.findViewById(R.id.list_item_schedule_subtitle);
+        // mNameText = (TextView) view.findViewById(R.id.list_item_schedule_name);
+        mBellScheduleTitle = (TextView) view.findViewById(R.id.list_item_schedule_title);
         mTableLayout = (TableLayout) view.findViewById(R.id.list_item_schedule_table);
         mProgressBar = (ProgressBar) view.findViewById(R.id.list_item_schedule_progress);
+        mBellScheduleCard = (CardView) view.findViewById(R.id.fragment_schedule_bell_schedule);
+        mEventsCard = (CardView) view.findViewById(R.id.fragment_schedule_events);
+        mEventsLayout = (LinearLayout) view.findViewById(R.id.fragment_schedule_events_linear);
+        mEventsTitle = (TextView) view.findViewById(R.id.fragment_schedule_events_title);
 
-        if (mError != null) {
-            setErrorMessage(mError);
-        } else if (mSchedule == null) {
-            mProgressBar.setVisibility(View.VISIBLE);
-            mTableLayout.setVisibility(View.GONE);
-
-            ((ScheduleActivity) getActivity()).retrieveBellSchedule();
-        } else {
-            initSchedule();
-        }
+        setLoading();
 
         return view;
     }
 
-    private void initSchedule() {
-        Calendar now = Calendar.getInstance();
-        //now.set(Calendar.MONTH, Calendar.OCTOBER);
-        //now.set(Calendar.DAY_OF_MONTH, 5);
+    public void setLoading() {
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            mBellScheduleCard.setVisibility(View.GONE);
+            mEventsCard.setVisibility(View.GONE);
+        }
+    }
 
-
-        mNameText.setText("Today - " +
-                DateUtils.formatDateTime(getActivity(),
-                        now.getTimeInMillis(),
-                        DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_MONTH));
-        mSubtitleText.setText(mSchedule.name);
-        mTableLayout.setVisibility(View.VISIBLE);
+    public void setData(@NonNull BellSchedule bellSchedule, @NonNull List<VEvent> events) {
+        mBellScheduleCard.setVisibility(View.VISIBLE);
+        mEventsCard.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
 
-        View heading = getActivity().getLayoutInflater()
-                .inflate(R.layout.table_row_heading_schedule, mTableLayout, false);
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+
+        if (!bellSchedule.bellSchedulePeriods.isEmpty()) {
+            inflateBellSchedule(bellSchedule, layoutInflater);
+        } else {
+            mBellScheduleTitle.setText(R.string.bell_schedule_no_school);
+        }
+
+
+        if (!events.isEmpty()) {
+            mEventsTitle.setText(R.string.school_events);
+            //CALENDAR EVENTS
+            while (mEventsLayout.getChildCount() > 1) {
+                mEventsLayout.removeViewAt(1);
+            }
+            for (VEvent event : events) {
+                View tableRowSeparator = layoutInflater.inflate(R.layout.table_row_divider, mEventsLayout, false);
+                mEventsLayout.addView(tableRowSeparator);
+                View eventLayout = layoutInflater.inflate(R.layout.list_item_calendar_event, mEventsLayout, false);
+                TextView name = (TextView) eventLayout.findViewById(R.id.list_item_calendar_event_name);
+                TextView subtitle = (TextView) eventLayout.findViewById(R.id.list_item_calendar_event_subtitle);
+
+                name.setText(event.getSummary().getValue());
+                ICalDate startTime = event.getDateStart().getValue();
+                ICalDate endTime = event.getDateEnd().getValue();
+                String range = DateUtils.formatDateRange(getActivity(), startTime.getTime(), endTime.getTime(), DateUtils.FORMAT_SHOW_TIME);
+                subtitle.setText(range);
+
+                mEventsLayout.addView(eventLayout);
+            }
+        } else {
+            mEventsTitle.setText(R.string.no_school_events);
+        }
+    }
+
+    private void inflateBellSchedule(@NonNull BellSchedule bellSchedule, LayoutInflater layoutInflater) {
+        mBellScheduleTitle.setText("Bell ");
+        mBellScheduleTitle.append(bellSchedule.name.replace("Sched.", "Schedule"));
+
+        //BELL SCHEDULE TABLE
+        mTableLayout.removeAllViews();
+
+        View divider = layoutInflater.inflate(R.layout.table_row_divider, mTableLayout, false);
+        mTableLayout.addView(divider);
+        View heading = layoutInflater.inflate(R.layout.table_row_heading_schedule, mTableLayout, false);
         mTableLayout.addView(heading);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        for (BellSchedulePeriod period : mSchedule.bellSchedulePeriods) {
-            mTableLayout.addView(getActivity().getLayoutInflater()
-                    .inflate(R.layout.table_row_divider, mTableLayout, false));
-            TableRow tableRow = (TableRow) getActivity().getLayoutInflater()
+        for (BellSchedulePeriod period : bellSchedule.bellSchedulePeriods) {
+            View tableRowSeparator = layoutInflater.inflate(R.layout.table_row_divider, mTableLayout, false);
+            mTableLayout.addView(tableRowSeparator);
+            TableRow tableRow = (TableRow) layoutInflater
                     .inflate(R.layout.table_row_schedule, mTableLayout, false);
 
             Calendar start = Calendar.getInstance();
@@ -121,7 +143,9 @@ public class ScheduleFragment extends Fragment {
             end.set(Calendar.HOUR_OF_DAY, period.endHour);
             end.set(Calendar.MINUTE, period.endMinute);
 
+            Calendar now = Calendar.getInstance();
             if (now.getTime().after(start.getTime()) && now.getTime().before(end.getTime())) {
+                //In this period right now
                 tableRow.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.primary));
             }
 

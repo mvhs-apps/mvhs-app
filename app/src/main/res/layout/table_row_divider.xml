@@ -3,11 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <View
-        android:layout_width="match_parent"
+    <include
+        layout="@layout/list_item_divider"
+        android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_weight="1"
-        android:background="#1f000000" />
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_weight="1" />
 
 
 </TableRow>

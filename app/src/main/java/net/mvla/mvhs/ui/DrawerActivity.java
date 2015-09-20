@@ -58,7 +58,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             R.drawable.ic_grade_black_24dp,
             R.drawable.ic_view_agenda_black_24dp,
             R.drawable.ic_map_black_24dp,
-            R.drawable.ic_calendar_black_24dp,
+            R.drawable.ic_event_24dp,
             R.drawable.ic_web_black_24dp,
             NAVDRAWER_ITEM_SEPARATOR,
             R.drawable.ic_settings_black_24dp,
@@ -159,7 +159,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
             View view = null;
             if (itemId == NAVDRAWER_ITEM_SEPARATOR) {
-                view = getLayoutInflater().inflate(R.layout.list_item_separator,
+                view = getLayoutInflater().inflate(R.layout.list_item_divider,
                         mDrawerListLinearLayout, false);
                 mDrawerListLinearLayout.addView(view);
             } else {
@@ -186,18 +186,13 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
                 if (itemId == getSelfNavDrawerItem()) {
                     v.setBackgroundColor(getResources().getColor(R.color.ripple_material_light));
-                    setTitle(getString(R.string.nav_drawer_toolbar_prefix) + navDrawerStrings[i]);
+                    setTitle(getToolbarTitle(navDrawerStrings[i]));
                 } else {
                     v.setBackgroundColor(getResources().getColor(android.R.color.transparent));
                 }
 
 
-                layout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onNavDrawerItemClicked(itemId);
-                    }
-                });
+                layout.setOnClickListener(v1 -> onNavDrawerItemClicked(itemId));
 
                 mDrawerListLinearLayout.addView(layout);
 
@@ -207,6 +202,10 @@ public abstract class DrawerActivity extends AppCompatActivity {
             view.setTag(itemId);
 
         }
+    }
+
+    protected String getToolbarTitle(String navDrawerString) {
+        return getString(R.string.nav_drawer_toolbar_prefix) + navDrawerString;
     }
 
     protected void openDrawer() {

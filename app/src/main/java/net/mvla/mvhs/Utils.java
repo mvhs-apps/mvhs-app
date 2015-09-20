@@ -10,6 +10,8 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 
 /**
@@ -67,5 +69,24 @@ public abstract class Utils {
         double x = Math.cos(latitude1) * Math.sin(latitude2) - Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(longDiff);
 
         return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+    }
+
+    public static void saveBytesToFile(byte[] bytes, String path) {
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(path);
+            fileOutputStream.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fileOutputStream != null) {
+                    fileOutputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

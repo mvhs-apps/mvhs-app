@@ -5,66 +5,116 @@
     android:id="@id/fragment_schedule_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_material_light"
-    android:clipToPadding="false"
-    android:padding="8dp">
+    android:background="#eeeeee"
+    android:clipToPadding="false">
 
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp">
+        android:minHeight="128dp">
 
-        <RelativeLayout
+        <ProgressBar
+            android:id="@id/list_item_schedule_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminate="true" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/fragment_schedule_bell_schedule"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp">
 
-            <TextView
-                android:id="@id/list_item_schedule_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="24dp"
-                android:textSize="20sp"
-                tools:text="Today" />
-
-            <TextView
-                android:id="@id/list_item_schedule_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/list_item_schedule_name"
-                android:layout_marginBottom="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:textColor="?android:textColorSecondary"
-                android:textSize="14sp"
-                tools:text="Sched. D: Modified Wed. Block" />
-
-            <HorizontalScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/list_item_schedule_subtitle"
-                android:fillViewport="true">
+                android:orientation="vertical">
 
-                <TableLayout
-                    android:id="@id/list_item_schedule_table"
+                <TextView
+                    android:id="@id/list_item_schedule_title"
                     android:layout_width="wrap_content"
+                    android:layout_height="47dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:drawableLeft="@drawable/ic_notifications_16dp"
+                    android:drawablePadding="8dp"
+                    android:drawableStart="@drawable/ic_notifications_16dp"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="13sp"
+                    tools:text="Bell Schedule E: Modified Thurs. Block" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:clipToPadding="false">
+                    android:fillViewport="true">
 
-                </TableLayout>
+                    <TableLayout
+                        android:id="@id/list_item_schedule_table"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false">
 
-            </HorizontalScrollView>
+                    </TableLayout>
 
-            <ProgressBar
-                android:id="@id/list_item_schedule_progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:indeterminate="true" />
+                </HorizontalScrollView>
 
-        </RelativeLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
 
-    </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            android:id="@id/fragment_schedule_events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/fragment_schedule_bell_schedule"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:id="@id/fragment_schedule_events_linear"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@id/fragment_schedule_events_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="47dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:drawableLeft="@drawable/ic_event_note_16dp"
+                    android:drawablePadding="8dp"
+                    android:drawableStart="@drawable/ic_event_note_16dp"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="@string/school_events"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@android:id/empty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:text="None"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="14sp"
+                    tools:visibility="gone" />
+
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+
+    </RelativeLayout>
+
 </ScrollView>

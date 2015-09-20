@@ -7,7 +7,7 @@
     android:paddingRight="16dp">
 
     <TextView
-        android:layout_height="56dp"
+        android:layout_height="55dp"
         android:fontFamily="@string/font_fontFamily_medium"
         android:gravity="center_vertical"
         android:text="@string/period"
@@ -16,7 +16,7 @@
         android:textStyle="@integer/font_textStyle_medium" />
 
     <TextView
-        android:layout_height="56dp"
+        android:layout_height="55dp"
         android:fontFamily="@string/font_fontFamily_medium"
         android:gravity="center_vertical"
         android:paddingLeft="56dp"
@@ -28,7 +28,7 @@
         tools:ignore="NewApi,RtlSymmetry" />
 
     <TextView
-        android:layout_height="56dp"
+        android:layout_height="55dp"
         android:fontFamily="@string/font_fontFamily_medium"
         android:gravity="center_vertical"
         android:paddingLeft="56dp"
@@ -40,7 +40,7 @@
         tools:ignore="NewApi,RtlSymmetry" />
 
     <TextView
-        android:layout_height="56dp"
+        android:layout_height="55dp"
         android:fontFamily="@string/font_fontFamily_medium"
         android:gravity="center_vertical"
         android:paddingLeft="56dp"

@@ -19,6 +19,12 @@
 
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:textColor">?android:textColorPrimary</item>
+
+        <!--Apparently values from AppCompat are overridden by android: namespace values.-->
+        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="android:colorForegroundInverse">@color/foreground_material_dark</item>
+        <item name="android:colorBackground">@color/background_material_light</item>
+        <item name="android:windowBackground">@color/background_material_light</item>
     </style>
 
     <style name="Theme.SearchboxMenu" parent="Theme.MVHSApp.Light">
@@ -28,6 +34,11 @@
     <style name="SearchboxDrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="drawableSize">24dp</item>
         <item name="barLength">18dp</item>
+    </style>
+
+    <style name="CalendarDayTextAppearance" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">?android:textColor</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
 </resources>
