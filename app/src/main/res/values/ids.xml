@@ -99,5 +99,6 @@
     <item name="fragment_schedule_events_linear" type="id" />
     <item name="list_item_calendar_event_subtitle" type="id" />
     <item name="fragment_schedule_events_title" type="id" />
+    <item name="activity_schedule_calendar_dropdown_image" type="id" />
 
 </resources>

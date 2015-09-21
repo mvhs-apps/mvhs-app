@@ -25,6 +25,7 @@ import net.mvla.mvhs.model.BellSchedulePeriod;
 import net.mvla.mvhs.model.UserPeriodInfo;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import biweekly.component.VEvent;
@@ -64,12 +65,28 @@ public class ScheduleFragment extends Fragment {
         mEventsLayout = (LinearLayout) view.findViewById(R.id.fragment_schedule_events_linear);
         mEventsTitle = (TextView) view.findViewById(R.id.fragment_schedule_events_title);
 
-        setLoading();
+        BellSchedule schedule = ((ScheduleActivity) getActivity()).getSchedule();
+        List<VEvent> events = ((ScheduleActivity) getActivity()).getEvents();
+        if (events != null && schedule != null) {
+            setData(schedule, events);
+        } else {
+            setLoading();
+        }
 
         return view;
     }
 
-    public void setLoading() {
+    public void setReady(boolean ready) {
+        if (ready) {
+            BellSchedule schedule = ((ScheduleActivity) getActivity()).getSchedule();
+            List<VEvent> events = ((ScheduleActivity) getActivity()).getEvents();
+            setData(schedule, events);
+        } else {
+            setLoading();
+        }
+    }
+
+    private void setLoading() {
         if (mProgressBar != null) {
             mProgressBar.setVisibility(View.VISIBLE);
             mBellScheduleCard.setVisibility(View.GONE);
@@ -77,7 +94,7 @@ public class ScheduleFragment extends Fragment {
         }
     }
 
-    public void setData(@NonNull BellSchedule bellSchedule, @NonNull List<VEvent> events) {
+    private void setData(@NonNull BellSchedule bellSchedule, @NonNull List<VEvent> events) {
         mBellScheduleCard.setVisibility(View.VISIBLE);
         mEventsCard.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
@@ -137,9 +154,12 @@ public class ScheduleFragment extends Fragment {
                     .inflate(R.layout.table_row_schedule, mTableLayout, false);
 
             Calendar start = Calendar.getInstance();
+            Date selectedDate = ((ScheduleActivity) getActivity()).getSelectedDate().getTime();
+            start.setTime(selectedDate);
             start.set(Calendar.HOUR_OF_DAY, period.startHour);
             start.set(Calendar.MINUTE, period.startMinute);
             Calendar end = Calendar.getInstance();
+            end.setTime(selectedDate);
             end.set(Calendar.HOUR_OF_DAY, period.endHour);
             end.set(Calendar.MINUTE, period.endMinute);
 

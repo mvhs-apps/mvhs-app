@@ -1,5 +1,7 @@
 package net.mvla.mvhs.ui;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -11,6 +13,9 @@ import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Pair;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,13 +23,13 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.squareup.okhttp.ResponseBody;
 
+import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.Utils;
 import net.mvla.mvhs.model.BellSchedule;
@@ -68,6 +73,8 @@ public class ScheduleActivity extends DrawerActivity {
     private LinearLayout mAppBar;
     private LinearLayout mTitleTextBar;
     private TextView mTitle;
+    private ImageView mCalendarDropdownImage;
+    private FrameLayout mFragmentContainer;
 
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
@@ -83,8 +90,7 @@ public class ScheduleActivity extends DrawerActivity {
         outState.putString(STATE_ERROR, mError);
         outState.putSerializable(STATE_CALENDAR, mSelectedDate);
         Gson gson = new GsonBuilder().create();
-        String events = gson.toJson(mEvents, new TypeToken<List<VEvent>>() {
-        }.getType());
+        String events = gson.toJson(mEvents);
         outState.putString(STATE_EVENTS, events);
     }
 
@@ -97,16 +103,18 @@ public class ScheduleActivity extends DrawerActivity {
             mSchedule = (BellSchedule) savedInstanceState.getSerializable(STATE_BELL_SCHEDULE);
             mError = savedInstanceState.getString(STATE_ERROR);
             mSelectedDate = (Calendar) savedInstanceState.getSerializable(STATE_CALENDAR);
-            Gson gson = new GsonBuilder().create();
+            /*Gson gson = new GsonBuilder().create();
             mEvents = gson.fromJson(savedInstanceState.getString(STATE_EVENTS),
                     new TypeToken<List<VEvent>>() {
-                    }.getType());
+                    }.getType());*/
         }
 
         mAppBar = (LinearLayout) findViewById(R.id.activity_schedule_appbar);
         mCalendarView = (MaterialCalendarView) findViewById(R.id.activity_schedule_calendar);
         mTitleTextBar = (LinearLayout) findViewById(R.id.activity_schedule_title_linear);
         mTitle = (TextView) findViewById(R.id.activity_schedule_title_text);
+        mCalendarDropdownImage = (ImageView) findViewById(R.id.activity_schedule_calendar_dropdown_image);
+        mFragmentContainer = (FrameLayout) findViewById(R.id.activity_schedule_fragment);
 
         mTitleTextBar.setOnClickListener(v -> {
             animateToggleCalendar();
@@ -150,6 +158,15 @@ public class ScheduleActivity extends DrawerActivity {
             }
         });
 
+        if (!PrefUtils.isCalWelcomeDone(this)) {
+            ViewGroup.LayoutParams layoutParams = mAppBar.getLayoutParams();
+            layoutParams.height = Utils.convertDpToPx(this, 48 * 8)
+                    + getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material);
+            mAppBar.setLayoutParams(layoutParams);
+            mCalendarDropdownImage.setRotation(180);
+            PrefUtils.markCalWelcomeDone(this);
+        }
+
         //mSelectedDate.set(Calendar.MONTH, Calendar.OCTOBER);
         //mSelectedDate.set(Calendar.DAY_OF_MONTH, 5);
         if (mSelectedDate == null) {
@@ -168,21 +185,29 @@ public class ScheduleActivity extends DrawerActivity {
                     .commit();
         }
 
-        if (savedInstanceState == null) {
+        /*if (savedInstanceState == null) {*/
             updateBellScheduleAndCalendarEvents(f);
-        } else {
-            f.setData(mSchedule, mEvents);
-        }
+        /*}*/
 
         overridePendingTransition(0, 0);
     }
 
+    public BellSchedule getSchedule() {
+        return mSchedule;
+    }
+
+    public List<VEvent> getEvents() {
+        return mEvents;
+    }
+
     private void animateToggleCalendar() {
+        AnimatorSet set = new AnimatorSet();
+
         ValueAnimator animator;
-        if (mAppBar.getHeight() == mTitleTextBar.getHeight()) {
+        boolean needExpand = mAppBar.getHeight() == mTitleTextBar.getHeight();
+        if (needExpand) {
             animator = ValueAnimator.ofInt(mTitleTextBar.getHeight(),
                     Utils.convertDpToPx(this, 48 * 8) + mTitleTextBar.getHeight());
-
         } else {
             animator = ValueAnimator.ofInt(mAppBar.getHeight(), mTitleTextBar.getHeight());
         }
@@ -193,7 +218,16 @@ public class ScheduleActivity extends DrawerActivity {
             mAppBar.setLayoutParams(params);
         });
 
-        animator.start();
+        ObjectAnimator animatorSpin;
+        if (needExpand) {
+            animatorSpin = ObjectAnimator.ofFloat(mCalendarDropdownImage, ImageView.ROTATION, 180);
+        } else {
+            animatorSpin = ObjectAnimator.ofFloat(mCalendarDropdownImage, ImageView.ROTATION, 0f);
+        }
+
+        set.setDuration(300);
+        set.play(animator).with(animatorSpin);
+        set.start();
     }
 
     public void updateTitle() {
@@ -202,9 +236,13 @@ public class ScheduleActivity extends DrawerActivity {
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_MONTH));
     }
 
+    public Calendar getSelectedDate() {
+        return mSelectedDate;
+    }
+
     public void updateBellScheduleAndCalendarEvents(ScheduleFragment f) {
         if (isDeviceOnline()) {
-            f.setLoading();
+            f.setReady(false);
 
             //Fetch today's events (from calendar) and bell schedule sheet entries in parallel
             Single.zip(
@@ -234,7 +272,7 @@ public class ScheduleActivity extends DrawerActivity {
                             mEvents = bellScheduleEventsPair.second;
                             mSchedule = bellScheduleEventsPair.first;
 
-                            f.setData(mSchedule, mEvents);
+                            f.setReady(true);
                         }
                     });
         } else {

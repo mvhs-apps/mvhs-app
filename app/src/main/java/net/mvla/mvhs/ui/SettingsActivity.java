@@ -54,14 +54,11 @@ public class SettingsActivity extends AppCompatActivity {
             addPreferencesFromResource(R.xml.preferences);
 
             Preference openSchdSetup = findPreference(PrefUtils.PREF_OPEN_SCHEDULE_SETUP);
-            openSchdSetup.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    Intent intent = new Intent(getActivity(), ScheduleSetupActivity.class);
-                    intent.putExtra(ScheduleSetupActivity.EXTRA_OPTIONAL, true);
-                    startActivity(intent);
-                    return true;
-                }
+            openSchdSetup.setOnPreferenceClickListener(preference -> {
+                Intent intent = new Intent(getActivity(), ScheduleSetupActivity.class);
+                intent.putExtra(ScheduleSetupActivity.EXTRA_OPTIONAL, true);
+                startActivity(intent);
+                return true;
             });
         }
     }
