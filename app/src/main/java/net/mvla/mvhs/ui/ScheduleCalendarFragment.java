@@ -41,6 +41,7 @@ public class ScheduleCalendarFragment extends Fragment {
     private ProgressBar mProgressBar;
     private CardView mBellScheduleCard;
     private CardView mEventsCard;
+    private View mDisclaimer;
 
     public void setErrorMessage(String error) {
         //TODO
@@ -64,6 +65,7 @@ public class ScheduleCalendarFragment extends Fragment {
         mEventsCard = (CardView) view.findViewById(R.id.fragment_schedule_events);
         mEventsLayout = (LinearLayout) view.findViewById(R.id.fragment_schedule_events_linear);
         mEventsTitle = (TextView) view.findViewById(R.id.fragment_schedule_events_title);
+        mDisclaimer = view.findViewById(R.id.fragment_schedule_disclaimer);
 
         BellSchedule schedule = ((ScheduleCalendarActivity) getActivity()).getSchedule();
         List<VEvent> events = ((ScheduleCalendarActivity) getActivity()).getEvents();
@@ -91,6 +93,7 @@ public class ScheduleCalendarFragment extends Fragment {
             mProgressBar.setVisibility(View.VISIBLE);
             mBellScheduleCard.setVisibility(View.GONE);
             mEventsCard.setVisibility(View.GONE);
+            mDisclaimer.setVisibility(View.GONE);
         }
     }
 
@@ -98,9 +101,11 @@ public class ScheduleCalendarFragment extends Fragment {
         mBellScheduleCard.setVisibility(View.VISIBLE);
         mEventsCard.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
+        mDisclaimer.setVisibility(View.VISIBLE);
 
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
 
+        mTableLayout.removeAllViews();
         if (!bellSchedule.bellSchedulePeriods.isEmpty()) {
             inflateBellSchedule(bellSchedule, layoutInflater);
         } else {
@@ -108,12 +113,12 @@ public class ScheduleCalendarFragment extends Fragment {
         }
 
 
+        while (mEventsLayout.getChildCount() > 1) {
+            mEventsLayout.removeViewAt(1);
+        }
         if (!events.isEmpty()) {
             mEventsTitle.setText(R.string.school_events);
             //CALENDAR EVENTS
-            while (mEventsLayout.getChildCount() > 1) {
-                mEventsLayout.removeViewAt(1);
-            }
             for (VEvent event : events) {
                 View tableRowSeparator = layoutInflater.inflate(R.layout.table_row_divider, mEventsLayout, false);
                 mEventsLayout.addView(tableRowSeparator);
@@ -139,7 +144,6 @@ public class ScheduleCalendarFragment extends Fragment {
         mBellScheduleTitle.append(bellSchedule.name.replace("Sched.", "Schedule"));
 
         //BELL SCHEDULE TABLE
-        mTableLayout.removeAllViews();
 
         View divider = layoutInflater.inflate(R.layout.table_row_divider, mTableLayout, false);
         mTableLayout.addView(divider);
