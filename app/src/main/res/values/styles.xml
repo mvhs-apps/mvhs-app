@@ -25,6 +25,9 @@
         <item name="android:colorForegroundInverse">@color/foreground_material_dark</item>
         <item name="android:colorBackground">@color/background_material_light</item>
         <item name="android:windowBackground">@color/background_material_light</item>
+
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="android:activatedBackgroundIndicator">?selectableItemBackground</item>
     </style>
 
     <style name="Theme.SearchboxMenu" parent="Theme.MVHSApp.Light">
