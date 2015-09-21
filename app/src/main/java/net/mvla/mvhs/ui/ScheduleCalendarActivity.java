@@ -14,7 +14,6 @@ import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Pair;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -58,7 +57,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
-public class ScheduleActivity extends DrawerActivity {
+public class ScheduleCalendarActivity extends DrawerActivity {
 
     public static final String STATE_BELL_SCHEDULE = "STATE_BELL_SCHEDULE";
     public static final String STATE_ERROR = "STATE_ERROR";
@@ -74,7 +73,6 @@ public class ScheduleActivity extends DrawerActivity {
     private LinearLayout mTitleTextBar;
     private TextView mTitle;
     private ImageView mCalendarDropdownImage;
-    private FrameLayout mFragmentContainer;
 
     private boolean isDeviceOnline() {
         ConnectivityManager connMgr =
@@ -114,7 +112,6 @@ public class ScheduleActivity extends DrawerActivity {
         mTitleTextBar = (LinearLayout) findViewById(R.id.activity_schedule_title_linear);
         mTitle = (TextView) findViewById(R.id.activity_schedule_title_text);
         mCalendarDropdownImage = (ImageView) findViewById(R.id.activity_schedule_calendar_dropdown_image);
-        mFragmentContainer = (FrameLayout) findViewById(R.id.activity_schedule_fragment);
 
         mTitleTextBar.setOnClickListener(v -> {
             animateToggleCalendar();
@@ -128,7 +125,8 @@ public class ScheduleActivity extends DrawerActivity {
 
             @Override
             public void decorate(DayViewFacade view) {
-                view.setSelectionDrawable(ContextCompat.getDrawable(ScheduleActivity.this, R.drawable.calendar_selector));
+                view.setSelectionDrawable(ContextCompat
+                        .getDrawable(ScheduleCalendarActivity.this, R.drawable.calendar_selector));
             }
         }, new DayViewDecorator() {
             @Override
@@ -140,9 +138,11 @@ public class ScheduleActivity extends DrawerActivity {
 
             @Override
             public void decorate(DayViewFacade view) {
-                ForegroundColorSpan span = new ForegroundColorSpan(ContextCompat.getColor(ScheduleActivity.this, R.color.primary_text_default_material_dark));
+                ForegroundColorSpan span = new ForegroundColorSpan(ContextCompat
+                        .getColor(ScheduleCalendarActivity.this, R.color.primary_text_default_material_dark));
                 view.addSpan(span);
-                view.setBackgroundDrawable(ContextCompat.getDrawable(ScheduleActivity.this, R.drawable.calendar_today_selected));
+                view.setBackgroundDrawable(ContextCompat
+                        .getDrawable(ScheduleCalendarActivity.this, R.drawable.calendar_today_selected));
             }
         });
 
@@ -153,7 +153,7 @@ public class ScheduleActivity extends DrawerActivity {
                 animateToggleCalendar();
 
                 FragmentManager fm = getFragmentManager();
-                ScheduleFragment f = (ScheduleFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
+                ScheduleCalendarFragment f = (ScheduleCalendarFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
                 updateBellScheduleAndCalendarEvents(f);
             }
         });
@@ -177,9 +177,9 @@ public class ScheduleActivity extends DrawerActivity {
         updateTitle();
 
         FragmentManager fm = getFragmentManager();
-        ScheduleFragment f = (ScheduleFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
+        ScheduleCalendarFragment f = (ScheduleCalendarFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
         if (f == null) {
-            f = new ScheduleFragment();
+            f = new ScheduleCalendarFragment();
             fm.beginTransaction()
                     .replace(R.id.activity_schedule_fragment, f)
                     .commit();
@@ -240,7 +240,7 @@ public class ScheduleActivity extends DrawerActivity {
         return mSelectedDate;
     }
 
-    public void updateBellScheduleAndCalendarEvents(ScheduleFragment f) {
+    public void updateBellScheduleAndCalendarEvents(ScheduleCalendarFragment f) {
         if (isDeviceOnline()) {
             f.setReady(false);
 
@@ -262,7 +262,7 @@ public class ScheduleActivity extends DrawerActivity {
                             e.printStackTrace();
 
                             FragmentManager fm = getFragmentManager();
-                            ScheduleFragment f = (ScheduleFragment)
+                            ScheduleCalendarFragment f = (ScheduleCalendarFragment)
                                     fm.findFragmentById(R.id.activity_schedule_fragment);
                             f.setErrorMessage("Error - cannot retrieve online bell schedule.");
                         }
@@ -276,7 +276,7 @@ public class ScheduleActivity extends DrawerActivity {
                         }
                     });
         } else {
-            Toast.makeText(ScheduleActivity.this,
+            Toast.makeText(ScheduleCalendarActivity.this,
                     "Not online - cannot retrieve online bell schedule", Toast.LENGTH_LONG).show();
         }
     }

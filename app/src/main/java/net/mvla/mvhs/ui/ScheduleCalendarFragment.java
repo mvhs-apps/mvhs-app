@@ -32,7 +32,7 @@ import biweekly.component.VEvent;
 import biweekly.util.ICalDate;
 
 
-public class ScheduleFragment extends Fragment {
+public class ScheduleCalendarFragment extends Fragment {
 
     private TextView mEventsTitle;
     private TextView mBellScheduleTitle;
@@ -65,8 +65,8 @@ public class ScheduleFragment extends Fragment {
         mEventsLayout = (LinearLayout) view.findViewById(R.id.fragment_schedule_events_linear);
         mEventsTitle = (TextView) view.findViewById(R.id.fragment_schedule_events_title);
 
-        BellSchedule schedule = ((ScheduleActivity) getActivity()).getSchedule();
-        List<VEvent> events = ((ScheduleActivity) getActivity()).getEvents();
+        BellSchedule schedule = ((ScheduleCalendarActivity) getActivity()).getSchedule();
+        List<VEvent> events = ((ScheduleCalendarActivity) getActivity()).getEvents();
         if (events != null && schedule != null) {
             setData(schedule, events);
         } else {
@@ -78,8 +78,8 @@ public class ScheduleFragment extends Fragment {
 
     public void setReady(boolean ready) {
         if (ready) {
-            BellSchedule schedule = ((ScheduleActivity) getActivity()).getSchedule();
-            List<VEvent> events = ((ScheduleActivity) getActivity()).getEvents();
+            BellSchedule schedule = ((ScheduleCalendarActivity) getActivity()).getSchedule();
+            List<VEvent> events = ((ScheduleCalendarActivity) getActivity()).getEvents();
             setData(schedule, events);
         } else {
             setLoading();
@@ -154,7 +154,7 @@ public class ScheduleFragment extends Fragment {
                     .inflate(R.layout.table_row_schedule, mTableLayout, false);
 
             Calendar start = Calendar.getInstance();
-            Date selectedDate = ((ScheduleActivity) getActivity()).getSelectedDate().getTime();
+            Date selectedDate = ((ScheduleCalendarActivity) getActivity()).getSelectedDate().getTime();
             start.setTime(selectedDate);
             start.set(Calendar.HOUR_OF_DAY, period.startHour);
             start.set(Calendar.MINUTE, period.startMinute);

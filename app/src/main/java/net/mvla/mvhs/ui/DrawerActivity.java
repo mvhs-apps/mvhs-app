@@ -44,8 +44,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
     private static final int NAVDRAWER_ITEM_SEPARATOR = -2;
 
     private static final int[] NAVDRAWER_ITEMS = new int[]{
-            NAVDRAWER_ITEM_AERIES,
             NAVDRAWER_ITEM_TODAYS_SCHED,
+            NAVDRAWER_ITEM_AERIES,
             NAVDRAWER_ITEM_MAP,
             NAVDRAWER_ITEM_CALENDAR,
             NAVDRAWER_ITEM_MVHSSITE,
@@ -55,8 +55,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
             NAVDRAWER_ITEM_ABOUT
     };
     private static final int[] NAVDRAWER_ITEMS_ICONS = new int[]{
-            R.drawable.ic_grade_black_24dp,
             R.drawable.ic_view_agenda_black_24dp,
+            R.drawable.ic_grade_black_24dp,
             R.drawable.ic_map_black_24dp,
             R.drawable.ic_event_24dp,
             R.drawable.ic_web_black_24dp,
@@ -339,7 +339,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 i = new Intent(this, AboutActivity.class);
                 break;
             case NAVDRAWER_ITEM_TODAYS_SCHED:
-                i = new Intent(this, ScheduleActivity.class);
+                i = new Intent(this, ScheduleCalendarActivity.class);
                 break;
             default:
                 Toast.makeText(getApplicationContext(), "Work in Progress",

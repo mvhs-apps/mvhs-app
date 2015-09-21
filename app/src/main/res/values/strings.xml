@@ -11,8 +11,8 @@
     <string name="about">About</string>
 
     <string-array name="nav_drawer_items">
-        <item>@string/aeries</item>
         <item>@string/schedule_and_calendar</item>
+        <item>@string/aeries</item>
         <item>@string/map</item>
         <item>@string/calendar</item>
         <item>@string/mvhs_site</item>

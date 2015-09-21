@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.view.View;
 import android.widget.Button;
 
 import net.mvla.mvhs.R;
@@ -25,19 +24,9 @@ public class StudentCalendarActivity extends DrawerActivity {
         Button add = (Button) findViewById(R.id.activity_calendar_add);
         Button today = (Button) findViewById(R.id.activity_calendar_view);
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addEvent();
-            }
-        });
+        add.setOnClickListener(v -> addEvent());
 
-        today.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openCalendar();
-            }
-        });
+        today.setOnClickListener(v -> openCalendar());
 
         overridePendingTransition(0, 0);
     }

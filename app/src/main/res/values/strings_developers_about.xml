@@ -2,7 +2,8 @@
 <resources>
     <string name="about_dev1">Daniel Ciao</string>
     <string name="about_dev1_subtitle">Lead Developer, Class of 2018</string>
-    <string name="about_dev1_desc">Developer of the school map and navigation, Aeries Smart Lock sign-in, and the general app framework.</string>
+    <string name="about_dev1_desc">Developer of the dynamic bell schedule, school calendar,
+        interactive school map, Aeries Google Smart Lock sign-in, and general app framework &amp; design.</string>
     <string name="about_dev1_website">http://www.pluscubed.com</string>
     <string name="about_dev1_email">plusCubed@gmail.com</string>
 

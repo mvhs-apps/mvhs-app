@@ -21,25 +21,30 @@
             android:name="net.mvla.mvhs.ui.AeriesActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
+
         <activity
             android:name="net.mvla.mvhs.ui.MapActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MVHSApp.Light.Map">
 
         </activity>
+
         <activity
             android:name="net.mvla.mvhs.ui.StudentCalendarActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer" />
+
         <activity
-            android:name="net.mvla.mvhs.ui.ScheduleActivity"
+            android:name=".ui.ScheduleCalendarActivity"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer" />
+            android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
 
         <activity android:name="net.mvla.mvhs.ui.ScheduleSetupActivity" />
