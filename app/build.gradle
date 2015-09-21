@@ -54,7 +54,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:7.+'
     compile 'com.google.android.gms:play-services-identity:7.+'
 
-    compile 'com.afollestad:material-dialogs:0.+'
+    compile 'com.afollestad.material-dialogs:core:0.+'
 
     compile('com.crashlytics.sdk.android:crashlytics:2.+@aar') {
         transitive = true;

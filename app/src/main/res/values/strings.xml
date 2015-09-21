@@ -77,4 +77,5 @@
     <string name="school_events">School Events</string>
     <string name="bell_schedule_no_school">Bell Schedule: No School</string>
     <string name="no_school_events">School Events: None</string>
+    <string name="schedule_calendar_disclaimer">Disclaimer: Although we strive to provide accurate and up-to-date information, the above may not be final and isn\'t endorsed by the school. Please check the school website for the official bell schedule and calendar information.</string>
 </resources>
