@@ -9,8 +9,9 @@ public abstract class PrefUtils {
 
     public static final String PREF_WELCOME_DONE = "pref_welcome_done";
     public static final String PREF_OPEN_SCHEDULE_SETUP = "pref_open_schedule_setup";
-    public static final String PREF_GUEST_MODE = "pref_guest_mode";
     public static final String PREF_CALENDAR_WELCOME = "pref_calendar_welcome";
+    public static final String PREF_MODE = "pref_mode";
+
 
     public static final String PREF_SCHEDULE_PREFIX = "pref_schd_prd";
     public static final String PREF_SCHEDULE_ROOM = "_room";
@@ -37,13 +38,13 @@ public abstract class PrefUtils {
         return sp.getBoolean(PREF_CALENDAR_WELCOME, false);
     }
 
-    public static boolean isGuest(final Context context) {
+    public static int getMode(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getBoolean(PREF_GUEST_MODE, false);
+        return Integer.parseInt(sp.getString(PREF_MODE, "0"));
     }
 
-    public static void setGuestMode(final Context context, boolean student) {
+    public static void setMode(final Context context, int mode) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putBoolean(PREF_GUEST_MODE, student).apply();
+        sp.edit().putString(PREF_MODE, String.valueOf(mode)).apply();
     }
 }

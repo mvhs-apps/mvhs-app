@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -59,6 +60,9 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             });
+
+            ListPreference modes = (ListPreference) findPreference(PrefUtils.PREF_MODE);
+            modes.setEntryValues(new String[]{"0", "1", "2"});
         }
     }
 

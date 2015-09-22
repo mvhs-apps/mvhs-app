@@ -172,11 +172,11 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 drawable.mutate();
                 DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
                 if (itemId == getSelfNavDrawerItem()) {
-                    DrawableCompat.setTint(drawable, getResources().getColor(R.color.primary_dark));
-                    v.setTextColor(getResources().getColor(R.color.primary_dark));
+                    DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.primary_dark));
+                    v.setTextColor(ContextCompat.getColor(this, R.color.primary_dark));
                 } else {
-                    DrawableCompat.setTint(drawable, getResources().getColor(R.color.nav_drawer_icon));
-                    v.setTextColor(getResources().getColor(R.color.primary_text_default_material_light));
+                    DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.nav_drawer_icon));
+                    v.setTextColor(ContextCompat.getColor(this, R.color.primary_text_default_material_light));
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                     v.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null);
@@ -185,10 +185,10 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
 
                 if (itemId == getSelfNavDrawerItem()) {
-                    v.setBackgroundColor(getResources().getColor(R.color.ripple_material_light));
+                    v.setBackgroundColor(ContextCompat.getColor(this, R.color.ripple_material_light));
                     setTitle(getToolbarTitle(navDrawerStrings[i]));
                 } else {
-                    v.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                    v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
                 }
 
 
@@ -246,7 +246,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
         super.onResume();
 
         //TODO: Array of guest mode hidden items
-        if (PrefUtils.isGuest(this) && (getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES || getSelfNavDrawerItem() == NAVDRAWER_ITEM_CALENDAR)) {
+        if (PrefUtils.getMode(this) == 2 && (getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES
+                || getSelfNavDrawerItem() == NAVDRAWER_ITEM_CALENDAR)) {
             goToNavDrawerItem(NAVDRAWER_ITEM_MAP);
         }
 
@@ -254,7 +255,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
             View item = mDrawerListLinearLayout.getChildAt(i);
             int itemId = (int) item.getTag();
 
-            if (PrefUtils.isGuest(this) && (itemId == NAVDRAWER_ITEM_AERIES || itemId == NAVDRAWER_ITEM_CALENDAR)) {
+            if (PrefUtils.getMode(this) == 2 && (itemId == NAVDRAWER_ITEM_AERIES || itemId == NAVDRAWER_ITEM_CALENDAR)
+                    || PrefUtils.getMode(this) == 1 && itemId == NAVDRAWER_ITEM_AERIES) {
                 item.setVisibility(View.GONE);
             } else {
                 item.setVisibility(View.VISIBLE);
@@ -282,12 +284,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             return;
         }
 
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                goToNavDrawerItem(itemId);
-            }
-        }, NAVDRAWER_LAUNCH_DELAY);
+        mHandler.postDelayed(() -> goToNavDrawerItem(itemId), NAVDRAWER_LAUNCH_DELAY);
         if (isNormalItem(itemId)) {
             View mainContent = findViewById(R.id.activity_drawer_content);
             if (mainContent != null) {

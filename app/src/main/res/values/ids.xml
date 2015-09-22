@@ -101,5 +101,6 @@
     <item name="fragment_schedule_events_title" type="id" />
     <item name="activity_schedule_calendar_dropdown_image" type="id" />
     <item name="fragment_schedule_disclaimer" type="id" />
+    <item name="activity_welcome_teacher" type="id" />
 
 </resources>

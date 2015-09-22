@@ -36,14 +36,27 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
+
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:id="@id/activity_welcome_teacher"
+            style="?buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/teacher"
+            android:textSize="16sp" />
 
         <Button
             android:id="@id/activity_welcome_student"
             style="?buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
             android:text="@string/student"
             android:textSize="16sp" />
 
@@ -52,9 +65,12 @@
             style="?buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
             android:text="@string/guest"
             android:textSize="16sp" />
+
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
