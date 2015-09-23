@@ -18,10 +18,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
         Button student = (Button) findViewById(R.id.activity_welcome_student);
         Button guest = (Button) findViewById(R.id.activity_welcome_guest);
-        Button teacher = (Button) findViewById(R.id.activity_welcome_teacher);
         student.setOnClickListener(v -> setChoice(0));
-        teacher.setOnClickListener(v -> setChoice(1));
-        guest.setOnClickListener(v -> setChoice(2));
+        guest.setOnClickListener(v -> setChoice(1));
     }
 
     @Override
@@ -31,7 +29,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void setChoice(int mode) {
         PrefUtils.setMode(this, mode);
-        if (mode != 2) {
+        if (mode != 1) {
             Intent intent = new Intent(this, ScheduleSetupActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

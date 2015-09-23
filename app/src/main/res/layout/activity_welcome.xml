@@ -45,14 +45,6 @@
             android:layout_height="match_parent" />
 
         <Button
-            android:id="@id/activity_welcome_teacher"
-            style="?buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/teacher"
-            android:textSize="16sp" />
-
-        <Button
             android:id="@id/activity_welcome_student"
             style="?buttonBarButtonStyle"
             android:layout_width="wrap_content"

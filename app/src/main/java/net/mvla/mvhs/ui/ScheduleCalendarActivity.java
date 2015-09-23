@@ -6,11 +6,13 @@ import android.animation.ValueAnimator;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Pair;
@@ -201,6 +203,20 @@ public class ScheduleCalendarActivity extends DrawerActivity {
         /*}*/
 
         overridePendingTransition(0, 0);
+
+        checkChangelog();
+    }
+
+    private void checkChangelog() {
+        if (PrefUtils.isWelcomeDone(this)) {
+            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            final int currentVersion = BuildConfig.VERSION_CODE;
+            if (currentVersion > prefs.getInt("changelog_version", -1)) {
+                showChangelog();
+            }
+
+            prefs.edit().putInt("changelog_version", currentVersion).apply();
+        }
     }
 
     public BellSchedule getSchedule() {

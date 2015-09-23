@@ -18,6 +18,7 @@
         <item>@string/mvhs_site</item>
         <item>SEPARATOR</item>
         <item>@string/settings</item>
+        <item>@string/changelog</item>
         <item>@string/about</item>
     </string-array>
 
@@ -66,13 +67,13 @@
 
     <string-array name="modes">
         <item>@string/student</item>
-        <item>@string/teacher</item>
         <item>@string/guest</item>
     </string-array>
     <string name="student">Student</string>
     <string name="guest">Guest</string>
-    <string name="teacher">Teacher</string>
-    <string name="student_guest_question">Are you a teacher, student, or guest?</string>
+    <string name="student_guest_question">Are you a student or guest?</string>
+
+    <string name="changelog">Changelog</string>
 
     <string name="mode">Mode</string>
     <string name="website">Website</string>

@@ -38,7 +38,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
     protected static final int NAVDRAWER_ITEM_TODAYS_SCHED = 10;
 
     private static final int NAVDRAWER_ITEM_SETTINGS = -3;
-    //private static final int NAVDRAWER_ITEM_HELP = -4;
+    private static final int NAVDRAWER_ITEM_CHANGELOG = -4;
     private static final int NAVDRAWER_ITEM_ABOUT = -5;
     private static final int NAVDRAWER_ITEM_INVALID = -1;
     private static final int NAVDRAWER_ITEM_SEPARATOR = -2;
@@ -51,7 +51,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             NAVDRAWER_ITEM_MVHSSITE,
             NAVDRAWER_ITEM_SEPARATOR,
             NAVDRAWER_ITEM_SETTINGS,
-            //NAVDRAWER_ITEM_HELP,
+            NAVDRAWER_ITEM_CHANGELOG,
             NAVDRAWER_ITEM_ABOUT
     };
     private static final int[] NAVDRAWER_ITEMS_ICONS = new int[]{
@@ -62,7 +62,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             R.drawable.ic_web_black_24dp,
             NAVDRAWER_ITEM_SEPARATOR,
             R.drawable.ic_settings_black_24dp,
-            //NAVDRAWER_ITEM_HELP,
+            R.drawable.ic_trending_up_24dp,
             R.drawable.ic_info_black_24dp
     };
 
@@ -246,7 +246,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
         super.onResume();
 
         //TODO: Array of guest mode hidden items
-        if (PrefUtils.getMode(this) == 2 && (getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES
+        if (PrefUtils.getMode(this) == 1 && (getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES
                 || getSelfNavDrawerItem() == NAVDRAWER_ITEM_CALENDAR)) {
             goToNavDrawerItem(NAVDRAWER_ITEM_MAP);
         }
@@ -255,8 +255,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             View item = mDrawerListLinearLayout.getChildAt(i);
             int itemId = (int) item.getTag();
 
-            if (PrefUtils.getMode(this) == 2 && (itemId == NAVDRAWER_ITEM_AERIES || itemId == NAVDRAWER_ITEM_CALENDAR)
-                    || PrefUtils.getMode(this) == 1 && itemId == NAVDRAWER_ITEM_AERIES) {
+            if (PrefUtils.getMode(this) == 1 && (itemId == NAVDRAWER_ITEM_AERIES || itemId == NAVDRAWER_ITEM_CALENDAR)) {
                 item.setVisibility(View.GONE);
             } else {
                 item.setVisibility(View.VISIBLE);
@@ -298,7 +297,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
     private boolean isNormalItem(int itemId) {
         return itemId != NAVDRAWER_ITEM_SETTINGS
-                //&& itemId != NAVDRAWER_ITEM_HELP
+                && itemId != NAVDRAWER_ITEM_CHANGELOG
                 && itemId != NAVDRAWER_ITEM_ABOUT
                 && itemId != NAVDRAWER_ITEM_MVHSSITE;
     }
@@ -311,6 +310,10 @@ public abstract class DrawerActivity extends AppCompatActivity {
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
+    }
+
+    protected void showChangelog() {
+        ChangelogDialog.newInstance().show(getFragmentManager(), "CHANGELOG_DIALOG");
     }
 
     private void goToNavDrawerItem(int itemId) {
@@ -338,6 +341,9 @@ public abstract class DrawerActivity extends AppCompatActivity {
             case NAVDRAWER_ITEM_TODAYS_SCHED:
                 i = new Intent(this, ScheduleCalendarActivity.class);
                 break;
+            case NAVDRAWER_ITEM_CHANGELOG:
+                showChangelog();
+                return;
             default:
                 Toast.makeText(getApplicationContext(), "Work in Progress",
                         Toast.LENGTH_SHORT).show();
