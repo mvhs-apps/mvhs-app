@@ -5,7 +5,7 @@
     android:id="@id/fragment_schedule_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#eeeeee"
+    android:background="@color/background_light_darker"
     android:clipToPadding="false">
 
     <RelativeLayout

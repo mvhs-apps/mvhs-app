@@ -95,7 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="88dp"
             android:alpha="0"
-            android:background="@color/background_material_light" />
+            android:background="@color/background_light_darker" />
 
         <FrameLayout
             android:id="@id/activity_map_list_fragment_container"
