@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
+
+    <TextView
+        android:id="@id/table_row_schedule_period_name_text"
+        android:layout_height="46dp"
+        android:gravity="center_vertical"
+        android:textSize="13sp"
+        tools:text="3" />
+
+    <TextView
+        android:id="@id/table_row_schedule_period_time_text"
+        android:layout_height="47dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="56dp"
+        android:paddingStart="6dp"
+        android:textSize="13sp"
+        tools:ignore="NewApi,RtlSymmetry"
+        tools:text="10:25-11:25" />
+
+    <TextView
+        android:id="@id/table_row_schedule_room_text"
+        android:layout_height="46dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="56dp"
+        android:paddingStart="56dp"
+        android:textSize="13sp"
+        tools:ignore="NewApi,RtlSymmetry"
+        tools:text="Packard Hall" />
+
+    <TextView
+        android:id="@id/table_row_schedule_subject_text"
+        android:layout_height="46dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="56dp"
+        android:paddingStart="56dp"
+        android:textSize="13sp"
+        tools:ignore="NewApi,RtlSymmetry"
+        tools:text="Chamber Orchestra" />
+</TableRow>

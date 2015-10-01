@@ -1,0 +1,47 @@
+<resources>
+
+    <!-- Base application theme. -->
+
+    <style name="Theme.MVHSApp.Light" parent="Base.Theme.MVHSApp.Light">
+        <item name="toolbarShadow">@drawable/shadow</item>
+    </style>
+
+    <style name="Theme.MVHSApp.Light.WithNavDrawer" parent="Base.Theme.MVHSApp.Light">
+        <item name="toolbarShadow">@drawable/shadow</item>
+    </style>
+
+    <style name="Theme.MVHSApp.Light.Map" parent="Theme.MVHSApp.Light.WithNavDrawer"/>
+
+    <style name="Base.Theme.MVHSApp.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+
+        <!--Apparently values from AppCompat are overridden by android: namespace values.-->
+        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="android:colorForegroundInverse">@color/foreground_material_dark</item>
+        <item name="android:colorBackground">@color/background_material_light</item>
+        <item name="android:windowBackground">@color/background_material_light</item>
+
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="android:activatedBackgroundIndicator">?selectableItemBackground</item>
+    </style>
+
+    <style name="Theme.SearchboxMenu" parent="Theme.MVHSApp.Light">
+        <item name="drawerArrowStyle">@style/SearchboxDrawerArrowStyle</item>
+    </style>
+
+    <style name="SearchboxDrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="drawableSize">24dp</item>
+        <item name="barLength">18dp</item>
+    </style>
+
+    <style name="CalendarDayTextAppearance" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">?android:textColor</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+</resources>

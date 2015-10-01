@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@id/navigation_selection_appbar"
+    android:layout_width="match_parent"
+    android:layout_height="152dp"
+    android:background="#4E342E"
+    android:elevation="8dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    tools:visibility="visible">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#4E342E"
+        android:elevation="8dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        tools:visibility="visible">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@id/navigation_selection_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/abc_action_bar_default_height_material"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:contentInsetStart="72dp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="64dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="68dp"
+            android:background="@null"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_vertical"
+            android:paddingLeft="8dp"
+            android:paddingStart="8dp"
+            android:text="@string/change_starting_point"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            tools:ignore="NewApi,RtlSymmetry" />
+
+        <Button
+            android:id="@+id/navigation_appbar_startingloc_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/navigation_selection_toolbar"
+            android:layout_marginLeft="64dp"
+            android:layout_marginStart="64dp"
+            android:background="?selectableItemBackground"
+            android:fontFamily="sans-serif"
+            android:gravity="start"
+            android:paddingLeft="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:text="@string/your_location"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            tools:ignore="NewApi,RtlSymmetry" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/navigation_appbar_startingloc_button"
+            android:layout_marginLeft="64dp"
+            android:layout_marginStart="64dp"
+            android:background="@null"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_vertical"
+            android:paddingLeft="8dp"
+            android:paddingStart="8dp"
+            android:text="@string/choose_destination_below"
+            android:textAllCaps="false"
+            android:textColor="#87ffffff"
+            android:textSize="16sp"
+            tools:ignore="NewApi,RtlSymmetry" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/navigation_appbar_startingloc_button"
+            android:layout_marginLeft="72dp"
+            android:layout_marginStart="72dp"
+            android:background="#67ffffff" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="80dp"
+            android:src="@drawable/ic_expand_more_white_24dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="86dp"
+            android:src="@drawable/ic_expand_more_white_24dp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="92dp"
+            android:src="@drawable/ic_expand_more_white_24dp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

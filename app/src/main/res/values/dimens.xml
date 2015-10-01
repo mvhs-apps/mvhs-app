@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="searchbox_height">64dp</dimen>
+    <dimen name="searchbox_no_menu_offset">-56dp</dimen>
+
+    <dimen name="navigation_drawer_margin">56dp</dimen>
+    <dimen name="navigation_drawer_limit">320dp</dimen>
+</resources>

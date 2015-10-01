@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:key="pref_open_schedule_setup"
+        android:title="@string/pref_open_schedule_setup_title" />
+
+    <android.support.v7.preference.ListPreference
+        android:defaultValue="0"
+        android:entries="@array/modes"
+        android:key="pref_mode"
+        android:summary="%s"
+        android:title="@string/mode" />
+
+</PreferenceScreen>

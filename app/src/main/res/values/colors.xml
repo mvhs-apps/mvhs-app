@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="primary_dark" type="color">#F9A825</item>
+    <item name="primary" type="color">#FDD835</item>
+    <item name="accent" type="color">#448AFF</item>
+
+    <item name="background_light_darker" type="color">#eeeeee</item>
+
+    <item name="disabled_button" type="color">#10000000</item>
+    <item name="nav_drawer_icon" type="color">#8a000000</item>
+</resources>

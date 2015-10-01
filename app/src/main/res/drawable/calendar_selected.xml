@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schelmas.android.com/apk/res/android"
+    android:insetBottom="4dp"
+    android:insetLeft="4dp"
+    android:insetRight="4dp"
+    android:insetTop="4dp">
+
+    <shape xmlns:android="http://schelmas.android.com/apk/res/android"
+        android:shape="oval">
+        <solid android:color="@color/ripple_material_light" />
+    </shape>
+
+</inset>
