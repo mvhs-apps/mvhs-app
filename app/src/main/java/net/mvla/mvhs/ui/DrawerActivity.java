@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +25,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.mvla.mvhs.CustomTabActivityHelper;
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
 
@@ -317,7 +319,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
     }
 
     private void goToNavDrawerItem(int itemId) {
-        Intent i;
+        Intent i = null;
         switch (itemId) {
             case NAVDRAWER_ITEM_AERIES:
                 i = new Intent(this, AeriesActivity.class);
@@ -326,8 +328,18 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 i = new Intent(this, MapActivity.class);
                 break;
             case NAVDRAWER_ITEM_MVHSSITE:
-                i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("http://www.mvla.net/MVHS/"));
+                Uri website = Uri.parse("http://www.mvla.net/MVHS/");
+
+                CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
+                        .setToolbarColor(ContextCompat.getColor(this, R.color.primary))
+                        .build();
+                CustomTabActivityHelper.openCustomTab(
+                        this, customTabsIntent, website, (activity, uri) -> {
+                            Intent open = new Intent(Intent.ACTION_VIEW);
+                            open.setData(uri);
+                            activity.startActivity(open);
+                        }
+                );
                 break;
             case NAVDRAWER_ITEM_CALENDAR:
                 i = new Intent(this, StudentCalendarActivity.class);
@@ -350,8 +362,11 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 return;
         }
 
-        startActivity(i);
-        //If it is not a special item, finish this activity
-        if (isNormalItem(itemId)) finish();
+        if (i != null) {
+            startActivity(i);
+
+            //If it is not a special item, finish this activity
+            if (isNormalItem(itemId)) finish();
+        }
     }
 }

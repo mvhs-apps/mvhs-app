@@ -154,15 +154,15 @@ public class ScheduleCalendarActivity extends DrawerActivity {
             }
         });
 
-        mCalendarView.setOnDateChangedListener((widget, date) -> {
+        mCalendarView.setOnDateChangedListener((widget, date, selected) -> {
             if (date != null) {
                 mSelectedDate = date.getCalendar();
-                updateTitle();
-                animateToggleCalendar();
+                ScheduleCalendarActivity.this.updateTitle();
+                ScheduleCalendarActivity.this.animateToggleCalendar();
 
-                FragmentManager fm = getFragmentManager();
+                FragmentManager fm = ScheduleCalendarActivity.this.getFragmentManager();
                 ScheduleCalendarFragment f = (ScheduleCalendarFragment) fm.findFragmentById(R.id.activity_schedule_fragment);
-                updateBellScheduleAndCalendarEvents(f);
+                ScheduleCalendarActivity.this.updateBellScheduleAndCalendarEvents(f);
             }
         });
 
@@ -272,6 +272,7 @@ public class ScheduleCalendarActivity extends DrawerActivity {
                     getBellScheduleSheetEntries(),
                     (Func2<List<VEvent>, List<Entry>, Pair<List<VEvent>, List<Entry>>>) Pair::new
             )
+                    .subscribeOn(Schedulers.io())
                     .flatMap(this::getBellScheduleAndEvents)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<Pair<BellSchedule, List<VEvent>>>() {
@@ -311,7 +312,7 @@ public class ScheduleCalendarActivity extends DrawerActivity {
                 .build();
         CalendarIcalService service = restAdapter.create(CalendarIcalService.class);
         return service.getCalendarFile()
-                .observeOn(Schedulers.io())
+                //.subscribeOn(Schedulers.io())
                 .flatMap(this::getEventList)
                 .flatMap(this::getEventsFromSelectedDayFromList);
     }
@@ -326,7 +327,7 @@ public class ScheduleCalendarActivity extends DrawerActivity {
         SheetService service = restAdapter.create(SheetService.class);
 
         return service.getRootElement()
-                .observeOn(Schedulers.io())
+                //.subscribeOn(Schedulers.io())
                 .flatMap(rootSheetElement -> Single.create(singleSubscriber -> {
                     singleSubscriber.onSuccess(rootSheetElement.getFeed().getEntry());
                 }));
