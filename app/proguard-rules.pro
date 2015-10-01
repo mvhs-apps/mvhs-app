@@ -15,5 +15,30 @@
 #   public *;
 #}
 
+-keepattributes SourceFile,LineNumberTable
+
 #retrolambda
 -dontwarn java.lang.invoke.*
+#retrofit
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+
+#rxjava
+-dontwarn sun.misc.**
+
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+   long producerIndex;
+   long consumerIndex;
+}
+
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+   long producerNode;
+   long consumerNode;
+}
+
+#okio
+-dontwarn java.nio.**
+-dontwarn org.codehaus.mojo.animal_sniffer.**
