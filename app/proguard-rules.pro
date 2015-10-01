@@ -15,6 +15,8 @@
 #   public *;
 #}
 
+-keepattributes SourceFile,LineNumberTable
+
 #retrolambda
 -dontwarn java.lang.invoke.*
 #retrofit
