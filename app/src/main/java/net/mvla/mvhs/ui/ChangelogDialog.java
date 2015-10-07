@@ -18,9 +18,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-/**
- * @author Aidan Follestad (afollestad)
- */
 public class ChangelogDialog extends DialogFragment {
 
     public static ChangelogDialog newInstance() {
@@ -51,7 +48,7 @@ public class ChangelogDialog extends DialogFragment {
 
         final WebView webView = (WebView) customView.findViewById(R.id.webview);
         try {
-            // Load from cabinetchangelog.html in the assets folder
+            // Load from changelog.html in the assets folder
             StringBuilder buf = new StringBuilder();
             InputStream json = getActivity().getAssets().open("changelog.html");
             BufferedReader in = new BufferedReader(new InputStreamReader(json, "UTF-8"));

@@ -66,7 +66,7 @@ public class ScheduleCalendarActivity extends DrawerActivity {
     public static final String STATE_BELL_SCHEDULE = "STATE_BELL_SCHEDULE";
     public static final String STATE_ERROR = "STATE_ERROR";
     public static final String STATE_EVENTS = "STATE_EVENTS";
-    private static final String STATE_CALENDAR = "state_calendar";
+    private static final String STATE_SELECTED_DATE = "state_calendar";
     private BellSchedule mSchedule;
     private List<VEvent> mEvents;
     private String mError;
@@ -90,7 +90,7 @@ public class ScheduleCalendarActivity extends DrawerActivity {
         super.onSaveInstanceState(outState);
         outState.putSerializable(STATE_BELL_SCHEDULE, mSchedule);
         outState.putString(STATE_ERROR, mError);
-        outState.putSerializable(STATE_CALENDAR, mSelectedDate);
+        outState.putSerializable(STATE_SELECTED_DATE, mSelectedDate);
         Gson gson = new GsonBuilder().create();
         String events = gson.toJson(mEvents);
         outState.putString(STATE_EVENTS, events);
@@ -99,7 +99,7 @@ public class ScheduleCalendarActivity extends DrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_schedule);
+        setContentView(R.layout.activity_schedule_calendar);
 
         if (!PrefUtils.isWelcomeDone(this)) {
             startActivity(new Intent(this, WelcomeActivity.class));
@@ -108,7 +108,7 @@ public class ScheduleCalendarActivity extends DrawerActivity {
         if (savedInstanceState != null) {
             mSchedule = (BellSchedule) savedInstanceState.getSerializable(STATE_BELL_SCHEDULE);
             mError = savedInstanceState.getString(STATE_ERROR);
-            mSelectedDate = (Calendar) savedInstanceState.getSerializable(STATE_CALENDAR);
+            mSelectedDate = (Calendar) savedInstanceState.getSerializable(STATE_SELECTED_DATE);
             /*Gson gson = new GsonBuilder().create();
             mEvents = gson.fromJson(savedInstanceState.getString(STATE_EVENTS),
                     new TypeToken<List<VEvent>>() {

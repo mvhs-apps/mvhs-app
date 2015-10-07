@@ -1,5 +1,6 @@
 package net.mvla.mvhs.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import net.mvla.mvhs.model.BellSchedule;
 import net.mvla.mvhs.model.BellSchedulePeriod;
 import net.mvla.mvhs.model.UserPeriodInfo;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +45,11 @@ public class ScheduleCalendarFragment extends Fragment {
     private CardView mEventsCard;
     private View mDisclaimer;
 
+    @SuppressLint("SimpleDateFormat")
+    private static String formatTime(Date date) {
+        return new SimpleDateFormat("hh:mm").format(date);
+    }
+
     public void setErrorMessage(String error) {
         //TODO
         mProgressBar.setVisibility(View.GONE);
@@ -55,9 +62,8 @@ public class ScheduleCalendarFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_schedule, container, false);
+        View view = inflater.inflate(R.layout.fragment_schedule_calendar, container, false);
 
-        // mNameText = (TextView) view.findViewById(R.id.list_item_schedule_name);
         mBellScheduleTitle = (TextView) view.findViewById(R.id.list_item_schedule_title);
         mTableLayout = (TableLayout) view.findViewById(R.id.list_item_schedule_table);
         mProgressBar = (ProgressBar) view.findViewById(R.id.list_item_schedule_progress);
@@ -152,61 +158,67 @@ public class ScheduleCalendarFragment extends Fragment {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         for (BellSchedulePeriod period : bellSchedule.bellSchedulePeriods) {
-            View tableRowSeparator = layoutInflater.inflate(R.layout.table_row_divider, mTableLayout, false);
-            mTableLayout.addView(tableRowSeparator);
-            TableRow tableRow = (TableRow) layoutInflater
-                    .inflate(R.layout.table_row_schedule, mTableLayout, false);
-
-            Calendar start = Calendar.getInstance();
-            Date selectedDate = ((ScheduleCalendarActivity) getActivity()).getSelectedDate().getTime();
-            start.setTime(selectedDate);
-            start.set(Calendar.HOUR_OF_DAY, period.startHour);
-            start.set(Calendar.MINUTE, period.startMinute);
-            Calendar end = Calendar.getInstance();
-            end.setTime(selectedDate);
-            end.set(Calendar.HOUR_OF_DAY, period.endHour);
-            end.set(Calendar.MINUTE, period.endMinute);
-
-            Calendar now = Calendar.getInstance();
-            if (now.getTime().after(start.getTime()) && now.getTime().before(end.getTime())) {
-                //In this period right now
-                tableRow.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.primary));
-            }
-
-            TextView periodText = (TextView) tableRow.findViewById(R.id.table_row_schedule_period_name_text);
-            TextView timeText = (TextView) tableRow.findViewById(R.id.table_row_schedule_period_time_text);
-            TextView room = (TextView) tableRow.findViewById(R.id.table_row_schedule_room_text);
-            TextView subject = (TextView) tableRow.findViewById(R.id.table_row_schedule_subject_text);
-
-            if (period.name.substring(0, 1).matches("^-?\\d+$")) {
-                //is integer (is a number period)
-                int firstChar = Integer.parseInt(period.name.substring(0, 1));
-
-                UserPeriodInfo info = new UserPeriodInfo();
-                info.room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX
-                        + firstChar + PrefUtils.PREF_SCHEDULE_ROOM, "");
-                info.subject = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX
-                        + firstChar + PrefUtils.PREF_SCHEDULE_SBJCT, "");
-
-
-                boolean secondCharA = period.name.length() > 1 && period.name.substring(1, 2).equals("A");
-                boolean secondCharB = period.name.length() > 1 && period.name.substring(1, 2).equals("B");
-                boolean rallyB = preferences.getBoolean(PrefUtils.PREF_SCHEDULE_RALLY_B, false);
-                if (firstChar == 2 && (secondCharA || secondCharB) && ((rallyB && secondCharB) || (!rallyB && secondCharA))) {
-                    //Rally schedule and this period is their rally
-                    room.setText(R.string.gym);
-                    subject.setText(String.format(getString(R.string.rally_blank), rallyB ? "B" : "A"));
-                } else {
-                    room.setText(!info.room.isEmpty() ? info.room : "");
-                    subject.setText(!info.subject.isEmpty() ? info.subject : "");
-                }
-            }
-
-            periodText.setText(period.name);
-            timeText.setText(String.format("%02d:%02d-%02d:%02d",
-                    period.startHour, period.startMinute, period.endHour, period.endMinute));
-
-            mTableLayout.addView(tableRow);
+            inflatePeriod(layoutInflater, preferences, period);
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void inflatePeriod(LayoutInflater layoutInflater, SharedPreferences preferences, BellSchedulePeriod period) {
+        View tableRowSeparator = layoutInflater.inflate(R.layout.table_row_divider, mTableLayout, false);
+        mTableLayout.addView(tableRowSeparator);
+        TableRow tableRow = (TableRow) layoutInflater
+                .inflate(R.layout.table_row_schedule, mTableLayout, false);
+
+        Calendar start = Calendar.getInstance();
+        Date selectedDate = ((ScheduleCalendarActivity) getActivity()).getSelectedDate().getTime();
+        start.setTime(selectedDate);
+        start.set(Calendar.HOUR_OF_DAY, period.startHour);
+        start.set(Calendar.MINUTE, period.startMinute);
+        Calendar end = Calendar.getInstance();
+        end.setTime(selectedDate);
+        end.set(Calendar.HOUR_OF_DAY, period.endHour);
+        end.set(Calendar.MINUTE, period.endMinute);
+
+        Calendar now = Calendar.getInstance();
+        if (now.getTime().after(start.getTime()) && now.getTime().before(end.getTime())) {
+            //In this period right now
+            tableRow.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.primary));
+        }
+
+        TextView periodText = (TextView) tableRow.findViewById(R.id.table_row_schedule_period_name_text);
+        TextView timeText = (TextView) tableRow.findViewById(R.id.table_row_schedule_period_time_text);
+        TextView room = (TextView) tableRow.findViewById(R.id.table_row_schedule_room_text);
+        TextView subject = (TextView) tableRow.findViewById(R.id.table_row_schedule_subject_text);
+
+        if (period.name.substring(0, 1).matches("^-?\\d+$")) {
+            //is integer (is a number period)
+            int firstChar = Integer.parseInt(period.name.substring(0, 1));
+
+            UserPeriodInfo info = new UserPeriodInfo();
+            info.room = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX
+                    + firstChar + PrefUtils.PREF_SCHEDULE_ROOM, "");
+            info.subject = preferences.getString(PrefUtils.PREF_SCHEDULE_PREFIX
+                    + firstChar + PrefUtils.PREF_SCHEDULE_SBJCT, "");
+
+
+            boolean secondCharA = period.name.length() > 1 && period.name.substring(1, 2).equals("A");
+            boolean secondCharB = period.name.length() > 1 && period.name.substring(1, 2).equals("B");
+            boolean rallyB = preferences.getBoolean(PrefUtils.PREF_SCHEDULE_RALLY_B, false);
+            if (firstChar == 2 && (secondCharA || secondCharB) && ((rallyB && secondCharB) || (!rallyB && secondCharA))) {
+                //Rally schedule and this period is their rally
+                room.setText(R.string.gym);
+                subject.setText(String.format(getString(R.string.rally_blank), rallyB ? "B" : "A"));
+            } else {
+                room.setText(!info.room.isEmpty() ? info.room : "");
+                subject.setText(!info.subject.isEmpty() ? info.subject : "");
+            }
+        }
+
+        periodText.setText(period.name);
+
+        //TODO Use SimpleDateFormat or something else (JodaTime?)
+        timeText.setText(formatTime(start.getTime()) + "-" + formatTime(end.getTime()));
+
+        mTableLayout.addView(tableRow);
     }
 }
