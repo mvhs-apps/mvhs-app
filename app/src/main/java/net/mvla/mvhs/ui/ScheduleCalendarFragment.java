@@ -36,6 +36,7 @@ import biweekly.util.ICalDate;
 
 public class ScheduleCalendarFragment extends Fragment {
 
+    private String mError;
     private TextView mEventsTitle;
     private TextView mBellScheduleTitle;
     private TableLayout mTableLayout;
@@ -43,7 +44,7 @@ public class ScheduleCalendarFragment extends Fragment {
     private ProgressBar mProgressBar;
     private CardView mBellScheduleCard;
     private CardView mEventsCard;
-    private View mDisclaimer;
+    private TextView mDisclaimer;
 
     @SuppressLint("SimpleDateFormat")
     private static String formatTime(Date date) {
@@ -51,12 +52,16 @@ public class ScheduleCalendarFragment extends Fragment {
     }
 
     public void setErrorMessage(String error) {
-        //TODO
-        mProgressBar.setVisibility(View.GONE);
-        mTableLayout.setVisibility(View.GONE);
-        //mNameText.setText(mError);
-        //mNameText.setPadding(0, 0, 0, Utils.convertDpToPx(getActivity(), 24));
-        mBellScheduleTitle.setVisibility(View.GONE);
+        mError = error;
+        //progress bar needs to initialized first
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.GONE);
+            mTableLayout.setVisibility(View.GONE);
+            mBellScheduleTitle.setVisibility(View.GONE);
+            mEventsCard.setVisibility(View.GONE);
+
+            mDisclaimer.setText(error);
+        }
     }
 
     @Nullable
@@ -71,12 +76,14 @@ public class ScheduleCalendarFragment extends Fragment {
         mEventsCard = (CardView) view.findViewById(R.id.fragment_schedule_events);
         mEventsLayout = (LinearLayout) view.findViewById(R.id.fragment_schedule_events_linear);
         mEventsTitle = (TextView) view.findViewById(R.id.fragment_schedule_events_title);
-        mDisclaimer = view.findViewById(R.id.fragment_schedule_disclaimer);
+        mDisclaimer = (TextView) view.findViewById(R.id.fragment_schedule_disclaimer);
 
         BellSchedule schedule = ((ScheduleCalendarActivity) getActivity()).getSchedule();
         List<VEvent> events = ((ScheduleCalendarActivity) getActivity()).getEvents();
         if (events != null && schedule != null) {
             setData(schedule, events);
+        } else if (mError != null) {
+            setErrorMessage(mError);
         } else {
             setLoading();
         }
@@ -108,6 +115,7 @@ public class ScheduleCalendarFragment extends Fragment {
         mEventsCard.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
         mDisclaimer.setVisibility(View.VISIBLE);
+        mDisclaimer.setText(R.string.schedule_calendar_disclaimer);
 
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
 

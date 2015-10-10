@@ -9,6 +9,7 @@
     <string name="calendar">Student Calendar</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
+    <string name="google_classroom">Google Classroom</string>
 
     <string-array name="nav_drawer_items">
         <item>@string/schedule_and_calendar</item>
@@ -16,6 +17,7 @@
         <item>@string/map</item>
         <item>@string/calendar</item>
         <item>@string/mvhs_site</item>
+        <item>@string/google_classroom</item>
         <item>SEPARATOR</item>
         <item>@string/settings</item>
         <item>@string/changelog</item>

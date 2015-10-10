@@ -21,8 +21,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -283,11 +283,10 @@ public class ScheduleCalendarActivity extends DrawerActivity {
                         @Override
                         public void onError(Throwable e) {
                             e.printStackTrace();
+                            Crashlytics.logException(e);
 
-                            FragmentManager fm = getFragmentManager();
-                            ScheduleCalendarFragment f = (ScheduleCalendarFragment)
-                                    fm.findFragmentById(R.id.activity_schedule_fragment);
-                            f.setErrorMessage("Error - cannot retrieve online bell schedule.");
+                            f.setErrorMessage("Error - cannot retrieve online bell schedule.\n" +
+                                    e.getMessage());
                         }
 
                         @Override
@@ -299,8 +298,7 @@ public class ScheduleCalendarActivity extends DrawerActivity {
                         }
                     });
         } else {
-            Toast.makeText(ScheduleCalendarActivity.this,
-                    "Not online - cannot retrieve online bell schedule", Toast.LENGTH_LONG).show();
+            f.setErrorMessage("Not online - cannot retrieve online bell schedule");
         }
     }
 

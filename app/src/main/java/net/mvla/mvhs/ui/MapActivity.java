@@ -655,6 +655,10 @@ public class MapActivity extends DrawerActivity {
     }
 
     private void updateMapOverlays(GoogleMap googleMap) {
+        if (googleMap == null) {
+            return;
+        }
+
         googleMap.clear();
         LatLngBounds mapBounds = new LatLngBounds(new LatLng(37.359014, -122.068730),
                 new LatLng(37.361323, -122.065080));

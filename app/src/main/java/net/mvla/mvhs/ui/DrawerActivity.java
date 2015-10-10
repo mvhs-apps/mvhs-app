@@ -1,6 +1,8 @@
 package net.mvla.mvhs.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -38,6 +40,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
     protected static final int NAVDRAWER_ITEM_CALENDAR = 6;
     protected static final int NAVDRAWER_ITEM_MVHSSITE = 8;
     protected static final int NAVDRAWER_ITEM_TODAYS_SCHED = 10;
+    protected static final int NAVDRAWER_ITEM_GCLASSROOM = 12;
 
     private static final int NAVDRAWER_ITEM_SETTINGS = -3;
     private static final int NAVDRAWER_ITEM_CHANGELOG = -4;
@@ -51,6 +54,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             NAVDRAWER_ITEM_MAP,
             NAVDRAWER_ITEM_CALENDAR,
             NAVDRAWER_ITEM_MVHSSITE,
+            NAVDRAWER_ITEM_GCLASSROOM,
             NAVDRAWER_ITEM_SEPARATOR,
             NAVDRAWER_ITEM_SETTINGS,
             NAVDRAWER_ITEM_CHANGELOG,
@@ -62,6 +66,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             R.drawable.ic_map_black_24dp,
             R.drawable.ic_event_24dp,
             R.drawable.ic_web_black_24dp,
+            R.drawable.ic_classroom_black_24dp,
             NAVDRAWER_ITEM_SEPARATOR,
             R.drawable.ic_settings_black_24dp,
             R.drawable.ic_trending_up_24dp,
@@ -79,6 +84,17 @@ public abstract class DrawerActivity extends AppCompatActivity {
     @Nullable
     private Toolbar mActionBarToolbar;
     private LinearLayout mDrawerListLinearLayout;
+
+    public static boolean openApp(Context context, String packageName) {
+        PackageManager manager = context.getPackageManager();
+        Intent i = manager.getLaunchIntentForPackage(packageName);
+        if (i == null) {
+            return false;
+        }
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+        context.startActivity(i);
+        return true;
+    }
 
     /**
      * Returns the navigation drawer item that corresponds to this Activity.
@@ -248,8 +264,10 @@ public abstract class DrawerActivity extends AppCompatActivity {
         super.onResume();
 
         //TODO: Array of guest mode hidden items
-        if (PrefUtils.getMode(this) == 1 && (getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES
-                || getSelfNavDrawerItem() == NAVDRAWER_ITEM_CALENDAR)) {
+        if (PrefUtils.getMode(this) == 1 && (
+                getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES
+                        || getSelfNavDrawerItem() == NAVDRAWER_ITEM_CALENDAR
+                        || getSelfNavDrawerItem() == NAVDRAWER_ITEM_GCLASSROOM)) {
             goToNavDrawerItem(NAVDRAWER_ITEM_MAP);
         }
 
@@ -301,7 +319,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
         return itemId != NAVDRAWER_ITEM_SETTINGS
                 && itemId != NAVDRAWER_ITEM_CHANGELOG
                 && itemId != NAVDRAWER_ITEM_ABOUT
-                && itemId != NAVDRAWER_ITEM_MVHSSITE;
+                && itemId != NAVDRAWER_ITEM_MVHSSITE
+                && itemId != NAVDRAWER_ITEM_GCLASSROOM;
     }
 
     boolean isNavDrawerOpen() {
@@ -355,6 +374,22 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 break;
             case NAVDRAWER_ITEM_CHANGELOG:
                 showChangelog();
+                return;
+            case NAVDRAWER_ITEM_GCLASSROOM:
+                if (!openApp(this, "com.google.android.apps.classroom")) {
+                    Uri gclassroom = Uri.parse("http://classroom.google.com");
+
+                    CustomTabsIntent tabsIntent = new CustomTabsIntent.Builder()
+                            .setToolbarColor(ContextCompat.getColor(this, R.color.primary))
+                            .build();
+                    CustomTabActivityHelper.openCustomTab(
+                            this, tabsIntent, gclassroom, (activity, uri) -> {
+                                Intent open = new Intent(Intent.ACTION_VIEW);
+                                open.setData(uri);
+                                activity.startActivity(open);
+                            }
+                    );
+                }
                 return;
             default:
                 Toast.makeText(getApplicationContext(), "Work in Progress",
