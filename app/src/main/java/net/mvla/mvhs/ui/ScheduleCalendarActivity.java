@@ -98,6 +98,8 @@ public class ScheduleCalendarActivity extends DrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Theme_MVHSApp_Light_WithNavDrawer);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_calendar);
 

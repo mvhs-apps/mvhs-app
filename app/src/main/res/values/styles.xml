@@ -6,6 +6,14 @@
         <item name="toolbarShadow">@drawable/shadow</item>
     </style>
 
+    <style name="Theme.MVHSApp.Light.Welcome" parent="Theme.MVHSApp.Light">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
+    <style name="Theme.MVHSApp.Launch" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
     <style name="Theme.MVHSApp.Light.WithNavDrawer" parent="Base.Theme.MVHSApp.Light">
         <item name="toolbarShadow">@drawable/shadow</item>
     </style>

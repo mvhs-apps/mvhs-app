@@ -3,29 +3,34 @@
     <string name="about_dev1">Daniel Ciao</string>
     <string name="about_dev1_subtitle">Lead Developer, Class of 2018</string>
     <string name="about_dev1_desc">Developer of the dynamic bell schedule, school calendar,
-        interactive school map, Aeries Google Smart Lock sign-in, and general app framework &amp; design.</string>
+        interactive school map, Aeries Google Smart Lock sign-in, school website shortcut,
+        and general app framework &amp; design.</string>
     <string name="about_dev1_website">http://www.pluscubed.com</string>
     <string name="about_dev1_email">plusCubed@gmail.com</string>
 
-    <string name="about_dev2">Jiale Wan</string>
+    <string name="about_dev2">Stephen Hurwit</string>
     <string name="about_dev2_subtitle">Class of 2016</string>
-    <string name="about_dev2_desc">Developer of the student calendar.</string>
+    <string name="about_dev2_desc">Developer of the Google Classroom shortcut</string>
 
-    <string name="about_dev3">Yasha Ektefaie</string>
+    <string name="about_dev3">Jiale Wan</string>
     <string name="about_dev3_subtitle">Class of 2016</string>
     <string name="about_dev3_desc">Developer of the student calendar.</string>
 
-    <string name="about_dev4">Chloe Stabinsky</string>
+    <string name="about_dev4">Yasha Ektefaie</string>
     <string name="about_dev4_subtitle">Class of 2016</string>
-    <string name="about_dev4_desc">Collected information for the school map.</string>
+    <string name="about_dev4_desc">Developer of the student calendar.</string>
 
-    <string name="about_dev5">Anand Bhavsar</string>
-    <string name="about_dev5_subtitle">Class of 2015</string>
+    <string name="about_dev5">Chloe Stabinsky</string>
+    <string name="about_dev5_subtitle">Class of 2016</string>
     <string name="about_dev5_desc">Collected information for the school map.</string>
 
-    <string name="about_dev6">Ly Nguyen</string>
-    <string name="about_dev6_subtitle">Computer Science Teacher</string>
-    <string name="about_dev6_desc">Coordinates the computer science club and meetings.</string>
-    <string name="about_dev6_email">ly.nguyen@mvla.net</string>
+    <string name="about_dev6">Anand Bhavsar</string>
+    <string name="about_dev6_subtitle">Class of 2015</string>
+    <string name="about_dev6_desc">Collected information for the school map.</string>
+
+    <string name="about_dev7">Ly Nguyen</string>
+    <string name="about_dev7_subtitle">Computer Science Teacher</string>
+    <string name="about_dev7_desc">Advisor to the MVHS App Team</string>
+    <string name="about_dev7_email">ly.nguyen@mvla.net</string>
 
 </resources>
