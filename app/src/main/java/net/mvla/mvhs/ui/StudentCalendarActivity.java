@@ -19,7 +19,7 @@ public class StudentCalendarActivity extends DrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calendar);
+        setContentView(R.layout.activity_student_calendar);
 
         Button add = (Button) findViewById(R.id.activity_calendar_add);
         Button today = (Button) findViewById(R.id.activity_calendar_view);

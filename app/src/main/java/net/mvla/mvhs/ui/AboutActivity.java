@@ -23,8 +23,6 @@ import java.util.List;
 
 public class AboutActivity extends AppCompatActivity {
 
-    private RecyclerView mRecyclerView;
-
 
     private List<Developer> mDevelopers;
 
@@ -62,15 +60,16 @@ public class AboutActivity extends AppCompatActivity {
             mDevelopers.add(dev);
         }
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.activity_about_recycler);
-        mRecyclerView.setAdapter(new AboutRecyclerAdapter());
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.activity_about_recycler);
+        recyclerView.setAdapter(new AboutRecyclerAdapter());
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
 
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setTitle(R.string.about);
     }
@@ -124,13 +123,9 @@ public class AboutActivity extends AppCompatActivity {
 
                 if (developer.website != null) {
                     holder.website.setVisibility(View.VISIBLE);
-                    holder.website.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW,
-                                    Uri.parse(developer.website));
-                            startActivity(intent);
-                        }
+                    holder.website.setOnClickListener(v -> {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(developer.website));
+                        startActivity(intent);
                     });
                 } else {
                     holder.website.setVisibility(View.GONE);
@@ -138,14 +133,10 @@ public class AboutActivity extends AppCompatActivity {
 
                 if (developer.email != null) {
                     holder.email.setVisibility(View.VISIBLE);
-                    holder.email.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(Intent.ACTION_SENDTO,
-                                    Uri.fromParts(
-                                            "mailto", developer.email, null));
-                            startActivity(intent);
-                        }
+                    holder.email.setOnClickListener(v -> {
+                        Intent intent = new Intent(Intent.ACTION_SENDTO,
+                                Uri.fromParts("mailto", developer.email, null));
+                        startActivity(intent);
                     });
                 } else {
                     holder.email.setVisibility(View.GONE);

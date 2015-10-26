@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('ical4j-2.0-beta1.jar'))

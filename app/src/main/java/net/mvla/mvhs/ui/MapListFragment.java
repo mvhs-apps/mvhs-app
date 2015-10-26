@@ -17,8 +17,8 @@ import net.mvla.mvhs.map.MapData;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * List
@@ -51,10 +51,12 @@ public class MapListFragment extends Fragment {
         return mRecyclerView;
     }
 
+
     private class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ArtViewHolder> {
 
         private String mSearchQuery;
         private List<LocationNode> mLocations;
+        private Map<LocationNode, List<String>> mTags;
 
         public LocationAdapter() {
             updateDataAndSearch("");
@@ -92,14 +94,11 @@ public class MapListFragment extends Fragment {
                 mLocations = new ArrayList<>(MapData.locationNodeMap.values());
             }
 
-            Collections.sort(mLocations, new Comparator<LocationNode>() {
-                @Override
-                public int compare(LocationNode lhs, LocationNode rhs) {
-                    if (lhs.getName().startsWith(mSearchQuery) && !rhs.getName().startsWith(mSearchQuery)) {
-                        return -1;
-                    }
-                    return lhs.getName().compareTo(rhs.getName());
+            Collections.sort(mLocations, (lhs, rhs) -> {
+                if (lhs.getName().startsWith(mSearchQuery) && !rhs.getName().startsWith(mSearchQuery)) {
+                    return -1;
                 }
+                return lhs.getName().compareTo(rhs.getName());
             });
             notifyDataSetChanged();
         }
@@ -115,12 +114,9 @@ public class MapListFragment extends Fragment {
 
             public ArtViewHolder(View itemView) {
                 super(itemView);
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        MapActivity activity = (MapActivity) getActivity();
-                        activity.onMapListItemClicked(mLocations.get(getLayoutPosition()));
-                    }
+                itemView.setOnClickListener(v -> {
+                    MapActivity activity = (MapActivity) getActivity();
+                    activity.onMapListItemClicked(mLocations.get(getLayoutPosition()));
                 });
             }
         }
