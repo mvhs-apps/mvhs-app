@@ -1,5 +1,6 @@
 package net.mvla.mvhs;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
@@ -12,7 +13,9 @@ import android.webkit.WebView;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Utilities
@@ -88,5 +91,10 @@ public abstract class Utils {
                 e.printStackTrace();
             }
         }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public static String formatTime(Date date) {
+        return new SimpleDateFormat("hh:mm").format(date);
     }
 }

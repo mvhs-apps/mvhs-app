@@ -73,7 +73,7 @@ public class AeriesActivity extends DrawerActivity {
     }
 
     @Override
-    int getSelfNavDrawerItem() {
+    protected int getSelfNavDrawerItem() {
         return NAVDRAWER_ITEM_AERIES;
     }
 }

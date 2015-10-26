@@ -27,9 +27,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.mvla.mvhs.CustomTabActivityHelper;
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
+import net.mvla.mvhs.customtabs.CustomTabActivityHelper;
+import net.mvla.mvhs.ui.schedulecalendar.ScheduleCalendarActivity;
 
 /**
  * Base Activity with the Navigation Drawer
@@ -101,7 +102,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
      * Subclasses of BaseActivity override this to indicate what nav drawer item
      * corresponds to them.
      */
-    int getSelfNavDrawerItem() {
+    protected int getSelfNavDrawerItem() {
         return NAVDRAWER_ITEM_INVALID;
     }
 
@@ -336,7 +337,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
         }
     }
 
-    protected void showChangelog() {
+    public void showChangelog() {
         ChangelogDialog.newInstance().show(getFragmentManager(), "CHANGELOG_DIALOG");
     }
 

@@ -86,7 +86,7 @@ public class MapActivity extends DrawerActivity {
     private Toolbar mNavToolbar;
 
     @Override
-    int getSelfNavDrawerItem() {
+    protected int getSelfNavDrawerItem() {
         return NAVDRAWER_ITEM_MAP;
     }
 
