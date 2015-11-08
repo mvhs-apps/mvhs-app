@@ -1,14 +1,18 @@
 package net.mvla.mvhs.ui;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.app.FragmentManager;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
@@ -63,6 +67,8 @@ public class MapActivity extends DrawerActivity {
     public static final String STATE_MAP_MODE = "mapMode";
     public static final String FRAGMENT_LIST = "List";
 
+    private static final int REQUEST_LOCATION = 42;
+
     private boolean mDebugMode;
 
     private boolean mListShowing;
@@ -84,6 +90,7 @@ public class MapActivity extends DrawerActivity {
     private View mNavigationSelectionAppBar;
     private Button mStartingLocationButton;
     private Toolbar mNavToolbar;
+    private FloatingActionButton mMyLocFab;
 
     @Override
     protected int getSelfNavDrawerItem() {
@@ -187,6 +194,29 @@ public class MapActivity extends DrawerActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode != REQUEST_LOCATION ||
+                (permissions.length == 1 &&
+                        permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            //Permission granted
+            getMap().setMyLocationEnabled(true);
+            mMyLocFab.setVisibility(View.VISIBLE);
+        } else {
+            // Permission was denied. Display an error message.
+            new MaterialDialog.Builder(this)
+                    .title(R.string.permission_needed)
+                    .content(R.string.permission_needed_desc)
+                    .cancelable(false)
+                    .positiveText(android.R.string.ok)
+                    .dismissListener(materialDialog -> onLocationPermissionDenied())
+                    .show();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
@@ -196,6 +226,24 @@ public class MapActivity extends DrawerActivity {
             downloadMapData();
         } else {
             mListShowing = !savedInstanceState.getBoolean(STATE_MAP_MODE);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // Show an expanation to the user
+                new MaterialDialog.Builder(this)
+                        .title(R.string.permission_needed)
+                        .content(R.string.permission_needed_desc)
+                        .cancelable(false)
+                        .positiveText(android.R.string.ok)
+                        .onPositive((materialDialog, dialogAction) -> requestLocationPermission())
+                        .onNegative((materialDialog, dialogAction) -> onLocationPermissionDenied())
+                        .show();
+            } else {
+                // No explanation needed, we can request the permission.
+                requestLocationPermission();
+            }
         }
 
         //ADD MAP AND LIST FRAGMENTS
@@ -299,9 +347,9 @@ public class MapActivity extends DrawerActivity {
         });
         mNavSelectionFab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary)));
 
-        FloatingActionButton myLocFab = (FloatingActionButton) findViewById(R.id.activity_map_my_loc_fab);
-        myLocFab.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
-        myLocFab.setOnClickListener(v -> {
+        mMyLocFab = (FloatingActionButton) findViewById(R.id.activity_map_my_loc_fab);
+        mMyLocFab.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        mMyLocFab.setOnClickListener(v -> {
             GoogleMap map = getMap();
             Location myLocation = map.getMyLocation();
             if (myLocation != null) {
@@ -346,6 +394,16 @@ public class MapActivity extends DrawerActivity {
         overridePendingTransition(0, 0);
     }
 
+    private void onLocationPermissionDenied() {
+        mMyLocFab.setVisibility(View.GONE);
+    }
+
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                REQUEST_LOCATION);
+    }
+
     private void enterChoosingStart() {
         mStartingLocation = null;
         mSearchView.clearText();
@@ -388,7 +446,6 @@ public class MapActivity extends DrawerActivity {
 
     private void onMapReady(final GoogleMap googleMap, boolean initCamera) {
         final boolean[] done = new boolean[1];
-        googleMap.setMyLocationEnabled(true);
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);

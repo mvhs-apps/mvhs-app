@@ -3,6 +3,7 @@ package net.mvla.mvhs.ui;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,9 +32,12 @@ import android.widget.EditText;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
+import com.google.android.gms.auth.api.credentials.CredentialPickerConfig;
 import com.google.android.gms.auth.api.credentials.CredentialRequest;
+import com.google.android.gms.auth.api.credentials.HintRequest;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResolvingResultCallbacks;
 import com.google.android.gms.common.api.Status;
 
 import net.mvla.mvhs.R;
@@ -41,6 +46,7 @@ import net.mvla.mvhs.Utils;
 public class AeriesFragment extends Fragment {
 
     public static final String SAVE_STATE_CREDENTIAL = "save_state_credential";
+    public static final String SAVE_STATE_RESOLVING = "save_state_resolving";
 
     public static final int RC_SAVE = 0;
     public static final int RC_READ = 1;
@@ -62,6 +68,8 @@ public class AeriesFragment extends Fragment {
     private Snackbar mErrorSnackbar;
     private Snackbar mSavingSnackbar;
 
+    private boolean mIsResolving;
+
     private boolean mConnected;
     private boolean mConnectionFailed;
 
@@ -70,19 +78,18 @@ public class AeriesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        mCredentialsApiClient.connect();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mCredentialsApiClient.disconnect();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(SAVE_STATE_CREDENTIAL, mCurrentCredential);
+        outState.putBoolean(SAVE_STATE_RESOLVING, mIsResolving);
         mWebView.saveState(outState);
     }
 
@@ -91,6 +98,10 @@ public class AeriesFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mHandler = new Handler(getActivity().getMainLooper());
+
+        if (savedInstanceState != null) {
+            mIsResolving = savedInstanceState.getBoolean(SAVE_STATE_RESOLVING);
+        }
 
         mCredentialsApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -101,10 +112,10 @@ public class AeriesFragment extends Fragment {
 
                     @Override
                     public void onConnectionSuspended(int i) {
-                        mCredentialsApiClient.reconnect();
+                        //mCredentialsApiClient.reconnect();
                     }
                 })
-                .addOnConnectionFailedListener(connectionResult -> {
+                .enableAutoManage(((AppCompatActivity) getActivity()), connectionResult -> {
                     mConnected = false;
                     mConnectionFailed = true;
                 })
@@ -223,26 +234,46 @@ public class AeriesFragment extends Fragment {
 
             Auth.CredentialsApi.request(mCredentialsApiClient, request).setResultCallback(
                     credentialRequestResult -> {
-                        if (credentialRequestResult.getStatus().isSuccess()) {
+                        finishAllLoading();
+                        final Status status = credentialRequestResult.getStatus();
+                        if (status.isSuccess()) {
                             // Single credential and auto sign-in enabled.
                             //Request 2
                             processRetrievedCredential(credentialRequestResult.getCredential(), false);
-                            finishAllLoading();
-                        } else {
-                            Status status = credentialRequestResult.getStatus();
-                            if (status.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
-                                // Needs to save credentials
-                                //Request 4
-                                resolveResult(status, RC_HINT);
-                            } else {
-                                // Multiple credentials - pick one
-                                //Request 3
-                                resolveResult(status, RC_READ);
-                            }
+                        } else if (status.getStatusCode() == CommonStatusCodes.RESOLUTION_REQUIRED) {
+                            // Multiple credentials - pick one
+                            //Request 3
+                            resolveResult(status, RC_READ);
+                        } else if (status.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
+                            loadHints();
                         }
+
+                        /*else{
+                            //Unexpected
+                        }*/
                     });
         }).start();
 
+    }
+
+    private void loadHints() {
+        HintRequest hintRequest = new HintRequest.Builder()
+                .setHintPickerConfig(new CredentialPickerConfig.Builder()
+                        .setShowCancelButton(true)
+                        .setShowAddAccountButton(true)
+                        .build())
+                .setEmailAddressIdentifierSupported(true)
+                .build();
+
+        PendingIntent intent =
+                Auth.CredentialsApi.getHintPickerIntent(mCredentialsApiClient, hintRequest);
+        try {
+            getActivity().startIntentSenderForResult(intent.getIntentSender(), RC_HINT, null, 0, 0, 0);
+            mIsResolving = true;
+        } catch (IntentSender.SendIntentException e) {
+            //Could not start hint picker Intent
+            mIsResolving = false;
+        }
     }
 
     private void showIndeterminateProgressBar() {
@@ -303,6 +334,7 @@ public class AeriesFragment extends Fragment {
                 } /*else {
                     //Credential Read: NOT OK
                 }*/
+                mIsResolving = false;
                 break;
             case RC_SAVE:
                 if (resultCode == Activity.RESULT_OK) {
@@ -310,6 +342,7 @@ public class AeriesFragment extends Fragment {
                 }/* else {
                     //User chose not to save
                 }*/
+                mIsResolving = false;
                 break;
         }
     }
@@ -359,26 +392,18 @@ public class AeriesFragment extends Fragment {
                 }
 
                 Auth.CredentialsApi.save(mCredentialsApiClient, credential).setResultCallback(
-                        status -> {
-                            if (status.isSuccess()) {
+                        new ResolvingResultCallbacks<Status>(getActivity(), RC_SAVE) {
+                            @Override
+                            public void onSuccess(Status status) {
                                 // Credentials were saved
-                                onCredentialsSaved();
-                                finishAllLoading();
-                            } else {
-                                if (status.hasResolution()) {
-                                    // Try to resolve the save request. This will prompt the user if
-                                    // the credential is new.
-                                    try {
-                                        status.startResolutionForResult(getActivity(), RC_SAVE);
-                                    } catch (IntentSender.SendIntentException e) {
-                                        // Could not resolve the request
-                                        finishAllLoading();
-                                        onCredentialsSaveFailed();
-                                    }
-                                } else {
-                                    finishAllLoading();
-                                    onCredentialsSaveFailed();
-                                }
+                                AeriesFragment.this.onCredentialsSaved();
+                                AeriesFragment.this.finishAllLoading();
+                            }
+
+                            @Override
+                            public void onUnresolvableFailure(Status status) {
+                                AeriesFragment.this.finishAllLoading();
+                                AeriesFragment.this.onCredentialsSaveFailed();
                             }
                         }
 
@@ -404,7 +429,7 @@ public class AeriesFragment extends Fragment {
             onError(view, errorCode, description, failingUrl);
         }
 
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @TargetApi(Build.VERSION_CODES.M)
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             super.onReceivedError(view, request, error);
@@ -454,6 +479,7 @@ public class AeriesFragment extends Fragment {
                 if (mAttemptRequestCredentials) {
                     showIndeterminateProgressBar();
                     attemptRequestCredentials();
+                    mAttemptRequestCredentials = false;
                 } else {
                     finishAllLoading();
                 }

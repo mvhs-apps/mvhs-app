@@ -26,6 +26,10 @@
 
     <string name="nav_drawer_toolbar_prefix">"MVHS - "</string>
 
+    <string name="permission_needed">Permission Needed</string>
+    <string name="permission_needed_desc">Permission to access your phone\'s location is needed for certain map features.</string>
+    <string name="permission_denied_desc">Permission to access your phone\'s location is needed for certain map features, which will now be disabled.</string>
+
     <string name="proceed">To proceed, press yellow circle with arrow.</string>
     <string name="path_to">Path from %1$s to %2$s</string>
     <string name="total">Total: %1$.0f feet, about %2$.1f minutes</string>
