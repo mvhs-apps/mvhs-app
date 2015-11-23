@@ -92,6 +92,8 @@ public class MapActivity extends DrawerActivity {
     private Toolbar mNavToolbar;
     private FloatingActionButton mMyLocFab;
 
+    private boolean mNeedEnableLocation;
+
     @Override
     protected int getSelfNavDrawerItem() {
         return NAVDRAWER_ITEM_MAP;
@@ -201,9 +203,7 @@ public class MapActivity extends DrawerActivity {
                 (permissions.length == 1 &&
                         permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-            //Permission granted
-            getMap().setMyLocationEnabled(true);
-            mMyLocFab.setVisibility(View.VISIBLE);
+            onLocationPermissionGranted(getMap());
         } else {
             // Permission was denied. Display an error message.
             new MaterialDialog.Builder(this)
@@ -238,12 +238,13 @@ public class MapActivity extends DrawerActivity {
                         .cancelable(false)
                         .positiveText(android.R.string.ok)
                         .onPositive((materialDialog, dialogAction) -> requestLocationPermission())
-                        .onNegative((materialDialog, dialogAction) -> onLocationPermissionDenied())
                         .show();
             } else {
                 // No explanation needed, we can request the permission.
                 requestLocationPermission();
             }
+        } else {
+            mNeedEnableLocation = true;
         }
 
         //ADD MAP AND LIST FRAGMENTS
@@ -394,6 +395,12 @@ public class MapActivity extends DrawerActivity {
         overridePendingTransition(0, 0);
     }
 
+    private void onLocationPermissionGranted(GoogleMap map) {
+        //Permission granted
+        map.setMyLocationEnabled(true);
+        mMyLocFab.setVisibility(View.VISIBLE);
+    }
+
     private void onLocationPermissionDenied() {
         mMyLocFab.setVisibility(View.GONE);
     }
@@ -445,6 +452,11 @@ public class MapActivity extends DrawerActivity {
     }
 
     private void onMapReady(final GoogleMap googleMap, boolean initCamera) {
+        if (mNeedEnableLocation) {
+            onLocationPermissionGranted(googleMap);
+            mNeedEnableLocation = false;
+        }
+
         final boolean[] done = new boolean[1];
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         googleMap.getUiSettings().setMapToolbarEnabled(false);

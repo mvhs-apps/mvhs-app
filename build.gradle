@@ -8,8 +8,8 @@ buildscript {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.4.0-beta6'
-        classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta2'
+        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta3'
         classpath 'io.fabric.tools:gradle:1.20.1'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
 
@@ -30,7 +30,7 @@ allprojects {
 }
 
 task wrapper(type: Wrapper) {
-    distributionUrl = 'https\\://services.gradle.org/distributions/gradle-2.8-all.zip'
+    distributionUrl = 'https\\://services.gradle.org/distributions/gradle-2.9-all.zip'
 }
 
 
