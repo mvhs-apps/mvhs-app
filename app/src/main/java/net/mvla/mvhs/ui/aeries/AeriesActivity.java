@@ -1,4 +1,4 @@
-package net.mvla.mvhs.ui;
+package net.mvla.mvhs.ui.aeries;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import net.mvla.mvhs.R;
+import net.mvla.mvhs.ui.DrawerActivity;
 
 public class AeriesActivity extends DrawerActivity {
 

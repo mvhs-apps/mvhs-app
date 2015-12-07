@@ -208,7 +208,7 @@ public class MapActivity extends DrawerActivity {
             // Permission was denied. Display an error message.
             new MaterialDialog.Builder(this)
                     .title(R.string.permission_needed)
-                    .content(R.string.permission_needed_desc)
+                    .content(R.string.permission_denied_desc)
                     .cancelable(false)
                     .positiveText(android.R.string.ok)
                     .dismissListener(materialDialog -> onLocationPermissionDenied())

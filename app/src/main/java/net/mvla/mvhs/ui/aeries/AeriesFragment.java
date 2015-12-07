@@ -1,4 +1,4 @@
-package net.mvla.mvhs.ui;
+package net.mvla.mvhs.ui.aeries;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -53,6 +53,7 @@ public class AeriesFragment extends Fragment {
     public static final int RC_HINT = 2;
 
     private Credential mCurrentCredential;
+    private Credential mCredentialToSave;
 
     private EditText mUsernameEditText;
     private EditText mPasswordEditText;
@@ -61,7 +62,7 @@ public class AeriesFragment extends Fragment {
     private Handler mHandler;
 
     private boolean mLoggedIn;
-    private GoogleApiClient mCredentialsApiClient;
+    private GoogleApiClient mGoogleApiClient;
 
     private View mLoginLayout;
     private Button mLoginButton;
@@ -70,10 +71,8 @@ public class AeriesFragment extends Fragment {
 
     private boolean mIsResolving;
 
-    private boolean mConnected;
-    private boolean mConnectionFailed;
-
     private boolean mAttemptRequestCredentials = true;
+    private boolean mNeedToRequestCredentials = true;
 
     @Override
     public void onStart() {
@@ -103,21 +102,22 @@ public class AeriesFragment extends Fragment {
             mIsResolving = savedInstanceState.getBoolean(SAVE_STATE_RESOLVING);
         }
 
-        mCredentialsApiClient = new GoogleApiClient.Builder(getActivity())
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle bundle) {
-                        mConnected = true;
+                        saveCredentialIfConnected(mCredentialToSave);
+                        if (mNeedToRequestCredentials) {
+                            attemptRequestCredentials();
+                        }
                     }
 
                     @Override
                     public void onConnectionSuspended(int i) {
-                        //mCredentialsApiClient.reconnect();
                     }
                 })
                 .enableAutoManage(((AppCompatActivity) getActivity()), connectionResult -> {
-                    mConnected = false;
-                    mConnectionFailed = true;
+                    showSnackbarMessage("Error");
                 })
                 .addApi(Auth.CREDENTIALS_API)
                 .build();
@@ -194,7 +194,8 @@ public class AeriesFragment extends Fragment {
     }
 
 
-    private void onCredentialsSaved() {
+    private void onCredentialsSaved(Credential credential) {
+        mCurrentCredential = credential;
         showSnackbarMessage(getString(R.string.credentials_saved));
     }
 
@@ -211,28 +212,19 @@ public class AeriesFragment extends Fragment {
      * Request option 1: https://developers.google.com/identity/smartlock-passwords/android/overview
      */
     private void attemptRequestCredentials() {
+        if (mIsResolving) {
+            return;
+        }
+
+        mNeedToRequestCredentials = true;
         mLoginButton.setText(getString(R.string.retrieving_credentials));
 
-        new Thread(() -> {
-            for (int attempt = 0; attempt < 10 && !mConnected && !mConnectionFailed; attempt++) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+        CredentialRequest request = new CredentialRequest.Builder()
+                .setSupportsPasswordLogin(true)
+                .build();
 
-            if (!mConnected || mConnectionFailed) {
-                //Failed
-                finishAllLoading();
-                return;
-            }
-
-            CredentialRequest request = new CredentialRequest.Builder()
-                    .setSupportsPasswordLogin(true)
-                    .build();
-
-            Auth.CredentialsApi.request(mCredentialsApiClient, request).setResultCallback(
+        if (mGoogleApiClient.isConnected()) {
+            Auth.CredentialsApi.request(mGoogleApiClient, request).setResultCallback(
                     credentialRequestResult -> {
                         finishAllLoading();
                         final Status status = credentialRequestResult.getStatus();
@@ -247,13 +239,9 @@ public class AeriesFragment extends Fragment {
                         } else if (status.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
                             loadHints();
                         }
-
-                        /*else{
-                            //Unexpected
-                        }*/
                     });
-        }).start();
-
+            mNeedToRequestCredentials = false;
+        }
     }
 
     private void loadHints() {
@@ -266,7 +254,7 @@ public class AeriesFragment extends Fragment {
                 .build();
 
         PendingIntent intent =
-                Auth.CredentialsApi.getHintPickerIntent(mCredentialsApiClient, hintRequest);
+                Auth.CredentialsApi.getHintPickerIntent(mGoogleApiClient, hintRequest);
         try {
             getActivity().startIntentSenderForResult(intent.getIntentSender(), RC_HINT, null, 0, 0, 0);
             mIsResolving = true;
@@ -338,10 +326,11 @@ public class AeriesFragment extends Fragment {
                 break;
             case RC_SAVE:
                 if (resultCode == Activity.RESULT_OK) {
-                    onCredentialsSaved();
-                }/* else {
-                    //User chose not to save
-                }*/
+                    onCredentialsSaved(mCredentialToSave);
+                    mCredentialToSave = null;
+                } else {
+                    onCredentialsSaveFailed();
+                }
                 mIsResolving = false;
                 break;
         }
@@ -359,56 +348,52 @@ public class AeriesFragment extends Fragment {
         }
     }
 
-    private void attemptSaveCredentials() {
-        //Username and password fields are not empty
+    private void attemptSaveCredential() {
         if (!mUsernameEditText.getText().toString().isEmpty()
                 && !mPasswordEditText.getText().toString().isEmpty()) {
 
             final Credential credential = new Credential.Builder(mUsernameEditText.getText().toString())
                     .setPassword(mPasswordEditText.getText().toString())
                     .build();
+            saveCredentialIfConnected(credential);
+        }
+    }
 
-            if (mCurrentCredential == null || mCurrentCredential.describeContents() != credential.describeContents()) {
-                mSavingSnackbar = Snackbar.make(mWebView, R.string.saving_credentials, Snackbar.LENGTH_INDEFINITE);
-                mSavingSnackbar.show();
-            }
+    private void saveCredentialIfConnected(Credential credential) {
+        //Username and password fields are not empty
 
-            mCurrentCredential = credential;
+        if (credential == null) {
+            return;
+        }
 
-            new Thread(() -> {
-                for (int attempt = 0; attempt < 10 && !mConnected && !mConnectionFailed; attempt++) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+        if (mCurrentCredential == null || mCurrentCredential.describeContents() != credential.describeContents()) {
+            mSavingSnackbar = Snackbar.make(mWebView, R.string.saving_credentials, Snackbar.LENGTH_INDEFINITE);
+            mSavingSnackbar.show();
+        }
 
-                if (!mConnected || mConnectionFailed) {
-                    //Failed
-                    finishAllLoading();
-                    onCredentialsSaveFailed();
-                    return;
-                }
+        mCredentialToSave = credential;
 
-                Auth.CredentialsApi.save(mCredentialsApiClient, credential).setResultCallback(
-                        new ResolvingResultCallbacks<Status>(getActivity(), RC_SAVE) {
-                            @Override
-                            public void onSuccess(Status status) {
-                                // Credentials were saved
-                                AeriesFragment.this.onCredentialsSaved();
-                                AeriesFragment.this.finishAllLoading();
-                            }
+        if (mGoogleApiClient.isConnected()) {
+            Auth.CredentialsApi.save(mGoogleApiClient, credential).setResultCallback(
+                    new ResolvingResultCallbacks<Status>(getActivity(), RC_SAVE) {
+                        @Override
+                        public void onSuccess(Status status) {
+                            // Credentials were saved
+                            AeriesFragment.this.onCredentialsSaved(mCredentialToSave);
+                            AeriesFragment.this.finishAllLoading();
 
-                            @Override
-                            public void onUnresolvableFailure(Status status) {
-                                AeriesFragment.this.finishAllLoading();
-                                AeriesFragment.this.onCredentialsSaveFailed();
-                            }
+                            mCredentialToSave = null;
                         }
 
-                );
-            }).start();
+                        @Override
+                        public void onUnresolvableFailure(Status status) {
+                            AeriesFragment.this.finishAllLoading();
+                            AeriesFragment.this.onCredentialsSaveFailed();
+
+                            mCredentialToSave = null;
+                        }
+                    }
+            );
         }
     }
 
@@ -514,7 +499,7 @@ public class AeriesFragment extends Fragment {
                 mWebView.setFocusable(true);
 
                 //If fields are not empty
-                attemptSaveCredentials();
+                attemptSaveCredential();
             }
         }
 

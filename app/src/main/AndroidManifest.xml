@@ -28,7 +28,7 @@
         android:label="${appName}"
         android:theme="@style/Theme.MVHSApp.Light">
         <activity
-            android:name=".ui.AeriesActivity"
+            android:name=".ui.aeries.AeriesActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer">
         </activity>

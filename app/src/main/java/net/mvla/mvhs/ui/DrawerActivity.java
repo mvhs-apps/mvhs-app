@@ -30,6 +30,7 @@ import android.widget.Toast;
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.customtabs.CustomTabActivityHelper;
+import net.mvla.mvhs.ui.aeries.AeriesActivity;
 import net.mvla.mvhs.ui.schedulecalendar.ScheduleCalendarActivity;
 
 /**
