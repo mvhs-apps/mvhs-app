@@ -34,11 +34,19 @@ public class MapData {
             String name = location.getString(0);
             JSONArray coord = location.getJSONArray(1);
             JSONArray pathCoord = location.getJSONArray(2);
+
+            List<String> tags = new ArrayList<>();
+            if (location.length() == 4) {
+                JSONArray tagsArray = location.getJSONArray(3);
+                for (int j = 0; j < tagsArray.length(); j++) {
+                    tags.add(tagsArray.getString(j));
+                }
+            }
             LocationNode node = new LocationNode(
                     coord.getDouble(0), coord.getDouble(1),
                     pathCoord.getDouble(0), pathCoord.getDouble(1),
-                    name
-            );
+                    name,
+                    tags);
             locationNodeMap.put(node.latLng, node);
         }
 

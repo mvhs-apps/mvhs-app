@@ -100,6 +100,7 @@ public class AeriesFragment extends Fragment {
 
         if (savedInstanceState != null) {
             mIsResolving = savedInstanceState.getBoolean(SAVE_STATE_RESOLVING);
+            mCurrentCredential = savedInstanceState.getParcelable(SAVE_STATE_CREDENTIAL);
         }
 
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())

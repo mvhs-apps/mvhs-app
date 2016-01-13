@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,7 +78,12 @@ public class MapListFragment extends Fragment {
         public void onBindViewHolder(ArtViewHolder holder, int i) {
             LocationNode location = mLocations.get(i);
             holder.title.setText(location.getName());
-            //holder.desc.setText(text);
+            if (location.getTags().size() > 0) {
+                holder.desc.setText(TextUtils.join(",", location.getTags()));
+                holder.desc.setVisibility(View.VISIBLE);
+            } else {
+                holder.desc.setVisibility(View.GONE);
+            }
         }
 
         public void updateDataAndSearch(String string) {

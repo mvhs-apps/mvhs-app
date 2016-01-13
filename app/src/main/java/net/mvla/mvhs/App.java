@@ -3,6 +3,7 @@ package net.mvla.mvhs;
 import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.leakcanary.LeakCanary;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -11,7 +12,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        //LeakCanary.install(this);
+        LeakCanary.install(this);
         if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
