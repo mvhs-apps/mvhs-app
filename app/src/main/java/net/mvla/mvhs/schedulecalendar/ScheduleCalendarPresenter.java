@@ -1,4 +1,4 @@
-package net.mvla.mvhs.ui.schedulecalendar;
+package net.mvla.mvhs.schedulecalendar;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import com.crashlytics.android.Crashlytics;
 import net.mvla.mvhs.BuildConfig;
 import net.mvla.mvhs.MvpPresenter;
 import net.mvla.mvhs.PrefUtils;
-import net.mvla.mvhs.model.BellSchedule;
+import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedule;
 import net.mvla.mvhs.ui.WelcomeActivity;
 
 import java.util.Calendar;

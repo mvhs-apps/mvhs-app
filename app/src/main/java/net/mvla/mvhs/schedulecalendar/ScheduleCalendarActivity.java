@@ -1,4 +1,4 @@
-package net.mvla.mvhs.ui.schedulecalendar;
+package net.mvla.mvhs.schedulecalendar;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -32,9 +32,9 @@ import net.mvla.mvhs.MvpPresenterHolder;
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.Utils;
-import net.mvla.mvhs.model.BellSchedule;
-import net.mvla.mvhs.model.BellSchedulePeriod;
-import net.mvla.mvhs.model.UserPeriodInfo;
+import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedule;
+import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedulePeriod;
+import net.mvla.mvhs.schedulecalendar.bellschedule.UserPeriodInfo;
 import net.mvla.mvhs.ui.DrawerActivity;
 
 import java.util.Calendar;

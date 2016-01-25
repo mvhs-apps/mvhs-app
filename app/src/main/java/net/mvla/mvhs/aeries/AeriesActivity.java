@@ -1,4 +1,4 @@
-package net.mvla.mvhs.ui.aeries;
+package net.mvla.mvhs.aeries;
 
 import android.app.Fragment;
 import android.app.FragmentManager;

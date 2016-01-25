@@ -1,10 +1,10 @@
-package net.mvla.mvhs.ui.schedulecalendar;
+package net.mvla.mvhs.schedulecalendar;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 
 import net.mvla.mvhs.MvpView;
-import net.mvla.mvhs.model.BellSchedule;
+import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedule;
 
 import java.util.Calendar;
 import java.util.List;

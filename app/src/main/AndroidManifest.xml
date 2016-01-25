@@ -28,12 +28,12 @@
         android:label="${appName}"
         android:theme="@style/Theme.MVHSApp.Light">
         <activity
-            android:name=".ui.aeries.AeriesActivity"
+            android:name=".aeries.AeriesActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer">
         </activity>
         <activity
-            android:name=".ui.MapActivity"
+            android:name=".map.MapActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MVHSApp.Light.Map">
         </activity>
@@ -42,7 +42,7 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer" />
         <activity
-            android:name=".ui.schedulecalendar.ScheduleCalendarActivity"
+            android:name=".schedulecalendar.ScheduleCalendarActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.MVHSApp.Launch">
             <intent-filter>

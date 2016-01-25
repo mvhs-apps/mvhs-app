@@ -1,4 +1,4 @@
-package net.mvla.mvhs.ui;
+package net.mvla.mvhs.map;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
@@ -43,10 +43,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import net.mvla.mvhs.BuildConfig;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.Utils;
-import net.mvla.mvhs.map.LocationNode;
-import net.mvla.mvhs.map.MapData;
-import net.mvla.mvhs.map.Node;
-import net.mvla.mvhs.map.TwoNodes;
+import net.mvla.mvhs.ui.DrawerActivity;
 import net.mvla.mvhs.widget.SearchView;
 
 import org.json.JSONException;

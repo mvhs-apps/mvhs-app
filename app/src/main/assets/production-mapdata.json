@@ -53,7 +53,8 @@
       [
         37.359889,
         -122.068003
-      ]
+      ],
+      ["Class schedule copy", "printer"]
     ],
     [
       "Conf Room",
@@ -230,9 +231,7 @@
         37.360408,
         -122.067855
       ],
-      [
-        "ID Cards (replacement)"
-      ]
+      ["ID cards (replacement)", "money", "parking permits", "reduced lunch", "bus pass", "buy dance tickets", "buy yearbook", "buy PE clothes", "dance guest pass", "lockers"]
     ],
     [
       "Registrar",
@@ -243,7 +242,8 @@
       [
         37.360408,
         -122.067942
-      ]
+      ],
+      ["Grade change", "transcripts"]
     ],
     [
       "Counseling",
@@ -254,10 +254,11 @@
       [
         37.360347,
         -122.067745
-      ]
+      ],
+      ["Counselors", "counseling appointment", "schedule change"]
     ],
     [
-      "Attendence ",
+      "Attendence",
       [
         37.360205,
         -122.067864
@@ -265,7 +266,8 @@
       [
         37.360205,
         -122.068003
-      ]
+      ],
+      ["Attendance correction"]
     ],
     [
       "Health/Resource",

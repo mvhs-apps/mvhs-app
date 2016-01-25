@@ -1,4 +1,4 @@
-package net.mvla.mvhs.ui.schedulecalendar;
+package net.mvla.mvhs.schedulecalendar;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,13 +7,15 @@ import android.util.Pair;
 import com.squareup.okhttp.ResponseBody;
 
 import net.mvla.mvhs.Utils;
-import net.mvla.mvhs.model.BellSchedule;
-import net.mvla.mvhs.model.BellSchedulePeriod;
-import net.mvla.mvhs.model.sheet.Entry;
-import net.mvla.mvhs.model.sheet.RootSheetElement;
+import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedule;
+import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedulePeriod;
+import net.mvla.mvhs.schedulecalendar.sheet.Entry;
+import net.mvla.mvhs.schedulecalendar.sheet.RootSheetElement;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -28,7 +30,6 @@ import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
 import retrofit.http.GET;
 import rx.Single;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class ScheduleCalendarModel {
@@ -44,7 +45,7 @@ public class ScheduleCalendarModel {
         return Single.zip(
                 getEventsFromSelectedDay(selectedDate),
                 getBellScheduleSheetEntries(),
-                (Func2<List<VEvent>, List<Entry>, Pair<List<VEvent>, List<Entry>>>) Pair::new
+                Pair::new
         )
                 .subscribeOn(Schedulers.io())
                 .flatMap(eventsAndSheet -> getBellScheduleAndEvents(eventsAndSheet, selectedDate));
@@ -135,13 +136,24 @@ public class ScheduleCalendarModel {
                 if (findCol == null) {
                     if (cellRow.equals("1")) {
                         //Iterating through schedule names - decide column
-                        for (Iterator<VEvent> iterator = calendarEvents.iterator(); iterator.hasNext(); ) {
-                            VEvent vEvent = iterator.next();
-                            String value = vEvent.getSummary().getValue();
-                            if (cellContent.startsWith(value.split("\\|")[0])) {
+
+                        SimpleDateFormat format = new SimpleDateFormat("M/dd/yyyy");
+                        try {
+                            if (format.parse(cellContent).equals(selectedDate.getTime())) {
                                 schedule.name = cellContent;
                                 findCol = cellCol;
-                                iterator.remove();
+                            }
+                        } catch (ParseException e) {
+                            //Nope.
+                            for (Iterator<VEvent> iterator = calendarEvents.iterator(); iterator.hasNext(); ) {
+                                VEvent vEvent = iterator.next();
+                                String value = vEvent.getSummary().getValue();
+                                if (cellContent.startsWith(value.split("\\|")[0])) {
+                                    schedule.name = cellContent;
+                                    findCol = cellCol;
+                                    iterator.remove();
+                                    break;
+                                }
                             }
                         }
                     } else {

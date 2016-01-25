@@ -25,7 +25,7 @@ import android.widget.TextView;
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
 import net.mvla.mvhs.Utils;
-import net.mvla.mvhs.model.UserPeriodInfo;
+import net.mvla.mvhs.schedulecalendar.bellschedule.UserPeriodInfo;
 
 
 /**

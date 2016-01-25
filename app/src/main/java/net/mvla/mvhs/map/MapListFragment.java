@@ -1,4 +1,4 @@
-package net.mvla.mvhs.ui;
+package net.mvla.mvhs.map;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.mvla.mvhs.R;
-import net.mvla.mvhs.map.LocationNode;
-import net.mvla.mvhs.map.MapData;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,7 +77,7 @@ public class MapListFragment extends Fragment {
             LocationNode location = mLocations.get(i);
             holder.title.setText(location.getName());
             if (location.getTags().size() > 0) {
-                holder.desc.setText(TextUtils.join(",", location.getTags()));
+                holder.desc.setText(TextUtils.join(", ", location.getTags()));
                 holder.desc.setVisibility(View.VISIBLE);
             } else {
                 holder.desc.setVisibility(View.GONE);
