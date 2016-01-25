@@ -1,42 +1,42 @@
 
-package net.mvla.mvhs.model.sheet;
+package net.mvla.mvhs.backend.model.sheet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Author {
+public class Title {
 
-    private Name name;
-    private Email email;
+    private String type;
+    private String $t;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * @return The name
+     * @return The type
      */
-    public Name getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
     /**
-     * @param name The name
+     * @param type The type
      */
-    public void setName(Name name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     /**
-     * @return The email
+     * @return The $t
      */
-    public Email getEmail() {
-        return email;
+    public String get$t() {
+        return $t;
     }
 
     /**
-     * @param email The email
+     * @param $t The $t
      */
-    public void setEmail(Email email) {
-        this.email = email;
+    public void set$t(String $t) {
+        this.$t = $t;
     }
 
     public Map<String, Object> getAdditionalProperties() {

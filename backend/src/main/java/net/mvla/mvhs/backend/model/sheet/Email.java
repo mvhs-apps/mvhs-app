@@ -1,11 +1,11 @@
 
-package net.mvla.mvhs.model.sheet;
+package net.mvla.mvhs.backend.model.sheet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Name {
+public class Email {
 
     private String $t;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();

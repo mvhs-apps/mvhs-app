@@ -1,29 +1,14 @@
 
-package net.mvla.mvhs.model.sheet;
+package net.mvla.mvhs.backend.model.sheet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Title {
+public class OpenSearch$startIndex {
 
-    private String type;
     private String $t;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    /**
-     * @return The type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @param type The type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
 
     /**
      * @return The $t

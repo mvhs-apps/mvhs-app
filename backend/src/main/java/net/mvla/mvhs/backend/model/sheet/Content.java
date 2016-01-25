@@ -1,30 +1,15 @@
 
-package net.mvla.mvhs.model.sheet;
+package net.mvla.mvhs.backend.model.sheet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Link {
+public class Content {
 
-    private String rel;
     private String type;
-    private String href;
+    private String $t;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    /**
-     * @return The rel
-     */
-    public String getRel() {
-        return rel;
-    }
-
-    /**
-     * @param rel The rel
-     */
-    public void setRel(String rel) {
-        this.rel = rel;
-    }
 
     /**
      * @return The type
@@ -41,17 +26,17 @@ public class Link {
     }
 
     /**
-     * @return The href
+     * @return The $t
      */
-    public String getHref() {
-        return href;
+    public String get$t() {
+        return $t;
     }
 
     /**
-     * @param href The href
+     * @param $t The $t
      */
-    public void setHref(String href) {
-        this.href = href;
+    public void set$t(String $t) {
+        this.$t = $t;
     }
 
     public Map<String, Object> getAdditionalProperties() {

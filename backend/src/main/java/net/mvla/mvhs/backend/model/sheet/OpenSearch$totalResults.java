@@ -1,11 +1,11 @@
 
-package net.mvla.mvhs.model.sheet;
+package net.mvla.mvhs.backend.model.sheet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Updated_ {
+public class OpenSearch$totalResults {
 
     private String $t;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();

@@ -1,6 +1,4 @@
-package net.mvla.mvhs.model;
-
-import android.support.annotation.NonNull;
+package net.mvla.mvhs.backend.model;
 
 import java.io.Serializable;
 
@@ -18,7 +16,7 @@ public class BellSchedulePeriod implements Comparable, Serializable {
     }
 
     @Override
-    public int compareTo(@NonNull Object another) {
+    public int compareTo(Object another) {
         BellSchedulePeriod o = (BellSchedulePeriod) another;
 
         if (startHour < o.startHour || (startHour == o.startHour && startMinute < o.startMinute)) {

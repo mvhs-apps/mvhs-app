@@ -1,4 +1,4 @@
-package net.mvla.mvhs.model;
+package net.mvla.mvhs.backend.model;
 
 import java.io.Serializable;
 

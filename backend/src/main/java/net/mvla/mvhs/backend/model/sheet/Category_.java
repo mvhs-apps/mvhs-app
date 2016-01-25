@@ -1,11 +1,11 @@
 
-package net.mvla.mvhs.model.sheet;
+package net.mvla.mvhs.backend.model.sheet;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class Category {
+public class Category_ {
 
     private String scheme;
     private String term;
