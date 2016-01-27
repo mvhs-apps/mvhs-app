@@ -10,6 +10,7 @@
     <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="google_classroom">Google Classroom</string>
+    <string name="feedback">Feedback/Bugs</string>
 
     <string-array name="nav_drawer_items">
         <item>@string/schedule_and_calendar</item>
@@ -21,6 +22,7 @@
         <item>SEPARATOR</item>
         <item>@string/settings</item>
         <item>@string/changelog</item>
+        <item>@string/feedback</item>
         <item>@string/about</item>
     </string-array>
 
@@ -92,4 +94,16 @@
     <string name="bell_schedule_no_school">Bell Schedule: No School</string>
     <string name="no_school_events">School Events: None</string>
     <string name="schedule_calendar_disclaimer">Disclaimer: The above information may not be fully accurate or finalized due to various unforeseen reasons.  It is important to double check with the school website for the <a href="https://calendar.google.com/calendar/embed?src=mvla.net_3236303434383738363838%40resource.calendar.google.com&amp;ctz=America/Los_Angeles">official school calendar</a> and bell schedule.</string>
+
+    <string name="send_bug">Send Bug</string>
+    <string name="feedback_type">Feedback Type</string>
+    <string name="bug_report">Bug Report</string>
+    <string name="general_feedback">General Feedback</string>
+    <string-array name="bugs">
+        <item>General Feedback/Suggestions</item>
+        <item>Bug: Calendar/Bell Schedule</item>
+        <item>Bug: School Map</item>
+        <item>Bug: Aeries Sign-in</item>
+    </string-array>
+
 </resources>

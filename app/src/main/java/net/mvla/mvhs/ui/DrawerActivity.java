@@ -47,6 +47,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
     private static final int NAVDRAWER_ITEM_SETTINGS = -3;
     private static final int NAVDRAWER_ITEM_CHANGELOG = -4;
+    private static final int NAVDRAWER_ITEM_FEEDBACK = -6;
     private static final int NAVDRAWER_ITEM_ABOUT = -5;
     private static final int NAVDRAWER_ITEM_INVALID = -1;
     private static final int NAVDRAWER_ITEM_SEPARATOR = -2;
@@ -61,6 +62,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             NAVDRAWER_ITEM_SEPARATOR,
             NAVDRAWER_ITEM_SETTINGS,
             NAVDRAWER_ITEM_CHANGELOG,
+            NAVDRAWER_ITEM_FEEDBACK,
             NAVDRAWER_ITEM_ABOUT
     };
     private static final int[] NAVDRAWER_ITEMS_ICONS = new int[]{
@@ -73,6 +75,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             NAVDRAWER_ITEM_SEPARATOR,
             R.drawable.ic_settings_black_24dp,
             R.drawable.ic_trending_up_24dp,
+            R.drawable.ic_feedback_black_24dp,
             R.drawable.ic_info_black_24dp
     };
 
@@ -324,7 +327,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 && itemId != NAVDRAWER_ITEM_CHANGELOG
                 && itemId != NAVDRAWER_ITEM_ABOUT
                 && itemId != NAVDRAWER_ITEM_MVHSSITE
-                && itemId != NAVDRAWER_ITEM_GCLASSROOM;
+                && itemId != NAVDRAWER_ITEM_GCLASSROOM
+                && itemId != NAVDRAWER_ITEM_FEEDBACK;
     }
 
     boolean isNavDrawerOpen() {
@@ -398,6 +402,9 @@ public abstract class DrawerActivity extends AppCompatActivity {
                             }
                     );
                 }
+                return;
+            case NAVDRAWER_ITEM_FEEDBACK:
+                new FeedbackDialog().show(getFragmentManager(), "FEEDBACK");
                 return;
             default:
                 Toast.makeText(getApplicationContext(), "Work in Progress",
