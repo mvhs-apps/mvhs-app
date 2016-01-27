@@ -355,6 +355,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
                 CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
                         .setToolbarColor(ContextCompat.getColor(this, R.color.primary))
+                        .enableUrlBarHiding()
+                        .setShowTitle(true)
                         .build();
                 CustomTabActivityHelper.openCustomTab(
                         this, customTabsIntent, website, (activity, uri) -> {
@@ -385,6 +387,8 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
                     CustomTabsIntent tabsIntent = new CustomTabsIntent.Builder()
                             .setToolbarColor(ContextCompat.getColor(this, R.color.primary))
+                            .enableUrlBarHiding()
+                            .setShowTitle(true)
                             .build();
                     CustomTabActivityHelper.openCustomTab(
                             this, tabsIntent, gclassroom, (activity, uri) -> {

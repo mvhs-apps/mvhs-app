@@ -28,9 +28,6 @@ import java.util.List;
 
 /**
  * Helper class for Custom Tabs.
- * <p>
- * <p>
- * Stolen from https://github.com/GoogleChrome/custom-tabs-client
  */
 public class CustomTabsHelper {
     static final String STABLE_PACKAGE = "com.android.chrome";
@@ -58,7 +55,7 @@ public class CustomTabsHelper {
      * Goes through all apps that handle VIEW intents and have a warmup service. Picks
      * the one chosen by the user if there is one, otherwise makes a best effort to return a
      * valid package name.
-     * <p>
+     *
      * This is <strong>not</strong> threadsafe.
      *
      * @param context {@link Context} to use for accessing {@link PackageManager}.
@@ -112,7 +109,6 @@ public class CustomTabsHelper {
 
     /**
      * Used to check whether there is a specialized handler for a given intent.
-     *
      * @param intent The intent to check with.
      * @return Whether there is a specialized handler for the given intent.
      */

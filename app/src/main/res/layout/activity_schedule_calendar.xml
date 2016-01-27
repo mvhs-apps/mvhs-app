@@ -95,6 +95,7 @@
                     android:id="@+id/fragment_schedule_bell_schedule"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="0.41dp"
                     android:layout_marginLeft="5.41dp"
                     android:layout_marginRight="5.41dp"
                     android:layout_marginTop="4.41dp"
@@ -148,7 +149,7 @@
                     android:layout_marginBottom="4.41dp"
                     android:layout_marginLeft="5.41dp"
                     android:layout_marginRight="5.41dp"
-                    android:layout_marginTop="4.41dp"
+                    android:layout_marginTop="0.41dp"
                     app:cardCornerRadius="2dp"
                     app:cardElevation="2dp"
                     app:cardUseCompatPadding="true">
