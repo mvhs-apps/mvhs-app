@@ -4,8 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Pair;
 
-import com.squareup.okhttp.ResponseBody;
-
 import net.mvla.mvhs.Utils;
 import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedule;
 import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedulePeriod;
@@ -25,10 +23,11 @@ import java.util.List;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
-import retrofit.http.GET;
+import okhttp3.ResponseBody;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Retrofit;
+import retrofit2.RxJavaCallAdapterFactory;
+import retrofit2.http.GET;
 import rx.Single;
 import rx.schedulers.Schedulers;
 

@@ -729,8 +729,7 @@ public class MapActivity extends DrawerActivity {
         LatLngBounds mapBounds = new LatLngBounds(new LatLng(37.359014, -122.068730),
                 new LatLng(37.361323, -122.065080));
         GroundOverlayOptions schoolMap = new GroundOverlayOptions()
-                .image(BitmapDescriptorFactory.fromResource(
-                        mDebugMode ? R.drawable.map_debug : R.drawable.map))
+                .image(BitmapDescriptorFactory.fromResource(R.drawable.map))
                 .transparency(0.1f)
                 .positionFromBounds(mapBounds);
         googleMap.addGroundOverlay(schoolMap);

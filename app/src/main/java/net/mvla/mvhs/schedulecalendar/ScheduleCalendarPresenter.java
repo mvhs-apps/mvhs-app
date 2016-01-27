@@ -142,7 +142,7 @@ public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView
         if (isViewAttached()) {
             //noinspection ConstantConditions
             ConnectivityManager connMgr =
-                    (ConnectivityManager) getView().getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                    (ConnectivityManager) getView().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             return (networkInfo != null && networkInfo.isConnected());
         } else {

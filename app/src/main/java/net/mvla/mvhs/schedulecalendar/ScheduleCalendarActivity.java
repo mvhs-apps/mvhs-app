@@ -9,8 +9,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.widget.CardView;
 import android.text.format.DateUtils;
+import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -244,6 +246,8 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
         mEventsTitle = (TextView) findViewById(R.id.fragment_schedule_events_title);
         mDisclaimer = (TextView) findViewById(R.id.fragment_schedule_disclaimer);
 
+        mDisclaimer.setMovementMethod(LinkMovementMethod.getInstance());
+
         mTitleTextBar.setOnClickListener(v -> {
             animateToggleCalendar();
         });
@@ -281,6 +285,7 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
             mPresenter.onDateChanged(date.getCalendar());
             ScheduleCalendarActivity.this.animateToggleCalendar();
         });
+        mCalendarView.setDynamicHeightEnabled(true);
 
         mPresenter = MvpPresenterHolder.getInstance().getPresenter(ScheduleCalendarPresenter.class);
         if (mPresenter == null) {
@@ -318,12 +323,16 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
             mAppBar.setLayoutParams(params);
         });
 
+        animator.setInterpolator(new FastOutSlowInInterpolator());
+
         ObjectAnimator animatorSpin;
         if (needExpand) {
             animatorSpin = ObjectAnimator.ofFloat(mCalendarDropdownImage, ImageView.ROTATION, 180);
         } else {
             animatorSpin = ObjectAnimator.ofFloat(mCalendarDropdownImage, ImageView.ROTATION, 0f);
         }
+
+        animatorSpin.setInterpolator(new FastOutSlowInInterpolator());
 
         set.setDuration(300);
         set.play(animator).with(animatorSpin);

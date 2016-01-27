@@ -91,5 +91,5 @@
     <string name="school_events">School Events</string>
     <string name="bell_schedule_no_school">Bell Schedule: No School</string>
     <string name="no_school_events">School Events: None</string>
-    <string name="schedule_calendar_disclaimer">Disclaimer: Although the above information should come from the school calendar and bell schedule, it may not be final. Please check the school website for the official school calendar and bell schedule.</string>
+    <string name="schedule_calendar_disclaimer">Disclaimer: The above information may not be fully accurate or finalized due to various unforeseen reasons.  It is important to double check with the school website for the <a href="https://calendar.google.com/calendar/embed?src=mvla.net_3236303434383738363838%40resource.calendar.google.com&amp;ctz=America/Los_Angeles">official school calendar</a> and bell schedule.</string>
 </resources>

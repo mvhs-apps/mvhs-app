@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
-    android:id="@id/activity_drawer_drawerlayout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@id/activity_drawer_drawerlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -44,14 +43,14 @@
                         android:id="@id/activity_schedule_title_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Today - Sep 17"
-                        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
+                        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+                        tools:text="Today - Sep 17" />
 
                     <ImageView
                         android:id="@id/activity_schedule_calendar_dropdown_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="Menu Dropdown"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_arrow_drop_down_24dp" />
                 </LinearLayout>
 
@@ -96,11 +95,12 @@
                     android:id="@+id/fragment_schedule_bell_schedule"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="5.41dp"
+                    android:layout_marginRight="5.41dp"
+                    android:layout_marginTop="4.41dp"
                     app:cardCornerRadius="2dp"
-                    app:cardElevation="2dp">
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -145,9 +145,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/fragment_schedule_bell_schedule"
-                    android:layout_margin="8dp"
+                    android:layout_marginBottom="4.41dp"
+                    android:layout_marginLeft="5.41dp"
+                    android:layout_marginRight="5.41dp"
+                    android:layout_marginTop="4.41dp"
                     app:cardCornerRadius="2dp"
-                    app:cardElevation="2dp">
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true">
 
                     <LinearLayout
                         android:id="@id/fragment_schedule_events_linear"
@@ -178,7 +182,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/fragment_schedule_events"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="16dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"

@@ -77,7 +77,7 @@ public class MapListFragment extends Fragment {
             LocationNode location = mLocations.get(i);
             holder.title.setText(location.getName());
             if (location.getTags().size() > 0) {
-                holder.desc.setText(TextUtils.join(", ", location.getTags()));
+                holder.desc.setText(TextUtils.join("\n", location.getTags()));
                 holder.desc.setVisibility(View.VISIBLE);
             } else {
                 holder.desc.setVisibility(View.GONE);

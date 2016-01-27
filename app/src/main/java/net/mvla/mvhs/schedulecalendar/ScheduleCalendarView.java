@@ -26,4 +26,6 @@ public interface ScheduleCalendarView extends MvpView {
     Context getContext();
 
     void openCalendarView();
+
+    Context getApplicationContext();
 }
