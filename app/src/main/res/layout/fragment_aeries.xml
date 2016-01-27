@@ -17,41 +17,58 @@
         android:background="@color/background_material_light"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="12dp"
+        android:padding="16dp"
         android:visibility="gone"
         tools:visibility="visible">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="16dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/aeries_logo"
-            android:paddingLeft="48dp"
-            android:paddingRight="48dp"
-            android:src="@drawable/aeries_sis_logo" />
+            android:paddingLeft="96dp"
+            android:paddingRight="96dp"
+            android:src="@drawable/aeries_sis" />
 
-        <EditText
-            android:id="@id/fragment_aeries_login_username"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/email"
-            android:inputType="textEmailAddress" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@id/fragment_aeries_login_password"
+            <EditText
+                android:id="@id/fragment_aeries_login_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress" />
+        </android.support.design.widget.TextInputLayout>
+
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:inputType="textPassword" />
+            android:layout_height="16dp" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@id/fragment_aeries_login_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password"
+                android:inputType="textPassword" />
+        </android.support.design.widget.TextInputLayout>
+
 
         <Button
             android:id="@id/fragment_aeries_login_button"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:text="@string/login" />
+            android:layout_marginTop="24dp"
+            android:text="@string/login"
+            android:theme="@style/Theme.MVHSApp.Light.YellowAccent" />
 
     </LinearLayout>
 

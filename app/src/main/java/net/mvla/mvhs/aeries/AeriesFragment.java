@@ -13,8 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -162,8 +160,6 @@ public class AeriesFragment extends Fragment {
             login(mUsernameEditText.getText().toString(), mPasswordEditText.getText().toString());
             Utils.hideSoftKeyBoard(getActivity());
         });
-
-        ViewCompat.setBackgroundTintList(mLoginButton, ContextCompat.getColorStateList(getActivity(), R.color.button_color_list));
 
         if (savedInstanceState == null) {
             mWebView.loadUrl("https://mvla.asp.aeries.net/student/LoginParent.aspx");
