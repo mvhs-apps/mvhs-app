@@ -1,7 +1,6 @@
 package net.mvla.mvhs.backend;
 
 import com.google.appengine.repackaged.com.google.common.base.Pair;
-import com.squareup.okhttp.ResponseBody;
 
 import net.mvla.mvhs.backend.model.BellSchedule;
 import net.mvla.mvhs.backend.model.BellSchedulePeriod;
@@ -20,10 +19,11 @@ import java.util.List;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
-import retrofit.http.GET;
+import okhttp3.ResponseBody;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Retrofit;
+import retrofit2.RxJavaCallAdapterFactory;
+import retrofit2.http.GET;
 import rx.Single;
 import rx.schedulers.Schedulers;
 

@@ -10,12 +10,13 @@ import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedulePeriod;
 import net.mvla.mvhs.schedulecalendar.sheet.Entry;
 import net.mvla.mvhs.schedulecalendar.sheet.RootSheetElement;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -88,11 +89,9 @@ public class ScheduleCalendarModel {
             } catch (IOException e) {
                 subscriber.onError(e);
             }
-            File file = new File(mContext.getCacheDir(), "basic.ics");
-            Utils.saveBytesToFile(calBytes, file.getPath());
             ICalendar calendar;
             try {
-                calendar = Biweekly.parse(file).first();
+                calendar = Biweekly.parse(new ByteArrayInputStream(calBytes)).first();
             } catch (IOException e) {
                 subscriber.onError(e);
                 return;
@@ -138,7 +137,10 @@ public class ScheduleCalendarModel {
 
                         SimpleDateFormat format = new SimpleDateFormat("M/dd/yyyy");
                         try {
-                            if (format.parse(cellContent).equals(selectedDate.getTime())) {
+                            Date date = format.parse(cellContent);
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTime(date);
+                            if (Utils.sameDay(calendar, selectedDate)) {
                                 schedule.name = cellContent;
                                 findCol = cellCol;
                             }
