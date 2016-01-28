@@ -15,16 +15,20 @@
 #   public *;
 #}
 
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable,*Annotation*,Signature,Exceptions
 
 #retrolambda
 -dontwarn java.lang.invoke.*
 #retrofit
--dontwarn retrofit.**
--keep class retrofit.** { *; }
--keepattributes Signature
--keepattributes Exceptions
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keep interface retrofit2.** { *; }
 
+#crashlytics
+-keep class com.crashlytics.** { *; }
+-keep class com.crashlytics.android.**
+
+-keep class biweekly.** { *; }
 
 #rxjava
 -dontwarn sun.misc.**
@@ -35,10 +39,20 @@
 }
 
 -keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
-   long producerNode;
-   long consumerNode;
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode consumerNode;
 }
 
 #okio
--dontwarn java.nio.**
--dontwarn org.codehaus.mojo.animal_sniffer.**
+-keep class sun.misc.Unsafe { *; }
+-dontwarn java.nio.file.*
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn okio.**
+
+#okhttp
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
