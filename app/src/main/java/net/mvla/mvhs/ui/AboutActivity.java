@@ -2,7 +2,9 @@ package net.mvla.mvhs.ui;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,9 +33,13 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, android.R.color.transparent));
+        }
 
-        TextView view = (TextView) findViewById(R.id.activity_about_appname_textview);
-        view.setText(getString(R.string.app_name) + " v" + BuildConfig.VERSION_NAME);
+
+        // TextView view = (TextView) findViewById(R.id.activity_about_appname_textview);
+        setTitle(getString(R.string.app_name) + " v" + BuildConfig.VERSION_NAME);
 
         mDevelopers = new ArrayList<>();
 
@@ -71,7 +77,6 @@ public class AboutActivity extends AppCompatActivity {
 
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setTitle(R.string.about);
     }
 
     private int getDevStringResource(String i) {

@@ -43,14 +43,14 @@
                         android:id="@id/activity_schedule_title_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Today - Sep 17"
-                        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title" />
+                        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+                        tools:text="Today - Sep 17" />
 
                     <ImageView
                         android:id="@id/activity_schedule_calendar_dropdown_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:contentDescription="Menu Dropdown"
+                        android:contentDescription="@null"
                         android:src="@drawable/ic_arrow_drop_down_24dp" />
                 </LinearLayout>
 
@@ -71,11 +71,128 @@
             android:layout_below="@id/activity_schedule_appbar"
             android:background="?toolbarShadow" />
 
-        <FrameLayout
-            android:id="@id/activity_schedule_fragment"
+        <ScrollView
+            android:id="@id/fragment_schedule_scrollview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/activity_schedule_appbar" />
+            android:layout_below="@id/activity_schedule_appbar"
+            android:background="@color/background_light_darker"
+            android:clipToPadding="false">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="128dp">
+
+                <ProgressBar
+                    android:id="@id/list_item_schedule_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="true" />
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/fragment_schedule_bell_schedule"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="0.41dp"
+                    android:layout_marginLeft="5.41dp"
+                    android:layout_marginRight="5.41dp"
+                    android:layout_marginTop="4.41dp"
+                    app:cardCornerRadius="2dp"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@id/list_item_schedule_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="47dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginRight="16dp"
+                            android:drawableLeft="@drawable/ic_notifications_16dp"
+                            android:drawablePadding="8dp"
+                            android:drawableStart="@drawable/ic_notifications_16dp"
+                            android:gravity="center_vertical"
+                            android:singleLine="true"
+                            android:textColor="?android:textColorSecondary"
+                            android:textSize="13sp"
+                            tools:text="Bell Schedule E: Modified Thurs. Block" />
+
+                        <HorizontalScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fillViewport="true">
+
+                            <TableLayout
+                                android:id="@id/list_item_schedule_table"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:clipToPadding="false">
+
+                            </TableLayout>
+
+                        </HorizontalScrollView>
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:id="@id/fragment_schedule_events"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/fragment_schedule_bell_schedule"
+                    android:layout_marginBottom="4.41dp"
+                    android:layout_marginLeft="5.41dp"
+                    android:layout_marginRight="5.41dp"
+                    android:layout_marginTop="0.41dp"
+                    app:cardCornerRadius="2dp"
+                    app:cardElevation="2dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:id="@id/fragment_schedule_events_linear"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@id/fragment_schedule_events_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="47dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginRight="16dp"
+                            android:drawableLeft="@drawable/ic_event_note_16dp"
+                            android:drawablePadding="8dp"
+                            android:drawableStart="@drawable/ic_event_note_16dp"
+                            android:gravity="center_vertical"
+                            android:singleLine="true"
+                            android:text="@string/school_events"
+                            android:textColor="?android:textColorSecondary"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <TextView
+                    android:id="@id/fragment_schedule_disclaimer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/fragment_schedule_events"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/schedule_calendar_disclaimer" />
+
+
+            </RelativeLayout>
+
+        </ScrollView>
 
     </RelativeLayout>
 

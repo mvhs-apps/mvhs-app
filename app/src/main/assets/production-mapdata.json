@@ -12,7 +12,7 @@
       ]
     ],
     [
-      "Cafeteria ",
+      "Cafeteria",
       [
         37.359823,
         -122.068175
@@ -53,10 +53,14 @@
       [
         37.359889,
         -122.068003
+      ],
+      [
+        "Class schedule copy",
+        "Printer"
       ]
     ],
     [
-      "Conf Room",
+      "Conference Room",
       [
         37.359683,
         -122.067890
@@ -67,7 +71,7 @@
       ]
     ],
     [
-      "Coll & Career ",
+      "College & Career ",
       [
         37.359560,
         -122.067905
@@ -78,7 +82,7 @@
       ]
     ],
     [
-      "TBC",
+      "Textbook Center",
       [
         37.359531,
         -122.067726
@@ -229,6 +233,18 @@
       [
         37.360408,
         -122.067855
+      ],
+      [
+        "ID cards (replacement)",
+        "Money",
+        "Parking permits",
+        "Reduced lunch",
+        "Bus pass",
+        "Buy dance tickets",
+        "Buy yearbook",
+        "Buy PE clothes",
+        "Dance guest pass",
+        "Lockers"
       ]
     ],
     [
@@ -240,6 +256,10 @@
       [
         37.360408,
         -122.067942
+      ],
+      [
+        "Grade change",
+        "Transcripts"
       ]
     ],
     [
@@ -251,10 +271,15 @@
       [
         37.360347,
         -122.067745
+      ],
+      [
+        "Counselors",
+        "Counseling appointment",
+        "Schedule change"
       ]
     ],
     [
-      "Attendence ",
+      "Attendence",
       [
         37.360205,
         -122.067864
@@ -262,10 +287,11 @@
       [
         37.360205,
         -122.068003
-      ]
+      ],
+      ["Attendance correction"]
     ],
     [
-      "Health/Resource",
+      "Health Office",
       [
         37.360348,
         -122.067665
@@ -276,7 +302,7 @@
       ]
     ],
     [
-      "CHAC/Mail",
+      "CHAC",
       [
         37.360353,
         -122.067523
@@ -287,7 +313,7 @@
       ]
     ],
     [
-      "School Psy",
+      "School Psychologist",
       [
         37.360203,
         -122.067518
@@ -298,14 +324,46 @@
       ]
     ],
     [
-      "Test Coordin",
+      "Mail Room",
       [
-        37.360203,
-        -122.067581
+        37.360353,
+        -122.067523
       ],
       [
-        37.360203,
-        -122.067411
+        37.360408,
+        -122.067525
+      ]
+    ],
+    [
+      "Administration Building",
+      [
+        37.360263,
+        -122.067588
+      ],
+      [
+        37.360150,
+        -122.067588
+      ],
+      [
+        "Activities office",
+        "Confiscated phones",
+        "Lost/found items",
+        "Principal (Grissom)",
+        "Teacher mailboxes",
+        "Theft (reporting)",
+        "Vice Principals (Gomez, Ewald, & Blair)",
+        "Work permits"
+      ]
+    ],
+    [
+      "S Weight Room",
+      [
+        37.360190,
+        -122.066133
+      ],
+      [
+        37.360190,
+        -122.066300
       ]
     ],
     [

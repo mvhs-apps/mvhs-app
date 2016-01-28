@@ -50,7 +50,7 @@ public class StudentCalendarActivity extends DrawerActivity {
     }
 
     @Override
-    int getSelfNavDrawerItem() {
+    protected int getSelfNavDrawerItem() {
         return NAVDRAWER_ITEM_CALENDAR;
     }
 }
