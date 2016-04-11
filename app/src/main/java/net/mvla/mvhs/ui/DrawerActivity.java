@@ -141,7 +141,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             mActionBarToolbar.setNavigationOnClickListener(view -> openDrawer());
         }
 
-        mDrawerLayout.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+        mDrawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 onNavDrawerSlide(slideOffset);
@@ -162,8 +162,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
         if (navDrawerWidth > navDrawerWidthLimit) {
             navDrawerWidth = navDrawerWidthLimit;
         }
-        DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) mDrawerScrollView
-                .getLayoutParams();
+        DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) mDrawerScrollView.getLayoutParams();
         params.width = navDrawerWidth;
         mDrawerScrollView.setLayoutParams(params);
 
