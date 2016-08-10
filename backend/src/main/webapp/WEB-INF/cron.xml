@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cronentries>
-    <cron>
-        <url>/calendar</url>
-        <description>Update calendar</description>
-        <schedule>every 10 minutes</schedule>
-    </cron>
-</cronentries>

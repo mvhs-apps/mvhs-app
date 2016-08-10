@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.preference.PreferenceManager;
-import android.util.Pair;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -17,28 +16,28 @@ import net.mvla.mvhs.schedulecalendar.bellschedule.BellSchedule;
 import net.mvla.mvhs.ui.WelcomeActivity;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
-import biweekly.component.VEvent;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 
 public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView> {
     private BellSchedule mSchedule;
-    private List<VEvent> mEvents;
+    private List<ScheduleCalendarRepository.Event> mEvents;
     private Calendar mSelectedDate;
     private String mError;
 
-    private ScheduleCalendarModel mModel;
-
     public ScheduleCalendarPresenter() {
-        mSelectedDate = Calendar.getInstance();
+        Calendar eventTime = Calendar.getInstance();
+        mSelectedDate = new GregorianCalendar();
+        mSelectedDate.clear();
+        mSelectedDate.set(eventTime.get(Calendar.YEAR), eventTime.get(Calendar.MONTH), eventTime.get(Calendar.DATE));
     }
 
     @Override
     public void attachView(ScheduleCalendarView view) {
         super.attachView(view);
-        mModel = new ScheduleCalendarModel(view.getContext());
     }
 
     public void onCreate() {
@@ -49,16 +48,20 @@ public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView
                 getView().getContext().startActivity(new Intent(getView().getContext(), WelcomeActivity.class));
             }
 
-            if (mEvents != null && mSchedule != null) {
+            if (mEvents == null && mSchedule == null) {
                 //noinspection ConstantConditions
-                getView().setData(mSchedule, mEvents, mSelectedDate);
+                getView().setLoading();
+                updateBellScheduleAndCalendarEvents();
             } else if (mError != null) {
                 //noinspection ConstantConditions
                 getView().showErrorMessage(mError);
             } else {
-                //noinspection ConstantConditions
-                getView().setLoading();
-                updateBellScheduleAndCalendarEvents();
+                if (mEvents != null) {
+                    getView().setEvents(mEvents);
+                }
+                if (mSchedule != null) {
+                    getView().setBellSchedule(mSchedule, mSelectedDate);
+                }
             }
 
             getView().setSelectedDate(mSelectedDate);
@@ -94,48 +97,85 @@ public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView
     }
 
     private void updateBellScheduleAndCalendarEvents() {
-        if (isDeviceOnline()) {
-            if (isViewAttached()) {
-                //noinspection ConstantConditions
-                getView().setLoading();
-            }
-
-            //Fetch today's events (from calendar) and bell schedule sheet entries in parallel
-            mModel.getBellScheduleAndEventsForSelectedDay(mSelectedDate)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<Pair<BellSchedule, List<VEvent>>>() {
-                        @Override
-                        public void onCompleted() {
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            e.printStackTrace();
-                            Crashlytics.logException(e);
-
-                            if (isViewAttached()) {
-                                mError = "Error - cannot retrieve online bell schedule.\n" + e.getMessage();
-                                //noinspection ConstantConditions
-                                getView().showErrorMessage(mError);
-                            }
-                        }
-
-                        @Override
-                        public void onNext(Pair<BellSchedule, List<VEvent>> bellScheduleEventsPair) {
-                            mSchedule = bellScheduleEventsPair.first;
-                            mEvents = bellScheduleEventsPair.second;
-                            if (isViewAttached()) {
-                                //noinspection ConstantConditions
-                                getView().setData(mSchedule, mEvents, mSelectedDate);
-                            }
-                        }
-                    });
-        } else {
+        if (!isDeviceOnline()) {
             if (isViewAttached()) {
                 //noinspection ConstantConditions
                 getView().showErrorMessage("Not online - cannot retrieve online bell schedule");
             }
+            return;
         }
+
+        if (isViewAttached()) {
+            //noinspection ConstantConditions
+            getView().setLoading();
+        }
+
+        //Fetch today's events (from calendar) and bell schedule sheet entries in parallel
+        ScheduleCalendarRepository.getInstance(getView().getContext())
+                .getEventListOnDate(mSelectedDate)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<ScheduleCalendarRepository.Event>>() {
+                    @Override
+                    public void onCompleted() {
+                        if (isViewAttached()) {
+                            getView().hideCalendarProgress();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Crashlytics.logException(e);
+
+                        if (isViewAttached()) {
+                            mError = "Error - cannot retrieve online bell schedule.\n" + e.getMessage();
+                            //noinspection ConstantConditions
+                            getView().showErrorMessage(mError);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(List<ScheduleCalendarRepository.Event> events) {
+                        mEvents = events;
+                        if (isViewAttached()) {
+                            //noinspection ConstantConditions
+                            getView().setEvents(mEvents);
+                        }
+                    }
+                });
+
+        ScheduleCalendarRepository.getInstance(getView().getContext())
+                .getBellSchedule(mSelectedDate)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BellSchedule>() {
+                    @Override
+                    public void onCompleted() {
+                        if (isViewAttached()) {
+                            getView().hideBellScheduleProgress();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        Crashlytics.logException(e);
+
+                        if (isViewAttached()) {
+                            mError = "Error - cannot retrieve online bell schedule.\n" + e.getMessage();
+                            //noinspection ConstantConditions
+                            getView().showErrorMessage(mError);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(BellSchedule bellSchedule) {
+                        mSchedule = bellSchedule;
+                        if (isViewAttached()) {
+                            //noinspection ConstantConditions
+                            getView().setBellSchedule(bellSchedule, mSelectedDate);
+                        }
+                    }
+                });
     }
 
     private boolean isDeviceOnline() {

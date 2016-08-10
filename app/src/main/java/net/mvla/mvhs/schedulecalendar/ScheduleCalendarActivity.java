@@ -43,37 +43,50 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import biweekly.component.VEvent;
-import biweekly.util.ICalDate;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ScheduleCalendarActivity extends DrawerActivity implements ScheduleCalendarView {
 
-    private MaterialCalendarView mCalendarView;
-    private LinearLayout mAppBar;
-    private LinearLayout mTitleTextBar;
-    private TextView mTitle;
-    private ImageView mCalendarDropdownImage;
+    @BindView(R.id.activity_schedule_calendar)
+    MaterialCalendarView mCalendarView;
+    @BindView(R.id.activity_schedule_appbar)
+    LinearLayout mAppBar;
+    @BindView(R.id.activity_schedule_title_linear)
+    LinearLayout mTitleTextBar;
+    @BindView(R.id.activity_schedule_title_text)
+    TextView mTitle;
+    @BindView(R.id.activity_schedule_calendar_dropdown_image)
+    ImageView mCalendarDropdownImage;
+
+    @BindView(R.id.fragment_schedule_events_title)
+    TextView mEventsTitle;
+    @BindView(R.id.list_item_schedule_title)
+    TextView mBellScheduleTitle;
+    @BindView(R.id.list_item_schedule_table)
+    TableLayout mTableLayout;
+    @BindView(R.id.schedule_events_linear)
+    LinearLayout mEventsLayout;
+    @BindView(R.id.calendar_events_progress)
+    ProgressBar mCalendarProgressBar;
+    @BindView(R.id.bell_schedule_progress)
+    ProgressBar mBellScheduleProgressBar;
+    @BindView(R.id.fragment_schedule_bell_schedule)
+    CardView mBellScheduleCard;
+    @BindView(R.id.schedule_events)
+    CardView mEventsCard;
+    @BindView(R.id.schedule_disclaimer)
+    TextView mDisclaimer;
 
     private ScheduleCalendarPresenter mPresenter;
 
-    private TextView mEventsTitle;
-    private TextView mBellScheduleTitle;
-    private TableLayout mTableLayout;
-    private LinearLayout mEventsLayout;
-    private ProgressBar mProgressBar;
-    private CardView mBellScheduleCard;
-    private CardView mEventsCard;
-    private TextView mDisclaimer;
-
     public void showErrorMessage(String error) {
         //progress bar needs to initialized first
-        if (mProgressBar != null) {
-            mProgressBar.setVisibility(View.GONE);
+        if (mCalendarProgressBar != null && mBellScheduleProgressBar != null) {
+            mCalendarProgressBar.setVisibility(View.GONE);
             mTableLayout.setVisibility(View.GONE);
             mBellScheduleTitle.setVisibility(View.GONE);
             mEventsCard.setVisibility(View.GONE);
-
-            mDisclaimer.setText(error);
         }
     }
 
@@ -84,12 +97,33 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
     }
 
     public void setLoading() {
-        if (mProgressBar != null) {
-            mProgressBar.setVisibility(View.VISIBLE);
-            mBellScheduleCard.setVisibility(View.GONE);
-            mEventsCard.setVisibility(View.GONE);
-            mDisclaimer.setVisibility(View.GONE);
+        if (mCalendarProgressBar != null && mBellScheduleProgressBar != null) {
+            mCalendarProgressBar.setVisibility(View.VISIBLE);
+            mBellScheduleProgressBar.setVisibility(View.VISIBLE);
+            mEventsTitle.setText(R.string.loading);
+            mBellScheduleTitle.setText(R.string.loading);
+            while (mEventsLayout.getChildCount() > 1) {
+                mEventsLayout.removeViewAt(1);
+            }
+            mTableLayout.removeAllViews();
         }
+    }
+
+    @Override
+    public void setBellSchedule(@NonNull BellSchedule bellSchedule, Calendar selectedCalDate) {
+        LayoutInflater layoutInflater = getLayoutInflater();
+
+        mTableLayout.removeAllViews();
+        if (!bellSchedule.bellSchedulePeriods.isEmpty()) {
+            inflateBellSchedule(bellSchedule, layoutInflater, selectedCalDate);
+        } else {
+            mBellScheduleTitle.setText(R.string.bell_schedule_no_school);
+        }
+    }
+
+    @Override
+    public void hideBellScheduleProgress() {
+        mBellScheduleProgressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -99,22 +133,9 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
                 this, date.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_MONTH));
     }
 
-    public void setData(@NonNull BellSchedule bellSchedule, @NonNull List<VEvent> events, Calendar selectedCalDate) {
-        mBellScheduleCard.setVisibility(View.VISIBLE);
-        mEventsCard.setVisibility(View.VISIBLE);
-        mProgressBar.setVisibility(View.GONE);
-        mDisclaimer.setVisibility(View.VISIBLE);
-        mDisclaimer.setText(R.string.schedule_calendar_disclaimer);
-
+    @Override
+    public void setEvents(@NonNull List<ScheduleCalendarRepository.Event> events) {
         LayoutInflater layoutInflater = getLayoutInflater();
-
-        mTableLayout.removeAllViews();
-        if (!bellSchedule.bellSchedulePeriods.isEmpty()) {
-            inflateBellSchedule(bellSchedule, layoutInflater, selectedCalDate);
-        } else {
-            mBellScheduleTitle.setText(R.string.bell_schedule_no_school);
-        }
-
 
         while (mEventsLayout.getChildCount() > 1) {
             mEventsLayout.removeViewAt(1);
@@ -122,17 +143,15 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
         if (!events.isEmpty()) {
             mEventsTitle.setText(R.string.school_events);
             //CALENDAR EVENTS
-            for (VEvent event : events) {
+            for (ScheduleCalendarRepository.Event event : events) {
                 View tableRowSeparator = layoutInflater.inflate(R.layout.table_row_divider, mEventsLayout, false);
                 mEventsLayout.addView(tableRowSeparator);
                 View eventLayout = layoutInflater.inflate(R.layout.list_item_calendar_event, mEventsLayout, false);
                 TextView name = (TextView) eventLayout.findViewById(R.id.list_item_calendar_event_name);
                 TextView subtitle = (TextView) eventLayout.findViewById(R.id.list_item_calendar_event_subtitle);
 
-                name.setText(event.getSummary().getValue());
-                ICalDate startTime = event.getDateStart().getValue();
-                ICalDate endTime = event.getDateEnd().getValue();
-                String range = DateUtils.formatDateRange(this, startTime.getTime(), endTime.getTime(), DateUtils.FORMAT_SHOW_TIME);
+                name.setText(event.name);
+                String range = DateUtils.formatDateRange(this, event.startTime, event.endTime, DateUtils.FORMAT_SHOW_TIME);
                 subtitle.setText(range);
 
                 mEventsLayout.addView(eventLayout);
@@ -142,9 +161,13 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
         }
     }
 
+    @Override
+    public void hideCalendarProgress() {
+        mCalendarProgressBar.setVisibility(View.GONE);
+    }
+
     private void inflateBellSchedule(@NonNull BellSchedule bellSchedule, LayoutInflater layoutInflater, Calendar selectedCalDate) {
-        mBellScheduleTitle.setText("Bell ");
-        mBellScheduleTitle.append(bellSchedule.name.replace("Sched.", "Schedule"));
+        mBellScheduleTitle.setText(bellSchedule.name.replace("Sched.", "Bell Schedule"));
 
         //BELL SCHEDULE TABLE
 
@@ -163,8 +186,7 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
     private void inflatePeriod(LayoutInflater layoutInflater, SharedPreferences preferences, BellSchedulePeriod period, Calendar selectedCalDate) {
         View tableRowSeparator = layoutInflater.inflate(R.layout.table_row_divider, mTableLayout, false);
         mTableLayout.addView(tableRowSeparator);
-        TableRow tableRow = (TableRow) layoutInflater
-                .inflate(R.layout.table_row_schedule, mTableLayout, false);
+        TableRow tableRow = (TableRow) layoutInflater.inflate(R.layout.table_row_schedule, mTableLayout, false);
 
         Calendar start = Calendar.getInstance();
         Date selectedDate = selectedCalDate.getTime();
@@ -231,20 +253,7 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_calendar);
 
-        mAppBar = (LinearLayout) findViewById(R.id.activity_schedule_appbar);
-        mCalendarView = (MaterialCalendarView) findViewById(R.id.activity_schedule_calendar);
-        mTitleTextBar = (LinearLayout) findViewById(R.id.activity_schedule_title_linear);
-        mTitle = (TextView) findViewById(R.id.activity_schedule_title_text);
-        mCalendarDropdownImage = (ImageView) findViewById(R.id.activity_schedule_calendar_dropdown_image);
-
-        mBellScheduleTitle = (TextView) findViewById(R.id.list_item_schedule_title);
-        mTableLayout = (TableLayout) findViewById(R.id.list_item_schedule_table);
-        mProgressBar = (ProgressBar) findViewById(R.id.list_item_schedule_progress);
-        mBellScheduleCard = (CardView) findViewById(R.id.fragment_schedule_bell_schedule);
-        mEventsCard = (CardView) findViewById(R.id.fragment_schedule_events);
-        mEventsLayout = (LinearLayout) findViewById(R.id.fragment_schedule_events_linear);
-        mEventsTitle = (TextView) findViewById(R.id.fragment_schedule_events_title);
-        mDisclaimer = (TextView) findViewById(R.id.fragment_schedule_disclaimer);
+        ButterKnife.bind(this);
 
         mDisclaimer.setMovementMethod(LinkMovementMethod.getInstance());
 

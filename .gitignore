@@ -60,7 +60,7 @@ Temporary Items
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.ear
 
@@ -145,3 +145,4 @@ $RECYCLE.BIN/
 *.lnk
 
 api_keys.xml
+google-services.json
