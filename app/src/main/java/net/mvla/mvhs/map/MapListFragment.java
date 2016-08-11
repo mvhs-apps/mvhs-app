@@ -4,7 +4,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -17,7 +17,7 @@ import net.mvla.mvhs.R;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * List
@@ -46,7 +46,14 @@ public class MapListFragment extends Fragment {
         mAdapter = new LocationAdapter();
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        GridLayoutManager layout = new GridLayoutManager(getActivity(), 4);
+        mRecyclerView.setLayoutManager(layout);
+        layout.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return mAdapter.getSpanSize(position);
+            }
+        });
         return mRecyclerView;
     }
 
@@ -55,7 +62,6 @@ public class MapListFragment extends Fragment {
 
         private String mSearchQuery;
         private List<LocationNode> mLocations;
-        private Map<LocationNode, List<String>> mTags;
 
         public LocationAdapter() {
             updateDataAndSearch("");
@@ -99,8 +105,12 @@ public class MapListFragment extends Fragment {
             }
 
             Collections.sort(mLocations, (lhs, rhs) -> {
-                if (lhs.getName().startsWith(mSearchQuery) && !rhs.getName().startsWith(mSearchQuery)) {
+                boolean leftRoom = Pattern.matches("^[0-9]*$", lhs.getName());
+                boolean rightRoom = Pattern.matches("^[0-9]*$", rhs.getName());
+                if (leftRoom && !rightRoom) {
                     return -1;
+                } else if (rightRoom && !leftRoom) {
+                    return 1;
                 }
                 return lhs.getName().compareTo(rhs.getName());
             });
@@ -110,6 +120,21 @@ public class MapListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mLocations.size();
+        }
+
+        public int getSpanSize(int position) {
+            LocationNode locationNode = mLocations.get(position);
+
+            //Hacky solution: last row full
+            if (locationNode.getName().equals("618")) {
+                return 4;
+            }
+
+            if (Pattern.matches("^[0-9]*$", locationNode.getName())) {
+                return 1;
+            } else {
+                return 2;
+            }
         }
 
         class ArtViewHolder extends RecyclerView.ViewHolder {

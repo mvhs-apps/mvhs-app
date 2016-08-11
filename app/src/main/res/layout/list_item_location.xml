@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
     android:gravity="center_vertical"
+    android:orientation="vertical"
     android:paddingBottom="16dp"
     android:paddingEnd="16dp"
     android:paddingLeft="16dp"
@@ -23,13 +24,12 @@
         android:id="@id/list_item_location_desc_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/list_item_location_title_textview"
         android:paddingLeft="16dp"
         android:paddingStart="16dp"
         android:textColor="?android:textColorSecondary"
         android:textSize="14sp"
         tools:ignore="RtlSymmetry"
         tools:text="Description"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
 
-</RelativeLayout>
+</LinearLayout>

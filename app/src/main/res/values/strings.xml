@@ -99,6 +99,7 @@
     <string name="feedback_type">Feedback Type</string>
     <string name="bug_report">Bug Report</string>
     <string name="general_feedback">General Feedback</string>
+    <string name="press_for_navigation">Press for navigation</string>
     <string-array name="bugs">
         <item>General Feedback/Suggestions</item>
         <item>Bug: Calendar/Bell Schedule</item>

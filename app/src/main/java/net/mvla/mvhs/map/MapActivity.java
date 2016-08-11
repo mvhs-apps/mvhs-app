@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,7 +32,6 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -82,7 +82,6 @@ public class MapActivity extends DrawerActivity {
     private List<Polyline> mNavPathPolylines;
     private int mNavPathStep;
     private List<String> mNavTexts;
-    //TODO: Cache zoom, only change if changed
 
     private Map<LocationNode, Marker> mMarkers;
     private SearchView mSearchView;
@@ -94,6 +93,7 @@ public class MapActivity extends DrawerActivity {
     private FloatingActionButton mMyLocFab;
 
     private boolean mNeedEnableLocation;
+    private LatLngBounds mapBounds;
 
     @Override
     protected int getSelfNavDrawerItem() {
@@ -221,6 +221,9 @@ public class MapActivity extends DrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        mapBounds = new LatLngBounds(new LatLng(37.358832, -122.068615),
+                new LatLng(37.361553, -122.065151));
 
         if (savedInstanceState == null) {
             mListShowing = false;
@@ -384,9 +387,8 @@ public class MapActivity extends DrawerActivity {
         }
 
 
-        Utils.addOnGlobalLayoutListener(findViewById(R.id.navigation_selection_appbar), () -> {
-            final View listFragmentFrame = findViewById(R.id.navigation_selection_appbar);
-            listFragmentFrame.setTranslationY(-listFragmentFrame.getMeasuredHeight());
+        Utils.addOnGlobalLayoutListener(mNavigationSelectionAppBar, () -> {
+            mNavigationSelectionAppBar.setTranslationY(-mNavigationSelectionAppBar.getMeasuredHeight());
             final View listFragment1 = findViewById(R.id.navigation_appbar);
             listFragment1.setTranslationY(-listFragment1.getMeasuredHeight());
         });
@@ -459,26 +461,59 @@ public class MapActivity extends DrawerActivity {
             mNeedEnableLocation = false;
         }
 
-        final boolean[] done = new boolean[1];
         googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        googleMap.getUiSettings().setCompassEnabled(true);
-        googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.searchbox_height), 0, 0);
+        googleMap.getUiSettings().setRotateGesturesEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(false);
+        googleMap.getUiSettings().setTiltGesturesEnabled(false);
+        googleMap.setPadding(0, getResources().getDimensionPixelSize(R.dimen.map_padding_top), 0, 0);
 
         if (initCamera) {
-            LatLngBounds mapBounds = new LatLngBounds(
-                    new LatLng(37.359014, -122.068730), new LatLng(37.361323, -122.065080));
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(
                     mapBounds, Utils.convertDpToPx(MapActivity.this, 8)));
         }
+
+        LatLngBounds cameraBounds = new LatLngBounds(
+                new LatLng(37.359568, -122.068124), new LatLng(37.361009, -122.065455));
+        googleMap.setLatLngBoundsForCameraTarget(cameraBounds);
+        googleMap.setMinZoomPreference(17);
 
         googleMap.setOnMarkerClickListener(marker -> {
             MapActivity.this.onMarkerClick(marker);
             return false;
         });
 
-        googleMap.setOnInfoWindowClickListener(marker -> MapActivity.this.startNavigation(marker, googleMap));
+        googleMap.setOnMapClickListener(latLng -> {
+            Point clickedPoint = googleMap.getProjection().toScreenLocation(latLng);
+
+            if (!mDebugMode && !mMarkers.isEmpty()) {
+                for (Marker marker : mMarkers.values()) {
+                    marker.hideInfoWindow();
+                    marker.remove();
+                }
+                mMarkers.clear();
+            } else {
+                for (LocationNode node : MapData.locationNodeMap.values()) {
+                    Point nodePoint = googleMap.getProjection().toScreenLocation(node.latLng);
+                    int dx = clickedPoint.x - nodePoint.x;
+                    int dy = clickedPoint.y - nodePoint.y;
+                    if (Utils.convertDpToPx(MapActivity.this, 24) >= Math.sqrt(dx * dx + dy * dy)) {
+                        MarkerOptions options = new MarkerOptions().position(new LatLng(node.latLng.latitude, node.latLng.longitude))
+                                .title(node.getName())
+                                .snippet(getString(R.string.press_for_navigation));
+                        Marker marker = googleMap.addMarker(options);
+                        mMarkers.put(node, marker);
+                        marker.showInfoWindow();
+
+                        break;
+                    }
+                }
+            }
+        });
+
+        googleMap.setOnInfoWindowClickListener(marker ->
+                MapActivity.this.startNavigation(marker, googleMap));
 
         googleMap.setOnCameraMoveListener(() -> {
             if (mNavigating) {
@@ -487,11 +522,6 @@ public class MapActivity extends DrawerActivity {
                         line.setWidth((googleMap.getCameraPosition().zoom - 14.7f) * 6f);
                     }
                 }
-            }
-            //Log.e("CameraZoom", "" + googleMap.getCameraPosition().zoom);
-            if (!done[0]) {
-                updateMapOverlays(googleMap);
-                done[0] = true;
             }
         });
     }
@@ -711,8 +741,10 @@ public class MapActivity extends DrawerActivity {
         hideNav();
         mNavSelectionFab.setImageResource(R.drawable.ic_directions_black_24dp);
 
-        if (mDestinationMarker != null)
-            mDestinationMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker));
+        if (mDestinationMarker != null) {
+            mDestinationMarker.remove();
+            mDestinationMarker = null;
+        }
 
         MapData.cleanTempNodes();
         if (mNavPathPolylines != null) {
@@ -724,9 +756,7 @@ public class MapActivity extends DrawerActivity {
             mNavPathPolylines = null;
         }
         if (mDebugMode) {
-            getMap().subscribe(googleMap -> {
-                updateMapOverlays(googleMap);
-            });
+            getMap().subscribe(this::updateMapOverlays);
         }
     }
 
@@ -734,12 +764,8 @@ public class MapActivity extends DrawerActivity {
         return Single.create(new Single.OnSubscribe<GoogleMap>() {
             @Override
             public void call(SingleSubscriber<? super GoogleMap> singleSubscriber) {
-                ((MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container)).getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(GoogleMap googleMap) {
-                        singleSubscriber.onSuccess(googleMap);
-                    }
-                });
+                ((MapFragment) getFragmentManager().findFragmentById(R.id.activity_map_fragment_container))
+                        .getMapAsync(singleSubscriber::onSuccess);
             }
         });
     }
@@ -750,23 +776,11 @@ public class MapActivity extends DrawerActivity {
         }
 
         googleMap.clear();
-        LatLngBounds mapBounds = new LatLngBounds(new LatLng(37.359014, -122.068730),
-                new LatLng(37.361323, -122.065080));
         GroundOverlayOptions schoolMap = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(R.drawable.map))
                 .transparency(0.1f)
                 .positionFromBounds(mapBounds);
         googleMap.addGroundOverlay(schoolMap);
-
-        for (LocationNode node : MapData.locationNodeMap.values()) {
-            MarkerOptions options = new MarkerOptions().position(new LatLng(node.latLng.latitude, node.latLng.longitude))
-                    .title(node.getName())
-                    .snippet("Press for navigation");
-            if (!mDebugMode) {
-                options.icon(BitmapDescriptorFactory.fromResource(R.drawable.map_marker));
-            }
-            mMarkers.put(node, googleMap.addMarker(options));
-        }
 
         if (mNavPathPolylines != null) {
             List<Polyline> newPolylines = new ArrayList<>();
@@ -785,6 +799,13 @@ public class MapActivity extends DrawerActivity {
         }
 
         if (mDebugMode) {
+            for (LocationNode node : MapData.locationNodeMap.values()) {
+                MarkerOptions options = new MarkerOptions().position(new LatLng(node.latLng.latitude, node.latLng.longitude))
+                        .title(node.getName())
+                        .snippet("Press for navigation");
+                mMarkers.put(node, googleMap.addMarker(options));
+            }
+
             Set<TwoNodes> addedNodeMap = new HashSet<>();
             for (Node n : MapData.pathNodeMap.values()) {
                 for (Node connected : n.getConnected()) {
@@ -792,7 +813,8 @@ public class MapActivity extends DrawerActivity {
                     if (!addedNodeMap.contains(path)) {
                         addedNodeMap.add(path);
                         googleMap.addPolyline(new PolylineOptions()
-                                .add(new LatLng(n.latLng.latitude, n.latLng.longitude), new LatLng(connected.latLng.latitude, connected.latLng.longitude))
+                                .add(new LatLng(n.latLng.latitude, n.latLng.longitude),
+                                        new LatLng(connected.latLng.latitude, connected.latLng.longitude))
                                 .color(Color.WHITE)
                                 .width(20));
                     }
@@ -836,7 +858,7 @@ public class MapActivity extends DrawerActivity {
         @Override
         protected void onPreExecute() {
             mLoadingDialog = new MaterialDialog.Builder(MapActivity.this)
-                    .title("Loading...")
+                    .title(R.string.loading)
                     .cancelable(false)
                     .progress(true, 0)
                     .show();
