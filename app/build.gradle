@@ -25,8 +25,8 @@ android {
         applicationId "net.mvla.mvhs"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 6
-        versionName "1.2.1"
+        versionCode 7
+        versionName "1.2.2"
         vectorDrawables.useSupportLibrary = true
         manifestPlaceholders = [appName: "@string/app_name"]
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -48,7 +48,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            shrinkResources false
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             if (project.hasProperty("RELEASE_STORE_MVHS_FILE")) {
@@ -78,7 +78,7 @@ retrolambda {
 }
 
 dependencies {
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
         transitive = true;
     }
 
@@ -119,8 +119,6 @@ dependencies {
 
     compile 'com.jakewharton:butterknife:8.2.1'
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
-
-    compile "com.andkulikov:transitionseverywhere:1.6.5"
 
     compile 'com.jakewharton:disklrucache:2.0.2'
     compile 'com.squareup.moshi:moshi:1.2.0'
