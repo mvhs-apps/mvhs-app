@@ -499,11 +499,7 @@ public class MapActivity extends DrawerActivity {
                     int dx = clickedPoint.x - nodePoint.x;
                     int dy = clickedPoint.y - nodePoint.y;
                     if (Utils.convertDpToPx(MapActivity.this, 24) >= Math.sqrt(dx * dx + dy * dy)) {
-                        MarkerOptions options = new MarkerOptions().position(new LatLng(node.latLng.latitude, node.latLng.longitude))
-                                .title(node.getName())
-                                .snippet(getString(R.string.press_for_navigation));
-                        Marker marker = googleMap.addMarker(options);
-                        mMarkers.put(node, marker);
+                        Marker marker = createMarker(googleMap, node);
                         marker.showInfoWindow();
 
                         break;
@@ -526,30 +522,42 @@ public class MapActivity extends DrawerActivity {
         });
     }
 
+    private Marker createMarker(GoogleMap googleMap, LocationNode node) {
+        MarkerOptions options = new MarkerOptions().position(new LatLng(node.latLng.latitude, node.latLng.longitude))
+                .title(node.getName())
+                .snippet(getString(R.string.press_for_navigation));
+        Marker marker = googleMap.addMarker(options);
+        mMarkers.put(node, marker);
+
+        return marker;
+    }
+
     public void onMapListItemClicked(LocationNode node) {
-        Marker marker = mMarkers.get(node);
-        if (mChoosingDestination) {
-            onBackPressed();
-            getMap().subscribe(map -> {
-                startNavigation(marker, map);
-            });
-        } else if (mChoosingStart) {
+        if (mChoosingStart) {
             onBackPressed();
             mStartingLocationButton.setText(node.getName());
             mStartingLocation = node.latLng;
-        } else {
-            if (mListShowing) {
-                hideList();
-            }
-            mSearchView.clearFocus();
-            marker.showInfoWindow();
-            getMap().subscribe(map -> {
-                map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-            });
 
-            //TODO: Clear nav?
-            //clearNav();
+            return;
         }
+
+        getMap().subscribe(map -> {
+            Marker marker = mMarkers.get(node);
+            if (marker == null) {
+                marker = createMarker(map, node);
+            }
+            if (mChoosingDestination) {
+                onBackPressed();
+                startNavigation(marker, map);
+            } else {
+                if (mListShowing) {
+                    hideList();
+                }
+                mSearchView.clearFocus();
+                marker.showInfoWindow();
+                map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+            }
+        });
     }
 
     private void startNavigation(Marker marker, GoogleMap googleMap) {

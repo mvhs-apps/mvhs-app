@@ -56,4 +56,8 @@
         <item name="colorAccent">@color/primary</item>
     </style>
 
+    <style name="Widget.Button.Borderless.Colored" parent="@style/Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
 </resources>

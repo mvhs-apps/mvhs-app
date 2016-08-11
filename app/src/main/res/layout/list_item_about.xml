@@ -50,7 +50,6 @@
 
         <LinearLayout
             android:id="@id/list_item_about_actions_bar"
-            style="?buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:gravity="center_vertical"
@@ -60,14 +59,14 @@
 
             <Button
                 android:id="@id/list_item_about_website_button"
-                style="?buttonBarButtonStyle"
+                style="@style/Widget.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/website" />
 
             <Button
                 android:id="@id/list_item_about_email_button"
-                style="?buttonBarButtonStyle"
+                style="@style/Widget.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/email" />
