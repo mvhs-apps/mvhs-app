@@ -35,14 +35,16 @@ public class ScheduleCalendarRepository {
     private final JsonAdapter<CalendarEvents> calendarEventsAdapter;
     private final JsonAdapter<List<BellSchedule>> bellScheduleListAdapter;
 
-    private ScheduleCalendarModel model;
+    private ScheduleCalendarDataSource model;
     private DiskMemoryCache<List<BellSchedule>> bellSchedulesCache;
     private DiskMemoryCache<CalendarEvents> calendarEventCache;
 
     private Observable<List<Event>> eventListObservable;
 
+    private boolean cacheUpdated;
+
     private ScheduleCalendarRepository(Context context) {
-        model = new ScheduleCalendarModel();
+        model = new ScheduleCalendarDataSource();
 
         Moshi moshi = new Moshi.Builder().build();
         calendarEventsAdapter = moshi.adapter(CalendarEvents.class);
@@ -77,6 +79,8 @@ public class ScheduleCalendarRepository {
                 sink.clear();
             }
         });
+
+        cacheUpdated = false;
     }
 
     public static ScheduleCalendarRepository getInstance(Context context) {
@@ -91,7 +95,7 @@ public class ScheduleCalendarRepository {
             return eventListObservable;
         }
 
-        Observable<List<Event>> cache = calendarEventCache.get(String.valueOf(selectedDate.getTimeInMillis()),
+        Observable<List<Event>> observable = calendarEventCache.get(String.valueOf(selectedDate.getTimeInMillis()),
                 calendarEvents -> calendarEvents != null)
                 .flatMap(calendarEvents -> Observable.just(calendarEvents.events));
 
@@ -116,7 +120,7 @@ public class ScheduleCalendarRepository {
                     CalendarEvents finishedEvents = new CalendarEvents();
                     finishedEvents.events = new ArrayList<>(eventsOnDay);
                     if (lastDay != Long.MAX_VALUE) {
-                        for (long i = (long) (lastDay + 8.64e+7); i < currDay.getTimeInMillis(); i += 8.64e+7) {
+                        for (long i = (long) (lastDay + 8.64e+7); i < currDay.getTimeInMillis(); i = (long) (i + 8.64e+7)) {
                             CalendarEvents item = new CalendarEvents();
                             item.events = new ArrayList<>();
                             calendarEventCache.put(String.valueOf(i), item);
@@ -128,24 +132,31 @@ public class ScheduleCalendarRepository {
                     }
 
                     lastDay = currDay.getTimeInMillis();
-                    currDay = null;
                     eventsOnDay.clear();
+
+                    eventsOnDay.add(event);
+                    currDay.clear();
+                    currDay.set(eventTime.get(Calendar.YEAR), eventTime.get(Calendar.MONTH), eventTime.get(Calendar.DATE));
                 }
             }
 
             return Single.just(eventsOnSelectedDay);
         });
 
-        eventListObservable = Observable.concat(cache, queryPutCache.toObservable())
-                .subscribeOn(Schedulers.io())
-                .doOnCompleted(() -> eventListObservable = null);
+        if (!cacheUpdated) {
+            observable = observable.mergeWith(queryPutCache.toObservable());
+        }
+
+        eventListObservable = observable.subscribeOn(Schedulers.io())
+                .doOnCompleted(() -> eventListObservable = null)
+                .replay().autoConnect();
 
         return eventListObservable;
     }
 
     public Observable<BellSchedule> getBellSchedule(Calendar selectedDate) {
 
-        Observable<List<BellSchedule>> cache = bellSchedulesCache.get("0",
+        Observable<List<BellSchedule>> bellScheduleObservable = bellSchedulesCache.get("0",
                 bellSchedules -> bellSchedules != null
         );
 
@@ -154,10 +165,13 @@ public class ScheduleCalendarRepository {
                     bellSchedulesCache.put("0", bellSchedules);
                 });
 
+        if (!cacheUpdated) {
+            bellScheduleObservable = bellScheduleObservable.mergeWith(bellSchedulesQuery.toObservable());
+        }
 
         return Observable.combineLatest(
                 getEventListOnDate(selectedDate),
-                Observable.concat(cache, bellSchedulesQuery.toObservable()),
+                bellScheduleObservable,
                 Pair::new
         ).subscribeOn(Schedulers.io())
                 .flatMap(new Func1<Pair<List<Event>, List<BellSchedule>>, Observable<BellSchedule>>() {
@@ -232,6 +246,8 @@ public class ScheduleCalendarRepository {
                         if (chosen == null) {
                             chosen = defaultSchedule;
                         }
+
+                        cacheUpdated = true;
 
                         return Observable.just(chosen);
 

@@ -11,7 +11,9 @@ import java.util.List;
 
 public interface ScheduleCalendarView extends MvpView {
 
-    void showErrorMessage(String error);
+    void showCalendarError(String error);
+
+    void showBellScheduleError(String error);
 
     void setLoading();
 

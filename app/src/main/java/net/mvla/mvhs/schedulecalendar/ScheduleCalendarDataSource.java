@@ -10,6 +10,7 @@ import net.mvla.mvhs.schedulecalendar.sheet.RootSheetElement;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import biweekly.Biweekly;
@@ -22,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import rx.Single;
 
-public class ScheduleCalendarModel {
+public class ScheduleCalendarDataSource {
 
     @NonNull
     Single<ScheduleCalendarRepository.CalendarEvents> getCalendarEvents() {
@@ -87,6 +88,7 @@ public class ScheduleCalendarModel {
                 events.add(event);
             }
 
+            Collections.sort(events, (e1, e2) -> Double.compare(e1.startTime, e2.startTime));
             subscriber.onSuccess(events);
         });
     }

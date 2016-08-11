@@ -44,17 +44,14 @@ public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView
         if (isViewAttached()) {
             //noinspection ConstantConditions
             if (!PrefUtils.isWelcomeDone(getView().getContext())) {
-                //noinspection ConstantConditions
                 getView().getContext().startActivity(new Intent(getView().getContext(), WelcomeActivity.class));
             }
 
             if (mEvents == null && mSchedule == null) {
-                //noinspection ConstantConditions
                 getView().setLoading();
                 updateBellScheduleAndCalendarEvents();
             } else if (mError != null) {
-                //noinspection ConstantConditions
-                getView().showErrorMessage(mError);
+                getView().showCalendarError(mError);
             } else {
                 if (mEvents != null) {
                     getView().setEvents(mEvents);
@@ -100,7 +97,7 @@ public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView
         if (!isDeviceOnline()) {
             if (isViewAttached()) {
                 //noinspection ConstantConditions
-                getView().showErrorMessage("Not online - cannot retrieve online bell schedule");
+                getView().showCalendarError("Not online - cannot retrieve online bell schedule");
             }
             return;
         }
@@ -125,12 +122,12 @@ public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        Crashlytics.logException(e);
+                        if (!BuildConfig.DEBUG)
+                            Crashlytics.logException(e);
 
                         if (isViewAttached()) {
-                            mError = "Error - cannot retrieve online bell schedule.\n" + e.getMessage();
-                            //noinspection ConstantConditions
-                            getView().showErrorMessage(mError);
+                            mError = "Error - " + e.getMessage();
+                            getView().showCalendarError(mError);
                         }
                     }
 
@@ -138,7 +135,6 @@ public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView
                     public void onNext(List<ScheduleCalendarRepository.Event> events) {
                         mEvents = events;
                         if (isViewAttached()) {
-                            //noinspection ConstantConditions
                             getView().setEvents(mEvents);
                         }
                     }
@@ -158,12 +154,13 @@ public class ScheduleCalendarPresenter extends MvpPresenter<ScheduleCalendarView
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        Crashlytics.logException(e);
+                        if (!BuildConfig.DEBUG)
+                            Crashlytics.logException(e);
 
                         if (isViewAttached()) {
-                            mError = "Error - cannot retrieve online bell schedule.\n" + e.getMessage();
+                            mError = "Error - " + e.getMessage();
                             //noinspection ConstantConditions
-                            getView().showErrorMessage(mError);
+                            getView().showBellScheduleError(mError);
                         }
                     }
 

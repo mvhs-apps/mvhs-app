@@ -80,14 +80,16 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
 
     private ScheduleCalendarPresenter mPresenter;
 
-    public void showErrorMessage(String error) {
-        //progress bar needs to initialized first
-        if (mCalendarProgressBar != null && mBellScheduleProgressBar != null) {
-            mCalendarProgressBar.setVisibility(View.GONE);
-            mTableLayout.setVisibility(View.GONE);
-            mBellScheduleTitle.setVisibility(View.GONE);
-            mEventsCard.setVisibility(View.GONE);
-        }
+    @Override
+    public void showCalendarError(String error) {
+        mCalendarProgressBar.setVisibility(View.GONE);
+        mEventsTitle.setText(error);
+    }
+
+    @Override
+    public void showBellScheduleError(String error) {
+        mBellScheduleProgressBar.setVisibility(View.GONE);
+        mBellScheduleTitle.setText(error);
     }
 
     @Override
@@ -97,16 +99,14 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
     }
 
     public void setLoading() {
-        if (mCalendarProgressBar != null && mBellScheduleProgressBar != null) {
-            mCalendarProgressBar.setVisibility(View.VISIBLE);
-            mBellScheduleProgressBar.setVisibility(View.VISIBLE);
-            mEventsTitle.setText(R.string.loading);
-            mBellScheduleTitle.setText(R.string.loading);
-            while (mEventsLayout.getChildCount() > 1) {
-                mEventsLayout.removeViewAt(1);
-            }
-            mTableLayout.removeAllViews();
+        mCalendarProgressBar.setVisibility(View.VISIBLE);
+        mBellScheduleProgressBar.setVisibility(View.VISIBLE);
+        mEventsTitle.setText(R.string.loading);
+        mBellScheduleTitle.setText(R.string.loading);
+        while (mEventsLayout.getChildCount() > 1) {
+            mEventsLayout.removeViewAt(1);
         }
+        mTableLayout.removeAllViews();
     }
 
     @Override
