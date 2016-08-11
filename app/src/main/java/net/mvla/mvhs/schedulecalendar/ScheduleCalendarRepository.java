@@ -247,6 +247,10 @@ public class ScheduleCalendarRepository {
                             chosen = defaultSchedule;
                         }
 
+                        if (chosen == null) {
+                            chosen = new BellSchedule();
+                        }
+
                         cacheUpdated = true;
 
                         return Observable.just(chosen);

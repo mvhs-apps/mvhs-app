@@ -1,5 +1,7 @@
 package net.mvla.mvhs.schedulecalendar;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -114,7 +116,7 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
         LayoutInflater layoutInflater = getLayoutInflater();
 
         mTableLayout.removeAllViews();
-        if (!bellSchedule.bellSchedulePeriods.isEmpty()) {
+        if (bellSchedule.bellSchedulePeriods != null && !bellSchedule.bellSchedulePeriods.isEmpty()) {
             inflateBellSchedule(bellSchedule, layoutInflater, selectedCalDate);
         } else {
             mBellScheduleTitle.setText(R.string.bell_schedule_no_school);
@@ -235,7 +237,7 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
 
         periodText.setText(period.name);
 
-        timeText.setText(Utils.formatTime(start.getTime()) + "-" + Utils.formatTime(end.getTime()));
+        timeText.setText(Utils.formatTime(start.getTime()) + " - " + Utils.formatTime(end.getTime()));
 
         mTableLayout.addView(tableRow);
     }
@@ -294,7 +296,6 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
             mPresenter.onDateChanged(date.getCalendar());
             ScheduleCalendarActivity.this.animateToggleCalendar();
         });
-        mCalendarView.setDynamicHeightEnabled(true);
 
         mPresenter = MvpPresenterHolder.getInstance().getPresenter(ScheduleCalendarPresenter.class);
         if (mPresenter == null) {
@@ -322,8 +323,15 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
         if (needExpand) {
             animator = ValueAnimator.ofInt(mTitleTextBar.getHeight(),
                     Utils.convertDpToPx(this, 48 * 8) + mTitleTextBar.getHeight());
+            mCalendarView.setVisibility(View.VISIBLE);
         } else {
             animator = ValueAnimator.ofInt(mAppBar.getHeight(), mTitleTextBar.getHeight());
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mCalendarView.setVisibility(View.GONE);
+                }
+            });
         }
 
         animator.addUpdateListener(animation -> {

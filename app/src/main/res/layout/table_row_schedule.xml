@@ -17,28 +17,28 @@
         android:id="@id/table_row_schedule_period_time_text"
         android:layout_height="47dp"
         android:gravity="center_vertical"
-        android:paddingLeft="56dp"
-        android:paddingStart="6dp"
+        android:paddingLeft="32dp"
+        android:paddingStart="32dp"
         android:textSize="13sp"
         tools:ignore="NewApi,RtlSymmetry"
         tools:text="10:25-11:25" />
 
     <TextView
         android:id="@id/table_row_schedule_room_text"
-        android:layout_height="46dp"
+        android:layout_height="47dp"
         android:gravity="center_vertical"
-        android:paddingLeft="56dp"
-        android:paddingStart="56dp"
+        android:paddingLeft="32dp"
+        android:paddingStart="32dp"
         android:textSize="13sp"
         tools:ignore="NewApi,RtlSymmetry"
         tools:text="Packard Hall" />
 
     <TextView
         android:id="@id/table_row_schedule_subject_text"
-        android:layout_height="46dp"
+        android:layout_height="47dp"
         android:gravity="center_vertical"
-        android:paddingLeft="56dp"
-        android:paddingStart="56dp"
+        android:paddingLeft="32dp"
+        android:paddingStart="32dp"
         android:textSize="13sp"
         tools:ignore="NewApi,RtlSymmetry"
         tools:text="Chamber Orchestra" />
