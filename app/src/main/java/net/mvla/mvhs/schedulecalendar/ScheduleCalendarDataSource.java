@@ -19,7 +19,7 @@ import biweekly.component.VEvent;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 import retrofit2.http.GET;
 import rx.Single;
 
@@ -51,7 +51,7 @@ public class ScheduleCalendarDataSource {
     private Single<List<Entry>> getBellScheduleSheet() {
         Retrofit restAdapter = new Retrofit.Builder()
                 .baseUrl("https://spreadsheets.google.com/")
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
         SheetService service = restAdapter.create(SheetService.class);
