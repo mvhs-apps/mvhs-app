@@ -313,6 +313,7 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
                 + getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material);
         mAppBar.setLayoutParams(layoutParams);
         mCalendarDropdownImage.setRotation(180);
+        mCalendarView.setVisibility(View.VISIBLE);
     }
 
     private void animateToggleCalendar() {

@@ -298,9 +298,11 @@ public abstract class DrawerActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         setupNavDrawer();
-        View mainContent = findViewById(R.id.activity_drawer_content);
-        mainContent.setAlpha(0);
-        mainContent.animate().alpha(1).setDuration(MAIN_CONTENT_FADEIN_DURATION);
+        if (getSelfNavDrawerItem() != NAVDRAWER_ITEM_TODAYS_SCHED) {
+            View mainContent = findViewById(R.id.activity_drawer_content);
+            mainContent.setAlpha(0);
+            mainContent.animate().alpha(1).setDuration(MAIN_CONTENT_FADEIN_DURATION);
+        }
     }
 
     private void onNavDrawerItemClicked(final int itemId) {
