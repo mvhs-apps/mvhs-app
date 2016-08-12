@@ -30,7 +30,8 @@
         <activity
             android:name=".aeries.AeriesActivity"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer">
+            android:theme="@style/Theme.MVHSApp.Light.WithNavDrawer"
+            android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
             android:name=".map.MapActivity"
