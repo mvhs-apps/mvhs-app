@@ -19,19 +19,30 @@
 
 #retrolambda
 -dontwarn java.lang.invoke.*
+-dontwarn net.mvla.mvhs.schedulecalendar.ScheduleCalendarModel
+
 #retrofit
 -dontwarn retrofit2.**
 -keep class retrofit2.** { *; }
--keep interface retrofit2.** { *; }
+
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
 
 #crashlytics
 -keep class com.crashlytics.** { *; }
 -keep class com.crashlytics.android.**
 
+#Moshi
+-keep class net.mvla.mvhs.schedulecalendar.sheet.** { *; }
+-keep class net.mvla.mvhs.schedulecalendar.bellschedule.** { *; }
+
 -keep class biweekly.** { *; }
+-dontwarn biweekly.**
 
 #rxjava
 -dontwarn sun.misc.**
+-keep class rx.** { *; }
 
 -keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
    long producerIndex;
