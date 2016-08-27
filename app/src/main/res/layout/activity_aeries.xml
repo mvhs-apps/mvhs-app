@@ -30,17 +30,17 @@
             android:layout_marginTop="-6dp"
             android:elevation="4dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_below="@id/toolbar_actionbar"
-            android:background="?toolbarShadow" />
-
         <FrameLayout
             android:id="@id/activity_aeries_fragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/toolbar_actionbar" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_below="@id/toolbar_actionbar"
+            android:background="?toolbarShadow" />
 
     </RelativeLayout>
 

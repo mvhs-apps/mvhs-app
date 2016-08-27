@@ -17,6 +17,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Menu;
@@ -188,7 +189,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
                 TextView v = (TextView) layout.findViewById(android.R.id.text1);
                 v.setText(navDrawerStrings[i]);
 
-                Drawable drawable = ContextCompat.getDrawable(this, NAVDRAWER_ITEMS_ICONS[i]);
+                Drawable drawable = AppCompatResources.getDrawable(this, NAVDRAWER_ITEMS_ICONS[i]);
                 drawable = DrawableCompat.wrap(drawable);
                 drawable.mutate();
                 DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);

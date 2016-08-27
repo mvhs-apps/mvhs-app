@@ -66,12 +66,6 @@
 
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_below="@id/activity_schedule_appbar"
-            android:background="?toolbarShadow" />
-
         <ScrollView
             android:id="@id/fragment_schedule_scrollview"
             android:layout_width="match_parent"
@@ -97,44 +91,55 @@
                     app:cardElevation="2dp"
                     app:cardUseCompatPadding="true">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:id="@id/list_item_schedule_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="47dp"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            android:layout_marginLeft="16dp"
-                            android:layout_marginRight="16dp"
-                            android:layout_toLeftOf="@id/bell_schedule_progress"
-                            android:layout_toStartOf="@id/bell_schedule_progress"
-                            android:drawableLeft="@drawable/ic_notifications_16dp"
-                            android:drawablePadding="8dp"
-                            android:drawableStart="@drawable/ic_notifications_16dp"
-                            android:gravity="center_vertical"
-                            android:maxLines="1"
-                            android:textColor="?android:textColorSecondary"
-                            android:textSize="13sp"
-                            tools:text="Bell Schedule E: Modified Thurs. Block" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            tools:ignore="UselessParent">
 
-                        <ProgressBar
-                            android:id="@id/bell_schedule_progress"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginRight="16dp"
-                            android:layout_marginTop="12dp"
-                            android:indeterminate="true" />
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                app:srcCompat="@drawable/ic_notifications_16dp" />
+
+                            <Space
+                                android:layout_width="8dp"
+                                android:layout_height="match_parent" />
+
+                            <TextView
+                                android:id="@id/list_item_schedule_title"
+                                android:layout_width="0dp"
+                                android:layout_height="47dp"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:maxLines="1"
+                                android:text="@string/school_events"
+                                android:textColor="?android:textColorSecondary"
+                                android:textSize="13sp"
+                                tools:text="Bell Schedule E: Modified Thurs. Block" />
+
+                            <ProgressBar
+                                android:id="@id/bell_schedule_progress"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="16dp"
+                                android:layout_marginStart="16dp"
+                                android:indeterminate="true" />
+
+                        </LinearLayout>
 
                         <HorizontalScrollView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_below="@id/list_item_schedule_title"
                             android:fillViewport="true">
 
                             <TableLayout
@@ -147,7 +152,7 @@
 
                         </HorizontalScrollView>
 
-                    </RelativeLayout>
+                    </LinearLayout>
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView
@@ -173,18 +178,25 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
                             tools:ignore="UselessParent">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                app:srcCompat="@drawable/ic_event_note_16dp" />
+
+                            <Space
+                                android:layout_width="8dp"
+                                android:layout_height="match_parent" />
 
                             <TextView
                                 android:id="@id/fragment_schedule_events_title"
                                 android:layout_width="0dp"
                                 android:layout_height="47dp"
-                                android:layout_marginLeft="16dp"
-                                android:layout_marginRight="16dp"
                                 android:layout_weight="1"
-                                android:drawableLeft="@drawable/ic_event_note_16dp"
-                                android:drawablePadding="8dp"
-                                android:drawableStart="@drawable/ic_event_note_16dp"
                                 android:gravity="center_vertical"
                                 android:maxLines="1"
                                 android:text="@string/school_events"
@@ -196,8 +208,8 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginEnd="16dp"
-                                android:layout_marginRight="16dp"
+                                android:layout_marginLeft="16dp"
+                                android:layout_marginStart="16dp"
                                 android:indeterminate="true" />
 
                         </LinearLayout>
@@ -221,6 +233,12 @@
             </RelativeLayout>
 
         </ScrollView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_below="@id/activity_schedule_appbar"
+            android:background="?toolbarShadow" />
 
     </RelativeLayout>
 

@@ -8,7 +8,7 @@ buildscript {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:2.2.0-beta3'
         classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta4'
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.13.0'
@@ -24,8 +24,9 @@ allprojects {
     }
 }
 
-task wrapper(type: Wrapper) {
-    distributionUrl = 'https\\://services.gradle.org/distributions/gradle-2.14.1-all.zip'
+ext {
+    buildToolsVersion = '24.0.2'
+    supportLibraryVersion = '24.2.0'
 }
 
 
