@@ -8,8 +8,7 @@ buildscript {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
-        classpath 'me.tatarka:gradle-retrolambda:3.3.0'
+        classpath 'com.android.tools.build:gradle:2.3.0-beta3'
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.13.0'
     }
@@ -25,8 +24,8 @@ allprojects {
 }
 
 ext {
-    buildToolsVersion = '24.0.3'
-    supportLibraryVersion = '24.2.1'
+    buildToolsVersion = '25.0.2'
+    supportLibraryVersion = '25.1.0'
 }
 
 

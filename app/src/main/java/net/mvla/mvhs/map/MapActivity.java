@@ -97,7 +97,7 @@ public class MapActivity extends DrawerActivity {
 
     @Override
     protected int getSelfNavDrawerItem() {
-        return NAVDRAWER_ITEM_MAP;
+        return R.id.nav_map;
     }
 
     @Override
@@ -394,9 +394,6 @@ public class MapActivity extends DrawerActivity {
         });
 
         mMarkers = new HashMap<>();
-
-
-        overridePendingTransition(0, 0);
     }
 
     private void onLocationPermissionGranted(GoogleMap map) {

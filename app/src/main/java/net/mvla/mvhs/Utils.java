@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
@@ -21,6 +22,17 @@ import java.util.Date;
  * Utilities
  */
 public abstract class Utils {
+
+    public static int getNavDrawerWidth(Context context) {
+        int navDrawerMargin = context.getResources().getDimensionPixelSize(R.dimen.navigation_drawer_margin);
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        int navDrawerWidthLimit = context.getResources().getDimensionPixelSize(R.dimen.navigation_drawer_limit);
+        int navDrawerWidth = displayMetrics.widthPixels - navDrawerMargin;
+        if (navDrawerWidth > navDrawerWidthLimit) {
+            navDrawerWidth = navDrawerWidthLimit;
+        }
+        return navDrawerWidth;
+    }
 
 
     public static void addOnGlobalLayoutListener(final View view, final Runnable r) {

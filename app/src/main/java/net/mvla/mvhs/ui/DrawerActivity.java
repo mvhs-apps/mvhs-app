@@ -3,94 +3,45 @@ package net.mvla.mvhs.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import net.mvla.mvhs.PrefUtils;
 import net.mvla.mvhs.R;
+import net.mvla.mvhs.Utils;
 import net.mvla.mvhs.aeries.AeriesActivity;
 import net.mvla.mvhs.customtabs.CustomTabActivityHelper;
 import net.mvla.mvhs.map.MapActivity;
 import net.mvla.mvhs.schedulecalendar.ScheduleCalendarActivity;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Base Activity with the Navigation Drawer
  */
 public abstract class DrawerActivity extends AppCompatActivity {
-    protected static final int NAVDRAWER_ITEM_AERIES = 2;
-    protected static final int NAVDRAWER_ITEM_MAP = 4;
-    protected static final int NAVDRAWER_ITEM_CALENDAR = 6;
-    protected static final int NAVDRAWER_ITEM_MVHSSITE = 8;
-    protected static final int NAVDRAWER_ITEM_TODAYS_SCHED = 10;
-    protected static final int NAVDRAWER_ITEM_GCLASSROOM = 12;
-
-    private static final int NAVDRAWER_ITEM_SETTINGS = -3;
-    private static final int NAVDRAWER_ITEM_CHANGELOG = -4;
-    private static final int NAVDRAWER_ITEM_FEEDBACK = -6;
-    private static final int NAVDRAWER_ITEM_ABOUT = -5;
-    private static final int NAVDRAWER_ITEM_INVALID = -1;
-    private static final int NAVDRAWER_ITEM_SEPARATOR = -2;
-
-    private static final int[] NAVDRAWER_ITEMS = new int[]{
-            NAVDRAWER_ITEM_TODAYS_SCHED,
-            NAVDRAWER_ITEM_AERIES,
-            NAVDRAWER_ITEM_MAP,
-            NAVDRAWER_ITEM_CALENDAR,
-            NAVDRAWER_ITEM_MVHSSITE,
-            NAVDRAWER_ITEM_GCLASSROOM,
-            NAVDRAWER_ITEM_SEPARATOR,
-            NAVDRAWER_ITEM_SETTINGS,
-            NAVDRAWER_ITEM_CHANGELOG,
-            NAVDRAWER_ITEM_FEEDBACK,
-            NAVDRAWER_ITEM_ABOUT
-    };
-    private static final int[] NAVDRAWER_ITEMS_ICONS = new int[]{
-            R.drawable.ic_view_agenda_black_24dp,
-            R.drawable.ic_grade_black_24dp,
-            R.drawable.ic_map_black_24dp,
-            R.drawable.ic_event_24dp,
-            R.drawable.ic_web_black_24dp,
-            R.drawable.ic_classroom_black_24dp,
-            NAVDRAWER_ITEM_SEPARATOR,
-            R.drawable.ic_settings_black_24dp,
-            R.drawable.ic_trending_up_24dp,
-            R.drawable.ic_feedback_black_24dp,
-            R.drawable.ic_info_black_24dp
-    };
-
     private static final int NAVDRAWER_LAUNCH_DELAY = 250;
-    private static final int MAIN_CONTENT_FADEOUT_DURATION = 150;
-    private static final int MAIN_CONTENT_FADEIN_DURATION = 250;
-
-    private DrawerLayout mDrawerLayout;
-
-    private Handler mHandler;
-
     @Nullable
-    private Toolbar mActionBarToolbar;
-    private LinearLayout mDrawerListLinearLayout;
+    @BindView(R.id.toolbar_actionbar)
+    Toolbar actionBarToolbar;
+    @BindView(R.id.drawer_navview)
+    NavigationView navigationView;
+    private DrawerLayout drawerLayout;
+    private Handler handler;
 
     public static boolean openApp(Context context, String packageName) {
         PackageManager manager = context.getPackageManager();
@@ -105,12 +56,10 @@ public abstract class DrawerActivity extends AppCompatActivity {
 
     /**
      * Returns the navigation drawer item that corresponds to this Activity.
-     * Subclasses of BaseActivity override this to indicate what nav drawer item
+     * Subclasses of DrawerActivity override this to indicate what nav drawer item
      * corresponds to them.
      */
-    protected int getSelfNavDrawerItem() {
-        return NAVDRAWER_ITEM_INVALID;
-    }
+    protected abstract int getSelfNavDrawerItem();
 
     void onNavDrawerSlide(float offset) {
     }
@@ -118,31 +67,18 @@ public abstract class DrawerActivity extends AppCompatActivity {
     void onNavDrawerClosed() {
     }
 
-    Toolbar getActionBarToolbar() {
-        if (mActionBarToolbar == null) {
-            mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-            if (mActionBarToolbar != null) {
-                setSupportActionBar(mActionBarToolbar);
-            }
-        }
-        return mActionBarToolbar;
-    }
-
     /**
      * Sets up the navigation drawer as appropriate.
      */
     private void setupNavDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_drawer_drawerlayout);
-        Resources resources = getResources();
+        drawerLayout = (DrawerLayout) findViewById(R.id.activity_drawer_drawerlayout);
 
-
-
-        if (mActionBarToolbar != null) {
-            mActionBarToolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
-            mActionBarToolbar.setNavigationOnClickListener(view -> openDrawer());
+        if (actionBarToolbar != null) {
+            actionBarToolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
+            actionBarToolbar.setNavigationOnClickListener(view -> openDrawer());
         }
 
-        mDrawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+        drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 onNavDrawerSlide(slideOffset);
@@ -154,76 +90,31 @@ public abstract class DrawerActivity extends AppCompatActivity {
             }
         });
 
-        ScrollView mDrawerScrollView = (ScrollView) findViewById(R.id
-                .activity_drawer_drawer_scrollview);
-        int actionBarSize = resources.getDimensionPixelSize(R.dimen.navigation_drawer_margin);
-        DisplayMetrics displayMetrics = resources.getDisplayMetrics();
-        int navDrawerWidthLimit = resources.getDimensionPixelSize(R.dimen.navigation_drawer_limit);
-        int navDrawerWidth = displayMetrics.widthPixels - actionBarSize;
-        if (navDrawerWidth > navDrawerWidthLimit) {
-            navDrawerWidth = navDrawerWidthLimit;
-        }
-        DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) mDrawerScrollView.getLayoutParams();
-        params.width = navDrawerWidth;
-        mDrawerScrollView.setLayoutParams(params);
-
-        mDrawerListLinearLayout = (LinearLayout) findViewById(R.id.activity_drawer_drawer_linearlayout);
+        navigationView.setLayoutParams(new DrawerLayout.LayoutParams(Utils.getNavDrawerWidth(this),
+                DrawerLayout.LayoutParams.MATCH_PARENT, Gravity.START));
 
         if (!PrefUtils.isWelcomeDone(this)) {
             PrefUtils.markWelcomeDone(this);
-            mDrawerLayout.openDrawer(GravityCompat.START);
+            drawerLayout.openDrawer(GravityCompat.START);
         }
 
-        String[] navDrawerStrings = resources.getStringArray(R.array.nav_drawer_items);
-        //INFLATE LAYOUTS AND SET CLICK LISTENERS
-        for (int i = 0; i < NAVDRAWER_ITEMS.length; i++) {
-            final int itemId = NAVDRAWER_ITEMS[i];
+        navigationView.setCheckedItem(getSelfNavDrawerItem());
+        navigationView.setNavigationItemSelectedListener(item -> {
+            onNavDrawerItemClicked(item.getItemId());
+            return false;
+        });
 
-            View view = null;
-            if (itemId == NAVDRAWER_ITEM_SEPARATOR) {
-                view = getLayoutInflater().inflate(R.layout.list_item_divider,
-                        mDrawerListLinearLayout, false);
-                mDrawerListLinearLayout.addView(view);
-            } else {
-                FrameLayout layout = (FrameLayout) getLayoutInflater().inflate(R.layout.list_item_drawer, mDrawerListLinearLayout, false);
-                TextView v = (TextView) layout.findViewById(android.R.id.text1);
-                v.setText(navDrawerStrings[i]);
+        navigationView.setItemTextColor(ContextCompat.getColorStateList(this, R.color.drawer_text));
+        navigationView.setItemIconTintList(ContextCompat.getColorStateList(this, R.color.drawer_icons));
+    }
 
-                Drawable drawable = AppCompatResources.getDrawable(this, NAVDRAWER_ITEMS_ICONS[i]);
-                drawable = DrawableCompat.wrap(drawable);
-                drawable.mutate();
-                DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
-                if (itemId == getSelfNavDrawerItem()) {
-                    DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.primary_dark));
-                    v.setTextColor(ContextCompat.getColor(this, R.color.primary_dark));
-                } else {
-                    DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.nav_drawer_icon));
-                    v.setTextColor(ContextCompat.getColor(this, R.color.primary_text_default_material_light));
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    v.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null);
-                }
-                v.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
-
-
-                if (itemId == getSelfNavDrawerItem()) {
-                    v.setBackgroundColor(ContextCompat.getColor(this, R.color.ripple_material_light));
-                    setTitle(getToolbarTitle(navDrawerStrings[i]));
-                } else {
-                    v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
-                }
-
-
-                layout.setOnClickListener(v1 -> onNavDrawerItemClicked(itemId));
-
-                mDrawerListLinearLayout.addView(layout);
-
-                view = layout;
-            }
-
-            view.setTag(itemId);
-
-        }
+    private boolean isNormalItem(int itemId) {
+        return itemId != R.id.nav_settings
+                && itemId != R.id.nav_changelog
+                && itemId != R.id.nav_about
+                && itemId != R.id.nav_site
+                && itemId != R.id.nav_classroom
+                && itemId != R.id.nav_feedback;
     }
 
     protected String getToolbarTitle(String navDrawerString) {
@@ -231,21 +122,21 @@ public abstract class DrawerActivity extends AppCompatActivity {
     }
 
     protected void openDrawer() {
-        mDrawerLayout.openDrawer(GravityCompat.START);
+        drawerLayout.openDrawer(GravityCompat.START);
     }
 
     void lockDrawer(boolean lock) {
         if (lock) {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         } else {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     }
 
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        getActionBarToolbar();
+        ButterKnife.bind(this);
     }
 
     @Override
@@ -260,14 +151,14 @@ public abstract class DrawerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHandler = new Handler();
+        handler = new Handler();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        //TODO: Array of guest mode hidden items
+       /* //TODO: Guest mode hidden items
         if (PrefUtils.getMode(this) == 1 && (
                 getSelfNavDrawerItem() == NAVDRAWER_ITEM_AERIES
                         || getSelfNavDrawerItem() == NAVDRAWER_ITEM_CALENDAR)) {
@@ -287,7 +178,7 @@ public abstract class DrawerActivity extends AppCompatActivity {
             } else {
                 item.setVisibility(View.VISIBLE);
             }
-        }
+        }*/
     }
 
     @Override
@@ -299,47 +190,26 @@ public abstract class DrawerActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         setupNavDrawer();
-        if (getSelfNavDrawerItem() != NAVDRAWER_ITEM_TODAYS_SCHED) {
-            View mainContent = findViewById(R.id.activity_drawer_content);
-            mainContent.setAlpha(0);
-            mainContent.animate().alpha(1).setDuration(MAIN_CONTENT_FADEIN_DURATION);
-        }
     }
 
     private void onNavDrawerItemClicked(final int itemId) {
         if (itemId == getSelfNavDrawerItem()) {
-            mDrawerLayout.closeDrawer(GravityCompat.START);
+            drawerLayout.closeDrawer(GravityCompat.START);
             return;
         }
 
-        mHandler.postDelayed(() -> goToNavDrawerItem(itemId), NAVDRAWER_LAUNCH_DELAY);
-        if (isNormalItem(itemId)) {
-            View mainContent = findViewById(R.id.activity_drawer_content);
-            if (mainContent != null) {
-                mainContent.animate().alpha(0).setDuration
-                        (MAIN_CONTENT_FADEOUT_DURATION);
-            }
-        }
+        handler.postDelayed(() -> goToNavDrawerItem(itemId), NAVDRAWER_LAUNCH_DELAY);
 
-        mDrawerLayout.closeDrawer(GravityCompat.START);
-    }
-
-    private boolean isNormalItem(int itemId) {
-        return itemId != NAVDRAWER_ITEM_SETTINGS
-                && itemId != NAVDRAWER_ITEM_CHANGELOG
-                && itemId != NAVDRAWER_ITEM_ABOUT
-                && itemId != NAVDRAWER_ITEM_MVHSSITE
-                && itemId != NAVDRAWER_ITEM_GCLASSROOM
-                && itemId != NAVDRAWER_ITEM_FEEDBACK;
+        drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     boolean isNavDrawerOpen() {
-        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
+        return drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START);
     }
 
     void closeNavDrawer() {
-        if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(GravityCompat.START);
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawer(GravityCompat.START);
         }
     }
 
@@ -348,15 +218,18 @@ public abstract class DrawerActivity extends AppCompatActivity {
     }
 
     private void goToNavDrawerItem(int itemId) {
-        Intent i = null;
+        Intent intent = null;
         switch (itemId) {
-            case NAVDRAWER_ITEM_AERIES:
-                i = new Intent(this, AeriesActivity.class);
+            case R.id.nav_sched:
+                intent = new Intent(this, ScheduleCalendarActivity.class);
                 break;
-            case NAVDRAWER_ITEM_MAP:
-                i = new Intent(this, MapActivity.class);
+            case R.id.nav_aeries:
+                intent = new Intent(this, AeriesActivity.class);
                 break;
-            case NAVDRAWER_ITEM_MVHSSITE:
+            case R.id.nav_map:
+                intent = new Intent(this, MapActivity.class);
+                break;
+            case R.id.nav_site:
                 Uri website = Uri.parse("http://www.mvla.net/MVHS/");
 
                 CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
@@ -372,22 +245,16 @@ public abstract class DrawerActivity extends AppCompatActivity {
                         }
                 );
                 break;
-            case NAVDRAWER_ITEM_CALENDAR:
-                i = new Intent(this, StudentCalendarActivity.class);
+            case R.id.nav_cal:
+                intent = new Intent(this, StudentCalendarActivity.class);
                 break;
-            case NAVDRAWER_ITEM_SETTINGS:
-                i = new Intent(this, SettingsActivity.class);
+            case R.id.nav_settings:
+                intent = new Intent(this, SettingsActivity.class);
                 break;
-            case NAVDRAWER_ITEM_ABOUT:
-                i = new Intent(this, AboutActivity.class);
-                break;
-            case NAVDRAWER_ITEM_TODAYS_SCHED:
-                i = new Intent(this, ScheduleCalendarActivity.class);
-                break;
-            case NAVDRAWER_ITEM_CHANGELOG:
+            case R.id.nav_changelog:
                 showChangelog();
                 return;
-            case NAVDRAWER_ITEM_GCLASSROOM:
+            case R.id.nav_classroom:
                 if (!openApp(this, "com.google.android.apps.classroom")) {
                     Uri gclassroom = Uri.parse("http://classroom.google.com");
 
@@ -405,20 +272,27 @@ public abstract class DrawerActivity extends AppCompatActivity {
                     );
                 }
                 return;
-            case NAVDRAWER_ITEM_FEEDBACK:
+            case R.id.nav_feedback:
                 new FeedbackDialog().show(getFragmentManager(), "FEEDBACK");
                 return;
+            case R.id.nav_about:
+                intent = new Intent(this, AboutActivity.class);
+                break;
             default:
                 Toast.makeText(getApplicationContext(), "Work in Progress",
                         Toast.LENGTH_SHORT).show();
                 return;
         }
 
-        if (i != null) {
-            startActivity(i);
+        if (intent != null) {
+            startActivity(intent);
+
 
             //If it is not a special item, finish this activity
-            if (isNormalItem(itemId)) finish();
+            if (isNormalItem(itemId)) {
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                finish();
+            }
         }
     }
 }

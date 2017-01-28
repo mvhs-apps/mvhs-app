@@ -303,8 +303,6 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
         }
         mPresenter.attachView(this);
         mPresenter.onCreate();
-
-        overridePendingTransition(0, 0);
     }
 
     public void openCalendarView() {
@@ -364,7 +362,7 @@ public class ScheduleCalendarActivity extends DrawerActivity implements Schedule
 
     @Override
     protected int getSelfNavDrawerItem() {
-        return NAVDRAWER_ITEM_TODAYS_SCHED;
+        return R.id.nav_sched;
     }
 
     @Override

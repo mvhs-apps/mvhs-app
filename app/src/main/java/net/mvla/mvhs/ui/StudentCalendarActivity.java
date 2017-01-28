@@ -27,8 +27,6 @@ public class StudentCalendarActivity extends DrawerActivity {
         add.setOnClickListener(v -> addEvent());
 
         today.setOnClickListener(v -> openCalendar());
-
-        overridePendingTransition(0, 0);
     }
 
     public void addEvent() {
@@ -51,6 +49,6 @@ public class StudentCalendarActivity extends DrawerActivity {
 
     @Override
     protected int getSelfNavDrawerItem() {
-        return NAVDRAWER_ITEM_CALENDAR;
+        return R.id.nav_cal;
     }
 }

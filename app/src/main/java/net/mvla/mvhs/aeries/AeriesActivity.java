@@ -30,8 +30,6 @@ public class AeriesActivity extends DrawerActivity {
         }
 
         mProgressBar = (ProgressBar) findViewById(R.id.activity_aeries_progress_bar);
-
-        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -75,6 +73,6 @@ public class AeriesActivity extends DrawerActivity {
 
     @Override
     protected int getSelfNavDrawerItem() {
-        return NAVDRAWER_ITEM_AERIES;
+        return R.id.nav_aeries;
     }
 }
